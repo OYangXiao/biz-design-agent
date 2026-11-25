@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { PKG_ROOT, ensureBridgeRunning, runDoctor } from '../src/env-doctor.mjs';
 import { configureHarness } from '../src/harness-setup.mjs';
 import { startMcpStdioServer } from '../src/mcp-server.mjs';
-import { computeMenuState, exportPrdBundle, inspectWordDocument } from '../src/prd.mjs';
+import { computeMenuState, exportPrdBundle, inspectWordDocument, syncPrdToFeishu } from '../src/prd.mjs';
 import { computePrototypeMenuState, derivePrototypeFromPrd, exportPrototypeBundle } from '../src/prototype.mjs';
 import { computeVisualMenuState, deriveVisualFromPrototype, exportVisualBundle } from '../src/visual-design.mjs';
 import { computeDevMenuState, exportDevHandoff } from '../src/dev-handoff.mjs';
@@ -46,7 +46,9 @@ function printHelp() {
   figma-agent bridge-ensure                       后台自启或复用共享 Figma 本地桥（:8787）
   figma-agent mcp                                 启动标准 stdio MCP Server（自动管理共享桥）
 
-  figma-agent prd export <source.json> <outDir>   同源生成 Figma 单页 PRD.figma.json 与可编辑 PRD.docx
+  figma-agent prd export <source.json> <outDir>   同源生成 Figma 单页 PRD.figma.json、PRD.docx 与 PRD.md
+  figma-agent prd sync-feishu <PRD.md> [--title "<标题>"] [--doc "<飞书文档URL>"]
+                                                  同步 PRD 到飞书云文档（新建或就地更新）
   figma-agent prd inspect <doc.docx> [--extract-dir <dir>]
                                                   读取 Word 需求原稿或参考 PRD 范本（正文/表格/批注/嵌图）
   figma-agent prd menu-state <source.json>        检查 PRD 对话菜单状态（含选项 3 解锁与 0 退出模式）
@@ -143,7 +145,19 @@ async function main() {
       console.log(JSON.stringify(computeMenuState(raw), null, 2));
       return;
     }
-    console.error(`未知 prd 子命令：${sub || '(空)'}，可选 export | inspect | menu-state`);
+    if (sub === 'sync-feishu') {
+      if (pos.length < 1) {
+        console.error('用法：figma-agent prd sync-feishu <PRD.md> [--title "<标题>"] [--doc "<飞书文档URL>"]');
+        process.exit(2);
+      }
+      const title = flag(subRest, 'title', null);
+      const docUrl = flag(subRest, 'doc', null);
+      const res = syncPrdToFeishu({ mdPath: pos[0], title, docUrl });
+      console.log(JSON.stringify(res, null, 2));
+      if (!res.ok) process.exit(1);
+      return;
+    }
+    console.error(`未知 prd 子命令：${sub || '(空)'}，可选 export | inspect | menu-state | sync-feishu`);
     process.exit(2);
   }
 

@@ -7,6 +7,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createFigma, loadPlugin, send } from './figma-stub.mjs';
+import { syncPrdToFeishu } from '../src/prd.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -45,6 +46,7 @@ test('五选项迭代菜单：未设定需求目标时选项 3（线上搜索与
     const exitOpt = initial.options.find((o) => o.id === 0);
     assert.equal(exitOpt.enabled, true);
     assert.match(exitOpt.label, /退出当前 PRD 模式/);
+    assert.ok(initial.post_export_options.some((o) => o.id === 1 && /飞书/.test(o.label)));
     assert.ok(initial.post_export_options.some((o) => o.id === 2 && /原型图/.test(o.label)));
     assert.ok(initial.post_export_options.some((o) => o.id === 0 && /退出/.test(o.label)));
     for (const id of [1, 2, 4, 5, 6, 0]) {
@@ -74,8 +76,14 @@ test('纯 Node 双端同源生成：产出合规单页 Figma 看板与内嵌原�
 
     const figmaSpecPath = path.join(tmp, 'PRD.figma.json');
     const docxPath = path.join(tmp, 'PRD.docx');
+    const mdPath = path.join(tmp, 'PRD.md');
     assert.ok(fs.existsSync(figmaSpecPath));
     assert.ok(fs.existsSync(docxPath));
+    assert.ok(fs.existsSync(mdPath));
+    const mdText = fs.readFileSync(mdPath, 'utf8');
+    assert.match(mdText, /# 日间阅读 App · 文章收藏与我的收藏夹 PRD/);
+    assert.match(mdText, /## 三、业务流程展示/);
+    assert.match(mdText, /AC-01/);
 
     // 1) 静态校验 Figma 规格：0 问题，且不硬编码 page 字段、顶层仅单页总看板
     const checkOut = execFileSync(process.execPath, [VALIDATOR, figmaSpecPath], {
@@ -246,6 +254,60 @@ test('紧接 PRD 生成可操作预览原型图：支持从 PRD 继承、含退�
     assert.ok(jumpPairs.some((s) => s.includes('收藏 => 02 文章详情页 · 已收藏')));
     assert.ok(jumpPairs.some((s) => s.includes('已收藏 => 01 文章详情页 · 未收藏')));
     assert.ok(jumpPairs.some((s) => s.includes('给自己留十分钟 => 02 文章详情页 · 已收藏')));
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('飞书文档同步：未授权时给出初始化指引；已授权时支持新建与更新飞书云文档', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'prd-feishu-'));
+  try {
+    const exp = runCliJson(['prd', 'export', SAMPLE_SOURCE, tmp]);
+    const mdPath = exp.markdown;
+    const mockLark = path.join(tmp, 'lark-cli');
+    const logPath = path.join(tmp, 'lark-calls.log');
+
+    // 1) 模拟未登录态 lark-cli
+    fs.writeFileSync(mockLark, `#!/usr/bin/env node
+const fs = require('node:fs');
+const args = process.argv.slice(2);
+fs.appendFileSync(${JSON.stringify(logPath)}, JSON.stringify(args) + '\\n');
+if (args[0] === '--version') { console.log('0.4.0'); process.exit(0); }
+if (args[0] === 'auth' && args[1] === 'status') { console.error('not logged in, please run lark-cli config init'); process.exit(1); }
+`, 'utf8');
+    fs.chmodSync(mockLark, 0o755);
+
+    const unauth = syncPrdToFeishu({ mdPath, larkBin: mockLark });
+    assert.equal(unauth.ok, false);
+    assert.equal(unauth.needsAuth, true);
+    assert.match(unauth.initCmd, /lark-cli auth login/);
+    assert.match(unauth.docUrl, /open\.feishu\.cn\/document\/mcp_open_tools\/feishu-cli-let-ai-actually-do-your-work-in-feishu/);
+
+    // 2) 模拟已授权态 lark-cli：新建文档与更新已有文档
+    fs.writeFileSync(mockLark, `#!/usr/bin/env node
+const fs = require('node:fs');
+const args = process.argv.slice(2);
+fs.appendFileSync(${JSON.stringify(logPath)}, JSON.stringify(args) + '\\n');
+if (args[0] === '--version') { console.log('0.4.0'); process.exit(0); }
+if (args[0] === 'auth' && args[1] === 'status') { console.log('✓ Logged in as 测试用户'); process.exit(0); }
+if (args[0] === 'docs' && args[1] === '+create') { console.log('Created: https://feishu.cn/docx/mockDocNew123'); process.exit(0); }
+if (args[0] === 'docs' && args[1] === '+update') { console.log('Updated: https://feishu.cn/docx/mockDocExisting'); process.exit(0); }
+`, 'utf8');
+    fs.chmodSync(mockLark, 0o755);
+
+    const created = syncPrdToFeishu({ mdPath, title: '收藏文章 PRD', larkBin: mockLark });
+    assert.equal(created.ok, true);
+    assert.equal(created.action, 'created');
+    assert.equal(created.feishu_doc_url, 'https://feishu.cn/docx/mockDocNew123');
+
+    const updated = syncPrdToFeishu({ mdPath, docUrl: 'https://feishu.cn/docx/mockDocExisting', larkBin: mockLark });
+    assert.equal(updated.ok, true);
+    assert.equal(updated.action, 'updated');
+    assert.equal(updated.feishu_doc_url, 'https://feishu.cn/docx/mockDocExisting');
+
+    const calls = fs.readFileSync(logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+    assert.ok(calls.some((c) => c[0] === 'docs' && c[1] === '+create' && c.includes('--doc-format') && c.includes('markdown')));
+    assert.ok(calls.some((c) => c[0] === 'docs' && c[1] === '+update' && c.includes('https://feishu.cn/docx/mockDocExisting')));
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

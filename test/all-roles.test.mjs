@@ -139,13 +139,13 @@ test('角色四（QA 功能验收）：严格区分 通过 / 失败 / 未测，�
   }
 });
 
-test('MCP Server 注册全部跨角色工具（16 项）并可执行角色二/三/四工具调用', async () => {
+test('MCP Server 注册全部跨角色工具（17 项）并可执行角色二/三/四工具调用', async () => {
   const list = await handleJsonRpc({ jsonrpc: '2.0', id: 10, method: 'tools/list' });
   const names = list.result.tools.map((t) => t.name);
   assert.equal(names.length, MCP_TOOLS.length);
   for (const t of [
     'figma_status', 'figma_command',
-    'prd_inspect_docx', 'prd_menu_state', 'prd_export_bundle',
+    'prd_inspect_docx', 'prd_menu_state', 'prd_export_bundle', 'prd_sync_feishu',
     'proto_from_prd', 'proto_menu_state', 'proto_export_bundle',
     'visual_from_proto', 'visual_menu_state', 'visual_export_bundle',
     'dev_extract_handoff', 'dev_menu_state',

@@ -115,13 +115,18 @@ ${registryCmd}
 
 ---
 
-## Step 3：安装 \`figma-agent\` 并自动检测当前 Harness 落盘配置
+## Step 3：安装 \`figma-agent\` 与飞书 CLI（\`@larksuite/cli\`），并自动配置当前 Harness
 
 1. 安装纯 Node 版 \`figma-agent\`（零 Python 依赖、零原生 C++ 编译）：
 \`\`\`bash
 ${installCmd}
 \`\`\`
-2. 结合你当前运行的 AI 客户端身份，执行 \`setup\` 自动生成对应 Harness（Antigravity / Claude Code / Cursor / Trae / Windsurf / 通用）的原生 MCP（绑定绝对路径 \`NODE_BIN\`，避免 GUI 客户端丢 PATH）、工作区 Skills 与 \`AGENTS.md\`，同时把 Figma 插件解出到本机固定目录 \`~/.figma-agent/plugin/\`：
+2. 安装飞书官方 CLI（用于将 PRD 同步到飞书云文档或从飞书读取需求文档，参考 [飞书 CLI 官方文档](https://open.feishu.cn/document/mcp_open_tools/feishu-cli-let-ai-actually-do-your-work-in-feishu)）：
+\`\`\`bash
+PATH="$(dirname "$NODE_BIN"):$PATH" "$NPM_BIN" install -g @larksuite/cli
+\`\`\`
+（若内网 registry 尚未同步 \`@larksuite/cli\`，可提示用户先切公共源安装或暂时跳过、后续再装。）
+3. 结合你当前运行的 AI 客户端身份，执行 \`setup\` 自动生成对应 Harness（Antigravity / Claude Code / Cursor / Trae / Windsurf / 通用）的原生 MCP（绑定绝对路径 \`NODE_BIN\`，避免 GUI 客户端丢 PATH）、工作区 Skills 与 \`AGENTS.md\`，同时把 Figma 插件解出到本机固定目录 \`~/.figma-agent/plugin/\`：
 \`\`\`bash
 FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/figma-agent"
 "$NODE_BIN" "$FIGMA_AGENT_BIN" setup --workspace "$(pwd)" --harness auto --node "$NODE_BIN"
@@ -130,13 +135,30 @@ FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/figma-agent"
 
 ---
 
-## Step 4：自动拉起共享 Figma Bridge（:8787）并完成 Figma 插件握手验收
+## Step 4：检查飞书 CLI 初始化授权 + 启动共享 Figma Bridge 并完成插件握手
 
-1. 执行完整体检（会自动检查或后台拉起共享本地桥 \`http://localhost:8787\`）：
+1. 执行完整体检（同时探测 \`feishu\`、\`bridge.reachable\` 与 \`bridge.pluginOnline\`）：
 \`\`\`bash
 "$NODE_BIN" "$FIGMA_AGENT_BIN" doctor --json
 \`\`\`
-2. 检查返回结果中的 \`bridge.reachable\` 与 \`bridge.pluginOnline\`：
+2. **飞书 CLI 登录授权引导（检查 \`feishu.installed\` 与 \`feishu.authenticated\`）**：
+   - 若 \`feishu.installed\` 为 true 但 \`feishu.authenticated\` 为 false，**直接由 AI 执行 \`lark-cli auth login\`**（或在需要交互时自动弹出终端窗口运行，无需用户自己找终端）：
+     - **直接执行（优先，会自动输出/拉起浏览器授权链接）**：
+       \`\`\`bash
+       PATH="$(dirname "$NODE_BIN"):$PATH" lark-cli auth login
+       \`\`\`
+       *(仅当提示尚未绑定应用配置时，再执行 \`lark-cli config init --new\` 在浏览器一键建应用并重试 \`lark-cli auth login\`。)*
+     - **macOS 自动打开 Terminal 运行（若需独立终端交互）**：
+       \`\`\`bash
+       osascript -e 'tell application "Terminal" to do script "export PATH=\\"'$(dirname "$NODE_BIN")':$PATH\\"; lark-cli auth login && lark-cli auth status"' -e 'tell application "Terminal" to activate'
+       \`\`\`
+     - **Windows 自动打开 PowerShell 运行**：
+       \`\`\`powershell
+       Start-Process powershell -ArgumentList '-NoExit','-Command','lark-cli auth login; lark-cli auth status'
+       \`\`\`
+   - 引导用户在打开的浏览器页面点「确认授权」（官方文档：\`https://open.feishu.cn/document/mcp_open_tools/feishu-cli-let-ai-actually-do-your-work-in-feishu\`）。
+   - 提示用户：*“在浏览器确认授权后回复『继续』，我立刻复测登录状态；如果本次暂不需要同步飞书文档，也可以回复『跳过飞书』继续。”*
+3. **Figma Bridge 与桌面端插件握手（检查 \`bridge.reachable\` 与 \`bridge.pluginOnline\`）**：
    - **若 \`bridge.reachable\` 为 false**：运行 \`"$NODE_BIN" "$FIGMA_AGENT_BIN" bridge-ensure\` 拉起后台共享桥后复测。
    - **若 \`bridge.pluginOnline\` 为 false**：
      1. 提示用户：本地免费账号读写画布依赖 **Figma Desktop 桌面客户端**加载插件（位于 \`~/.figma-agent/plugin/manifest.json\`，全局只需导入一次）。
@@ -153,11 +175,11 @@ FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/figma-agent"
 
 ## Step 5：完全就绪，转入业务角色入口
 
-全部检查项均通过后，向用户汇报简明就绪清单（Node 版本、npm 源、已配置的 Harness、已连接的 Figma 文件名；如首次写入 MCP 配置则顺便提醒“重载一次窗口即可原生调用 MCP，当前会话也已可直接开工”），并立刻发起业务入口提问：
+全部检查项均通过后，向用户汇报简明就绪清单（Node 版本、npm 源、飞书 CLI 授权状态、已配置的 Harness、已连接的 Figma 文件名；如首次写入 MCP 配置则顺便提醒“重载一次窗口即可原生调用 MCP，当前会话也已可直接开工”），并立刻发起业务入口提问：
 
-> “✅ \`figma-agent\` 环境与 Figma 画布桥已全部准备就绪！
+> “✅ \`figma-agent\` 环境、飞书文档能力与 Figma 画布桥已全部准备就绪！
 > 这次想进入哪个工作模式？
-> 1. 业务设计 · 开发或更新 PRD（Figma 单页 + Word）
+> 1. 业务设计 · 开发或更新 PRD（Figma 单页 + Word + 飞书文档同步）
 > 2. 业务设计 · 生成可操作预览原型图（点击跳转 + PRD 说明卡）
 > 3. 美工 / UI · 制作高保真视觉稿
 > 4. 前端 / 研发 · 提取视觉规格联调与提测

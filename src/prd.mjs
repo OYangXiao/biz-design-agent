@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { FEISHU_DOC_URL, detectFeishuCli, discoverNodeCandidates } from './env-doctor.mjs';
 import { readZip, writeZip } from './zip.mjs';
 
 /* ============================================================================
@@ -386,7 +387,7 @@ export function computeMenuState(prd) {
     },
     {
       id: 6,
-      label: '预览摘要并生成双端 PRD（Figma 单页看板 + Word 文档）',
+      label: '预览摘要并生成三端同源 PRD（Figma 单页看板 + Word 文档 + 飞书文档同步）',
       enabled: true,
       status: (hasGoal && flow.length > 0 && screens.length > 0) ? '已具备出稿条件' : '可先出草稿（会标明待补项）',
     },
@@ -407,8 +408,9 @@ export function computeMenuState(prd) {
     open_questions_count: openQuestions.length,
     options,
     post_export_options: [
-      { id: 1, label: '继续修改或补充当前 PRD' },
+      { id: 1, label: '同步当前 PRD 到飞书云文档（新建或更新已有飞书文档）' },
       { id: 2, label: '紧接着基于这份 PRD 生成可操作预览原型图（进入原型图模式）' },
+      { id: 3, label: '继续修改或补充当前 PRD' },
       { id: 0, label: '退出当前模式，返回主菜单切换其他角色或任务' },
     ],
   };
@@ -1693,6 +1695,114 @@ export function writeDocx(prd, outPath) {
   fs.writeFileSync(outPath, zipBuf);
 }
 
+export function renderPrdMarkdown(prd) {
+  const lines = [
+    `# ${prd.title}`,
+    '',
+    prd.subtitle ? `> ${prd.subtitle}` : '',
+    '',
+    '| 文档状态 | 版本 | 负责角色 | 更新日期 | 目标对象 | 采用 PRD 范本 |',
+    '|---|---|---|---|---|---|',
+    `| ${prd.status} | ${prd.version} | ${prd.owner_role} | ${prd.updated_at} | ${prd.goal.target_users} | ${prd.template.name} |`,
+    '',
+    '## 一、需求背景与目标范围',
+    '',
+  ];
+
+  if (prd.goal.background) {
+    lines.push('### 1.1 背景与现状痛点', '', prd.goal.background, '');
+  }
+  lines.push('### 1.2 核心需求目标', '');
+  (prd.goal.objectives.length ? prd.goal.objectives : ['待补充具体需求目标'])
+    .forEach((obj, i) => lines.push(`${i + 1}. ${obj}`));
+  lines.push('', '### 1.3 本次不做范围（Non-Goals）', '');
+  (prd.goal.non_goals.length ? prd.goal.non_goals : ['暂无显式排除项（待评审确认）'])
+    .forEach((ng) => lines.push(`- ${ng}`));
+
+  lines.push('', '## 二、现状材料与多源输入溯源', '', '### 2.1 现状画面说明', '');
+  if (prd.images.length) {
+    prd.images.forEach((img, idx) => {
+      const tag = img.missing ? '【现状截图待补充】' : `${img.width}×${img.height}`;
+      lines.push(`- **图 ${idx + 1} · ${img.title}**（状态：${img.state}｜来源：\`${img.source}\`｜${tag}）${img.note ? `：${img.note}` : ''}`);
+    });
+  } else {
+    lines.push('- 当前尚未提供现状截图（待补充）。');
+  }
+
+  if (prd.feedback.length) {
+    lines.push('', '### 2.2 外部反馈、内部评审与检索建议台账', '', '| 类别 | 来源 | 核心内容与原意 | 采纳状态 | 方案影响 |', '|---|---|---|---|---|');
+    for (const fb of prd.feedback) {
+      lines.push(`| ${fb.category} | ${fb.source} | ${fb.content.replace(/\|/g, '｜')} | ${fb.decision} | ${(fb.impact || '—').replace(/\|/g, '｜')} |`);
+    }
+  }
+
+  lines.push('', '## 三、业务流程展示', '');
+  if (prd.flow.length) {
+    lines.push(`**主路径概览**：${prd.flow.map((st) => `[${st.step}] ${st.title}`).join(' → ')}`, '');
+    lines.push('| 步骤 | 角色 | 节点名称 | 触发操作 | 预期可见结果 |', '|---|---|---|---|---|');
+    for (const st of prd.flow) {
+      lines.push(`| ${st.step} | ${st.role} | ${st.title} | ${st.action} | ${st.result} |`);
+    }
+  } else {
+    lines.push('待补充主流程步骤。');
+  }
+
+  if (prd.branches.length) {
+    lines.push('', '### 3.2 关键分支与异常闭环', '', '| 分支场景 | 触发条件 | 处理动作 | 预期结果 |', '|---|---|---|---|');
+    for (const br of prd.branches) {
+      lines.push(`| ${br.name} | ${br.when} | ${br.action} | ${br.result} |`);
+    }
+  }
+
+  lines.push('', '## 四、产品原型图与关键状态说明', '');
+  prd.screens.forEach((sc, idx) => {
+    lines.push(`### 4.${idx + 1} ${sc.name}（${sc.state}）`, '');
+    lines.push(`- **入口**：${sc.entry}`);
+    lines.push(`- **动作**：${sc.action}`);
+    lines.push(`- **结果**：${sc.result}`);
+    if (sc.blocks.length) {
+      lines.push('- **界面元素**：');
+      for (const b of sc.blocks) {
+        const extra = b.detail ? ` — ${b.detail}` : (b.items.length ? ` — ${b.items.join(' / ')}` : '');
+        lines.push(`  - [${b.kind}] ${b.label}${extra}`);
+      }
+    }
+    lines.push('');
+  });
+
+  lines.push('## 五、功能需求细化', '');
+  if (prd.sections.length) {
+    prd.sections.forEach((sec, idx) => {
+      lines.push(`### 5.${idx + 1} ${sec.heading}${sec.origin ? `（${sec.origin}）` : ''}`, '');
+      if (sec.summary) lines.push(sec.summary, '');
+      sec.items.forEach((it) => lines.push(`- ${it.origin ? `[${it.origin}] ` : ''}${it.text}`));
+      lines.push('');
+    });
+  } else {
+    lines.push('详见各原型屏交互说明与验收标准。', '');
+  }
+
+  lines.push('## 六、验收标准与待确认事项', '');
+  if (prd.acceptance.length) {
+    lines.push('| 编号 | 前置条件与状态 | 执行操作 | 预期可见结果 |', '|---|---|---|---|');
+    for (const ac of prd.acceptance) {
+      lines.push(`| ${ac.id} | ${ac.precondition} | ${ac.action} | ${ac.expected} |`);
+    }
+    lines.push('');
+  }
+  if (prd.open_questions.length) {
+    lines.push('### 待确认问题（Open Questions）', '');
+    prd.open_questions.forEach((q) => lines.push(`- [ ] ${q}`));
+    lines.push('');
+  }
+  if (prd.materials.length) {
+    lines.push('### 附录：参考资料来源台账', '');
+    prd.materials.forEach((m) => lines.push(`- **${m.name}**（${m.kind}）：${m.note || '已读取'}`));
+  }
+
+  return `${lines.filter((x, i, a) => !(x === '' && a[i - 1] === '')).join('\n').trim()}\n`;
+}
+
 export function exportPrdBundle(sourceJsonPath, outDir) {
   const absSource = path.resolve(sourceJsonPath);
   const absOut = path.resolve(outDir);
@@ -1703,10 +1813,12 @@ export function exportPrdBundle(sourceJsonPath, outDir) {
   fs.mkdirSync(absOut, { recursive: true });
   const docxPath = path.join(absOut, 'PRD.docx');
   const figmaPath = path.join(absOut, 'PRD.figma.json');
+  const mdPath = path.join(absOut, 'PRD.md');
 
   writeDocx(prd, docxPath);
   const figmaSpec = buildFigmaSpec(prd);
   fs.writeFileSync(figmaPath, `${JSON.stringify(figmaSpec, null, 2)}\n`, 'utf8');
+  fs.writeFileSync(mdPath, renderPrdMarkdown(prd), 'utf8');
 
   return {
     ok: true,
@@ -1714,6 +1826,7 @@ export function exportPrdBundle(sourceJsonPath, outDir) {
     status: prd.status,
     docx: docxPath,
     figma_spec: figmaPath,
+    markdown: mdPath,
     single_page_board: figmaSpec.frames[0].name,
     stats: {
       flow_steps: prd.flow.length,
@@ -1725,5 +1838,59 @@ export function exportPrdBundle(sourceJsonPath, outDir) {
       open_questions: prd.open_questions.length,
     },
     menu_state: menuState,
+  };
+}
+
+export function syncPrdToFeishu({ mdPath, title = null, docUrl = null, larkBin = null, nodeBin = null } = {}) {
+  const absMd = path.resolve(String(mdPath));
+  if (!fs.existsSync(absMd)) {
+    throw new Error(`找不到要同步的 PRD Markdown 文件：${absMd}`);
+  }
+  const bestNode = nodeBin || discoverNodeCandidates().find((n) => n.ok)?.path || process.execPath;
+  const feishu = detectFeishuCli(bestNode, { explicitBin: larkBin });
+
+  if (!feishu.installed) {
+    return {
+      ok: false,
+      needsInstall: true,
+      error: '尚未安装飞书 CLI（@larksuite/cli），请先安装并完成初始化授权。',
+      installCmd: feishu.installCmd,
+      initCmd: feishu.initCmd,
+      docUrl: FEISHU_DOC_URL,
+    };
+  }
+  if (!feishu.authenticated) {
+    return {
+      ok: false,
+      needsAuth: true,
+      error: `飞书 CLI 尚未完成初始化或登录授权：${feishu.statusText}`,
+      initCmd: feishu.initCmd,
+      docUrl: FEISHU_DOC_URL,
+    };
+  }
+
+  const mdContent = fs.readFileSync(absMd, 'utf8');
+  const firstHeading = /^#\s+(.+)$/m.exec(mdContent)?.[1]?.trim();
+  const docTitle = title || firstHeading || '产品需求文档（PRD）';
+
+  const args = docUrl
+    ? ['docs', '+update', '--api-version', 'v2', '--doc', String(docUrl), '--doc-format', 'markdown', '--content', `@${absMd}`]
+    : ['docs', '+create', '--api-version', 'v2', '--doc-format', 'markdown', '--title', docTitle, '--content', `@${absMd}`];
+
+  const env = {
+    ...process.env,
+    PATH: [path.dirname(bestNode), path.dirname(feishu.bin), process.env.PATH || ''].filter(Boolean).join(path.delimiter),
+  };
+
+  const stdout = execFileSync(feishu.bin, args, { encoding: 'utf8', timeout: 30000, env }).trim();
+  const matchedUrl = /https?:\/\/[^\s"')\]]+/.exec(stdout)?.[0] || docUrl || null;
+
+  return {
+    ok: true,
+    action: docUrl ? 'updated' : 'created',
+    title: docTitle,
+    source_markdown: absMd,
+    feishu_doc_url: matchedUrl,
+    raw_output: stdout,
   };
 }

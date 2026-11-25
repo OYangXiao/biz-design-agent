@@ -75,4 +75,4 @@
 
 每次扩展先问：是团队特有的要求（写进团队卡），新的交付物（加场景），还是不同工具完成同一动作（加适配器）？只有重复出现的需要才进共享层。**不做**所有业务共用的页面命名、预置审美 Tokens、五件套强制流水线、无限层级规则继承或多格式渲染平台。
 
-配套：[设计师填写示例](TEAM-INTAKE.md) · [验证范围与结果](ARCH-VALIDATION.md) · [Chrome DevTools MCP 官方工具说明](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md) · [Figma 导出设置](https://developers.figma.com/docs/plugins/api/ExportSettings/)。
+配套：[设计师填写示例](TEAM-INTAKE.md) · [四角色真机模拟报告](ROLE-SIMULATION-REPORT.md) · [Chrome DevTools MCP 官方工具说明](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md) · [Figma 导出设置](https://developers.figma.com/docs/plugins/api/ExportSettings/)。

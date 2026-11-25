@@ -135,6 +135,10 @@ test('内网分发服务：动态生成 /bootstrap.md（含自动配置 nvm + �
     assert.match(md, /http:\/\/mirror\.intranet\.local\/node/);
     assert.match(md, /@team:registry.*http:\/\/npm\.intranet\.local:4873/);
     assert.match(md, /setup --workspace/);
+    assert.match(md, /@larksuite\/cli/);
+    assert.match(md, /lark-cli auth login/);
+    assert.match(md, /lark-cli config init --new/);
+    assert.match(md, /open\.feishu\.cn\/document\/mcp_open_tools\/feishu-cli-let-ai-actually-do-your-work-in-feishu/);
     assert.match(md, /doctor --json/);
     assert.match(md, /FIMG Agent Plugin/);
 

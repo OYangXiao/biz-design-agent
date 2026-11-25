@@ -108,6 +108,84 @@ export function detectFigmaDesktop() {
   return { installed: false, path: null };
 }
 
+export const FEISHU_DOC_URL = 'https://open.feishu.cn/document/mcp_open_tools/feishu-cli-let-ai-actually-do-your-work-in-feishu';
+
+export function detectFeishuCli(nodeBin = null, { explicitBin = null } = {}) {
+  const home = os.homedir();
+  const isWin = process.platform === 'win32';
+  const exe = isWin ? 'lark-cli.cmd' : 'lark-cli';
+  const binDir = nodeBin ? path.dirname(nodeBin) : '';
+  const candidates = new Set();
+
+  if (explicitBin) candidates.add(explicitBin);
+  if (process.env.LARK_CLI_BIN) candidates.add(process.env.LARK_CLI_BIN);
+  if (binDir) candidates.add(path.join(binDir, exe));
+  for (const dir of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
+    candidates.add(path.join(dir, exe));
+  }
+  if (!isWin) {
+    candidates.add('/opt/homebrew/bin/lark-cli');
+    candidates.add('/usr/local/bin/lark-cli');
+    candidates.add(path.join(home, '.volta', 'bin', 'lark-cli'));
+    const nvmRoot = path.join(process.env.NVM_DIR || path.join(home, '.nvm'), 'versions', 'node');
+    if (fs.existsSync(nvmRoot)) {
+      for (const verDir of fs.readdirSync(nvmRoot)) {
+        candidates.add(path.join(nvmRoot, verDir, 'bin', 'lark-cli'));
+      }
+    }
+  }
+
+  const foundBin = [...candidates].find((c) => c && fs.existsSync(c)) || null;
+  if (!foundBin) {
+    return {
+      installed: false,
+      bin: null,
+      version: null,
+      authenticated: false,
+      statusText: '未安装 @larksuite/cli（如需将 PRD 同步到飞书云文档，请先安装并登录授权）',
+      installCmd: 'npm install -g @larksuite/cli',
+      initCmd: 'lark-cli auth login',
+      fallbackConfigCmd: 'lark-cli config init --new',
+      docUrl: FEISHU_DOC_URL,
+    };
+  }
+
+  const execDir = path.dirname(foundBin);
+  const env = {
+    ...process.env,
+    PATH: [binDir, execDir, process.env.PATH || ''].filter(Boolean).join(path.delimiter),
+  };
+
+  let version = null;
+  try {
+    version = execFileSync(foundBin, ['--version'], { encoding: 'utf8', timeout: 4000, env }).trim().split(/\r?\n/)[0];
+  } catch { /* ignore */ }
+
+  let authenticated = false;
+  let statusText = '';
+  try {
+    const out = execFileSync(foundBin, ['auth', 'status'], { encoding: 'utf8', timeout: 5000, env }).trim();
+    authenticated = !/not logged in|unauthenticated|请先登录|未登录|config init/i.test(out);
+    statusText = out || '已登录飞书';
+  } catch (e) {
+    const msg = String(e.stderr || e.stdout || e.message || '').trim();
+    authenticated = false;
+    statusText = msg || '尚未登录飞书账号，请执行 lark-cli auth login';
+  }
+
+  return {
+    installed: true,
+    bin: foundBin,
+    version,
+    authenticated,
+    statusText,
+    installCmd: 'npm install -g @larksuite/cli',
+    initCmd: 'lark-cli auth login',
+    fallbackConfigCmd: 'lark-cli config init --new',
+    docUrl: FEISHU_DOC_URL,
+  };
+}
+
 export async function checkBridgeStatus(bridgeUrl = DEFAULT_BRIDGE_URL) {
   try {
     const ctrl = new AbortController();
@@ -168,6 +246,7 @@ export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL } = {}) {
   const nvm = detectNvmInstalled();
   const npmInfo = detectNpmRegistry(bestNode?.path);
   const figmaApp = detectFigmaDesktop();
+  const feishu = detectFeishuCli(bestNode?.path);
   const localManifest = path.join(AGENT_HOME, 'plugin', 'manifest.json');
   const bridge = await checkBridgeStatus(bridgeUrl);
 
@@ -182,6 +261,7 @@ export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL } = {}) {
     },
     nvm,
     npm: npmInfo,
+    feishu,
     figma: {
       desktopInstalled: figmaApp.installed,
       desktopPath: figmaApp.path,

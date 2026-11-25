@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline';
 import { DEFAULT_BRIDGE_URL, checkBridgeStatus, ensureBridgeRunning } from './env-doctor.mjs';
-import { computeMenuState, exportPrdBundle, inspectWordDocument } from './prd.mjs';
+import { computeMenuState, exportPrdBundle, inspectWordDocument, syncPrdToFeishu } from './prd.mjs';
 import { computePrototypeMenuState, derivePrototypeFromPrd, exportPrototypeBundle } from './prototype.mjs';
 import { computeVisualMenuState, deriveVisualFromPrototype, exportVisualBundle } from './visual-design.mjs';
 import { computeDevMenuState, exportDevHandoff } from './dev-handoff.mjs';
@@ -61,7 +61,7 @@ export const MCP_TOOLS = [
   },
   {
     name: 'prd_export_bundle',
-    description: '从统一结构化 PRD 数据源同源生成美观易读的 Figma 单页看板规格（PRD.figma.json）与可编辑 Word 文档（PRD.docx）。',
+    description: '从统一结构化 PRD 数据源同源生成美观易读的 Figma 单页看板规格（PRD.figma.json）、可编辑 Word 文档（PRD.docx）与飞书同步用 PRD.md。',
     inputSchema: {
       type: 'object',
       properties: {
@@ -69,6 +69,19 @@ export const MCP_TOOLS = [
         outDir: { type: 'string', description: '输出目录路径' },
       },
       required: ['sourcePath', 'outDir'],
+    },
+  },
+  {
+    name: 'prd_sync_feishu',
+    description: '将同源生成的 PRD.md 同步到飞书云文档（调用 lark-cli docs +create 或 docs +update）。若尚未安装或未初始化飞书 CLI，会返回安装与授权引导。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        mdPath: { type: 'string', description: 'PRD.md 文件路径' },
+        title: { type: 'string', description: '可选：飞书文档标题（新建时使用）' },
+        docUrl: { type: 'string', description: '可选：已有飞书文档 URL 或 Token（传入则更新原文档，不新建）' },
+      },
+      required: ['mdPath'],
     },
   },
   {
@@ -245,6 +258,14 @@ export async function handleToolCall(name, args = {}) {
 
   if (name === 'prd_export_bundle') {
     return exportPrdBundle(String(args.sourcePath), String(args.outDir));
+  }
+
+  if (name === 'prd_sync_feishu') {
+    return syncPrdToFeishu({
+      mdPath: String(args.mdPath),
+      title: args.title || null,
+      docUrl: args.docUrl || null,
+    });
   }
 
   if (name === 'proto_from_prd') {

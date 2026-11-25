@@ -14,8 +14,7 @@
 | 第一次参加 App 需求，想知道四个岗位各交什么 | [阅读 App「收藏文章」培训手册](examples/app-delivery/index.html)：业务设计交 PRD 与原型、美工交视觉稿、开发交测试页、测试跑流程并找美工对图 |
 | 评审架构、能力边界和建设顺序 | [架构决策与试点](docs/DESIGN-AGENT.md) |
 | 作为设计师提供团队规范或发起一单 | [团队规范与任务卡](docs/TEAM-INTAKE.md) |
-| 查看已经验证了什么 | [验证记录](docs/ARCH-VALIDATION.md) |
 | 重跑全角色纯 Node 契约与分发实验 | `node --test test/design-contract.test.mjs test/prd-workflow.test.mjs test/distribution.test.mjs test/all-roles.test.mjs` |
-| 查历史原型读写能力与真机记录 | [能力手册](docs/CAPABILITIES.md)、[验证记录](docs/ROADMAP.md) |
+| 查底层 Figma 画布读写与渲染引擎参考 | [能力手册](docs/CAPABILITIES.md)、[画布迭代指南](docs/ITERATING.md)、[规格 DSL](docs/SPEC_DSL.md) |
 
-`plugin/`、`bridge/`、`tools/`、`specs/`、参考图及旧技术手册是上一代原型实验材料；其中的金融示例、页面命名和命令提示不构成新产品默认规范。
+`specs/stock-app.json` 与 `examples/app-delivery/` 仅作引擎测试与流程演练样例，其中的示例产品、页面命名不构成业务默认规范。

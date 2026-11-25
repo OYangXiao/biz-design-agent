@@ -47,6 +47,7 @@
 | 资料类型 | Agent 具体处理方式 |
 |---|---|
 | **Word 文档（`.docx` / `.doc`）或参考范本** | 运行 `./fimg prd inspect <文档路径> --extract-dir <工作区材料目录>`（或 MCP 工具 `prd_inspect_docx`，纯 Node 零 Python 依赖）：自动提取章节大纲（可直接作为选项 4 的范本骨架）、正文段落、全部表格、`word/comments.xml` 评审批注，并将 `word/media/*` 内嵌截图解出保存。旧版 `.doc` 在 macOS 下自动经 `textutil` 转换后解析；无法直接读取的 OLE 嵌入附件或离线外链图片，必须在回执中逐条列出，不得当成已读。 |
+| **飞书云文档（URL / Token）** | 若已配置飞书 CLI（`lark-cli auth status` 通过），运行 `lark-cli docs +fetch --api-version v2 --doc "<飞书文档URL或Token>"` 直接拉取在线需求全文或评审记录；未登录时提示用户直接运行 `lark-cli auth login` 在浏览器确认授权后再拉取。 |
 | **Figma 文档或现状页面截图** | 先向用户确认是「只读参考稿」还是「最终写入目标」。只读查看指定页/Frame 的节点树与导出图，每张现状图标明来源文件、版本、屏幕与状态。打不开的外部链接直接请用户开放权限或提供导出图，绝不凭链接名称猜测画面。 |
 | **外部反馈与内部评审意见** | 逐条保留原始出处与原意，标记采纳状态（`已确认采纳` / `待确认` / `暂不纳入`）及对界面或规则的具体影响，写入 PRD 的输入溯源台账。 |
 
@@ -63,18 +64,28 @@
 
 ---
 
-## 5. 双端同源产出：美观易读的 Figma 单页 + PRD Word 文档
+## 5. 三端同源产出：美观易读的 Figma 单页 + Word 文档 + 飞书云文档同步
 
 业务设计人员全程只需自然对话，由 Agent 维护统一数据源 `<prd-source.json>`（字段示例见 [`examples/app-delivery/prd-source.json`](../examples/app-delivery/prd-source.json)）并执行以下交付步骤：
 
-1. **同源构建双端产物（纯 Node.js，零 Python / 零第三方依赖）**
+1. **同源构建本地三件套产物（纯 Node.js，零 Python / 零第三方依赖）**
    ```bash
    ./fimg prd export <工作区>/prd-source.json <交付目录>
    # 或直接调用 MCP 工具 prd_export_bundle
    ```
-   一次生成两份内容严格一致的交付物：
+   一次生成三份内容严格一致的交付物：
    - **`<交付目录>/PRD.docx`**：标准可编辑 Word 文档，内置中文排版样式与导航大纲层级，包含元信息总表、需求目标与不做范围、**内嵌真实 PNG/JPEG 现状截图**、多源反馈与搜索建议台账、主流程与分支表、**文字可直接编辑的产品原型框线示意卡**、功能细则与验收标准表。
    - **`<交付目录>/PRD.figma.json`**：单页宽幅看板规格（`PRD 单页看板 · <标题>`），按清晰视觉层级在一个页面内纵向组织六大分区：`00 深色总览头卡` → `01 目标与边界双栏卡` → `02 现状截图画廊与反馈溯源` → `03 横向可视化流程链与分支卡` → `04 多屏并排产品原型线框展示台` → `05 需求细则、验收标准表与待确认项`。**绝不按章节拆分成多个 Figma Page。**
+   - **`<交付目录>/PRD.md`**：结构化 Markdown 文本，用于同步至飞书云文档。
+2. **同步到飞书云文档（新建或就地更新）**
+   ```bash
+   # 新建飞书云文档
+   ./fimg prd sync-feishu <交付目录>/PRD.md --title "<PRD 标题>"
+   # 更新已有飞书云文档（传入已有文档 URL 或 Token，不重复建空文档）
+   ./fimg prd sync-feishu <交付目录>/PRD.md --doc "<已有飞书文档URL>"
+   # 或直接调用 MCP 工具 prd_sync_feishu
+   ```
+   若用户尚未登录飞书 CLI，直接提示或拉起 `lark-cli auth login` 在浏览器完成账号授权（仅当未绑定应用时再运行 `lark-cli config init --new`，参考 [飞书 CLI 官方文档](https://open.feishu.cn/document/mcp_open_tools/feishu-cli-let-ai-actually-do-your-work-in-feishu)）后重试，并先交付本地 Word 与 Figma 产物。
 2. **静态校验 Figma 单页规格**
    ```bash
    ./fimg check <交付目录>/PRD.figma.json
