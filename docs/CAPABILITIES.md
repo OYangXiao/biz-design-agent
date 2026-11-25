@@ -471,4 +471,5 @@ Figma 加新字段也不会丢。
 | [`SPEC_DSL.md`](SPEC_DSL.md) | 规格 DSL 完整参考（从零生成模式） |
 | [`DESIGN-AGENT.md`](DESIGN-AGENT.md) | 架构方案与设计决策 |
 | [`ROLE-SIMULATION-REPORT.md`](ROLE-SIMULATION-REPORT.md) | 四角色真机模拟验证报告 |
+| [`harness-plugins/README.md`](harness-plugins/README.md) | 多 Harness 插件打包：Antigravity / Claude Code / Codex / DSH 架构对比 |
 | [`../AGENTS.md`](../AGENTS.md) | 开发者交接（先读这份） |

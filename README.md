@@ -108,6 +108,7 @@ npm run build:dist    # 重新生成 dist/ 预打包引导
 | [规格 DSL](docs/SPEC_DSL.md) | 从零生成的规格参考 |
 | [团队规范与任务卡](docs/TEAM-INTAKE.md) | 设计师提供规范或发起任务 |
 | [四角色真机验证报告](docs/ROLE-SIMULATION-REPORT.md) | 真实 Figma + 真实 Headless Chrome 演练 |
+| [多 Harness 插件打包研究](docs/harness-plugins/README.md) | Antigravity / Claude Code / Codex / DSH 的插件架构对比与打包方案 |
 | [AGENTS.md](AGENTS.md) | 开发者交接（先读这份） |
 
 ---
