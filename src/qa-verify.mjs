@@ -123,60 +123,233 @@ export function findChromeBinary() {
   return candidates.find((p) => fs.existsSync(p)) || null;
 }
 
+/** 供 doctor / CLI 展示的浏览器安装指引。 */
+export const CHROME_INSTALL_HINT = [
+  '安装任一基于 Chromium 的浏览器后重试：',
+  '  macOS：brew install --cask google-chrome   （或 chromium / microsoft-edge）',
+  '  Linux：sudo apt install chromium-browser   （或 google-chrome-stable）',
+  '  Windows：winget install Google.Chrome       （或 Microsoft.Edge）',
+  '也可用 CHROME_BIN=/path/to/chrome 指定已有可执行文件。',
+].join('\n');
+
+/**
+ * 真正启动一次 headless 浏览器做可用性探测（不再只看文件是否存在）。
+ * 返回 { ok, bin, reason, detail, hint }，永不抛错、永不悬挂。
+ */
+export async function probeBrowser({ timeoutMs = 20000 } = {}) {
+  const bin = findChromeBinary();
+  if (!bin) {
+    return {
+      ok: false,
+      bin: null,
+      reason: 'not-found',
+      detail: '未找到 Chrome / Chromium / Edge 可执行文件',
+      hint: CHROME_INSTALL_HINT,
+    };
+  }
+
+  const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'biz-design-agent-probe-'));
+  let child = null;
+  try {
+    const launched = await launchIsolatedChrome(bin, profileDir, { timeoutMs });
+    child = launched.child;
+    const cdp = new CdpSession(launched.pageWsUrl, { defaultTimeoutMs: timeoutMs });
+    await cdp.connect({ timeoutMs });
+    try {
+      await cdp.send('Runtime.enable', {}, { timeoutMs });
+    } finally {
+      cdp.close();
+    }
+    return { ok: true, bin, reason: 'ok', detail: '隔离 Headless 会话可正常建立并完成 CDP 握手', hint: null };
+  } catch (err) {
+    const msg = String(err?.message || err);
+    return { ok: false, bin, reason: classifyBrowserFailure(msg), detail: msg, hint: browserFailureHint(msg) };
+  } finally {
+    if (child) {
+      try { child.kill('SIGKILL'); } catch { /* ignore */ }
+    }
+    try {
+      fs.rmSync(profileDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+    } catch { /* ignore */ }
+  }
+}
+
+/** 把底层报错归类成可操作的原因，便于 CLI / 报告中给出精准建议。 */
+export function classifyBrowserFailure(message = '') {
+  const m = String(message);
+  if (/未找到|not found|ENOENT/i.test(m)) return 'not-found';
+  if (/sandbox initialization failed|Operation not permitted|Failed to initialize sandbox/i.test(m)) return 'sandbox-blocked';
+  if (/CDP WebSocket 连接失败|WebSocket.*1006|CLOSE code=1006|CDP 连接已关闭/i.test(m)) return 'ws-blocked';
+  if (/提前退出|exit code|SIGTRAP|SIGSEGV|code=null/i.test(m)) return 'crashed';
+  if (/超时|timeout/i.test(m)) return 'timeout';
+  return 'unknown';
+}
+
+/** 针对不同失败原因给出可直接照做的解决建议。 */
+export function browserFailureHint(message = '') {
+  switch (classifyBrowserFailure(message)) {
+    case 'not-found':
+      return CHROME_INSTALL_HINT;
+    case 'sandbox-blocked':
+      return [
+        '浏览器进程被沙箱策略阻止（sandbox initialization failed）。',
+        '常见解法：',
+        '  1) 在具备完整权限的终端直接运行本命令（不要套在受限沙箱 / 容器内）；',
+        '  2) 容器或 CI 中可用 CHROME_BIN 指向带 --no-sandbox 的包装脚本；',
+        '  3) 确认 /Applications 下浏览器的可执行位未被安全策略剥离。',
+      ].join('\n');
+    case 'ws-blocked':
+      return [
+        '浏览器能启动，但页面级 DevTools WebSocket 被立即断开（code 1006）。',
+        '常见解法：',
+        '  1) 检查是否有代理 / 安全软件拦截 127.0.0.1 的随机高位端口；',
+        '  2) 关闭占用同一 user-data-dir 的其他浏览器实例后重试；',
+        '  3) 换用官方 Google Chrome（Edge 在某些环境对 CDP 支持不完整）。',
+      ].join('\n');
+    case 'crashed':
+      return [
+        '浏览器进程启动后立即崩溃退出。',
+        '常见解法：',
+        '  1) 升级或重装浏览器；',
+        '  2) 清理临时 profile 目录（系统临时目录下的 biz-design-agent-* 与 figma-qa-chrome-*）；',
+        '  3) 用 CHROME_BIN 指向另一个已知可用的 Chromium 内核浏览器。',
+      ].join('\n');
+    case 'timeout':
+      return [
+        '浏览器在限定时间内未完成握手，可能是启动过慢或端口被拦截。',
+        '常见解法：换用更轻量的 Chromium，或检查本机负载与安全软件拦截。',
+      ].join('\n');
+    default:
+      return CHROME_INSTALL_HINT;
+  }
+}
+
 class CdpSession {
-  constructor(wsUrl) {
+  constructor(wsUrl, { defaultTimeoutMs = 30000 } = {}) {
     this.wsUrl = wsUrl;
     this.ws = null;
     this.seq = 0;
     this.pending = new Map();
     this.eventWaiters = new Map();
+    this.defaultTimeoutMs = defaultTimeoutMs;
+    this.closed = false;
+    this.closeReason = null;
   }
 
-  async connect() {
+  /** 连接断开时立刻让所有在途请求与事件等待失败，避免 Promise 永久悬挂。 */
+  #failAllPending(reason) {
+    this.closed = true;
+    this.closeReason = reason;
+    for (const [id, { rej, timer }] of this.pending) {
+      clearTimeout(timer);
+      rej(new Error(reason));
+      this.pending.delete(id);
+    }
+    for (const [method, list] of this.eventWaiters) {
+      for (const { rej, timer } of list) {
+        clearTimeout(timer);
+        rej(new Error(`${reason}（等待事件 ${method} 期间连接中断）`));
+      }
+      this.eventWaiters.delete(method);
+    }
+  }
+
+  async connect({ timeoutMs = 15000 } = {}) {
     await new Promise((resolve, reject) => {
-      const ws = new WebSocket(this.wsUrl);
+      let settled = false;
+      const finish = (fn, arg) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        fn(arg);
+      };
+      const timer = setTimeout(
+        () => finish(reject, new Error(`CDP WebSocket 连接超时（${timeoutMs}ms 内未建立）`)),
+        timeoutMs,
+      );
+      let ws;
+      try {
+        ws = new WebSocket(this.wsUrl);
+      } catch (e) {
+        finish(reject, new Error(`CDP WebSocket 连接失败：${e.message || e}`));
+        return;
+      }
       this.ws = ws;
-      ws.addEventListener('open', () => resolve());
-      ws.addEventListener('error', (e) => reject(new Error(`CDP WebSocket 连接失败：${e.message || e.type}`)));
+      ws.addEventListener('open', () => finish(resolve));
+      ws.addEventListener('error', (e) => {
+        const raw = e?.message || e?.error?.message || e?.type || 'unknown';
+        // 浏览器对连接失败常只给 "error"，补充目标地址便于定位端口/代理拦截
+        const msg = `CDP WebSocket 连接失败：${raw === 'error' ? `握手失败（目标 ${this.wsUrl}）` : raw}`;
+        this.#failAllPending(msg);
+        finish(reject, new Error(msg));
+      });
+      ws.addEventListener('close', (ev) => {
+        const msg = `CDP 连接已关闭（code=${ev?.code ?? '?'}${ev?.reason ? `, reason=${ev.reason}` : ''}）`;
+        this.#failAllPending(msg);
+        finish(reject, new Error(msg));
+      });
       ws.addEventListener('message', (ev) => {
-        const msg = JSON.parse(typeof ev.data === 'string' ? ev.data : Buffer.from(ev.data).toString('utf8'));
+        let msg;
+        try {
+          msg = JSON.parse(typeof ev.data === 'string' ? ev.data : Buffer.from(ev.data).toString('utf8'));
+        } catch {
+          return;
+        }
         if (msg.id && this.pending.has(msg.id)) {
-          const { res, rej } = this.pending.get(msg.id);
+          const { res, rej, timer } = this.pending.get(msg.id);
+          clearTimeout(timer);
           this.pending.delete(msg.id);
           if (msg.error) rej(new Error(`CDP ${msg.error.message}`));
           else res(msg.result);
         } else if (msg.method && this.eventWaiters.has(msg.method)) {
           const list = this.eventWaiters.get(msg.method);
           this.eventWaiters.delete(msg.method);
-          for (const fn of list) fn(msg.params);
+          for (const { res, timer } of list) { clearTimeout(timer); res(msg.params); }
         }
       });
     });
   }
 
-  send(method, params = {}) {
+  send(method, params = {}, { timeoutMs = this.defaultTimeoutMs } = {}) {
+    if (this.closed) {
+      return Promise.reject(new Error(`CDP 连接不可用，无法发送 ${method}：${this.closeReason || '已关闭'}`));
+    }
     const id = ++this.seq;
     return new Promise((res, rej) => {
-      this.pending.set(id, { res, rej });
-      this.ws.send(JSON.stringify({ id, method, params }));
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        rej(new Error(`CDP 调用 ${method} 超时（${timeoutMs}ms 未返回）`));
+      }, timeoutMs);
+      this.pending.set(id, { res, rej, timer });
+      try {
+        this.ws.send(JSON.stringify({ id, method, params }));
+      } catch (e) {
+        clearTimeout(timer);
+        this.pending.delete(id);
+        rej(new Error(`CDP 调用 ${method} 发送失败：${e.message || e}`));
+      }
     });
   }
 
   waitForEvent(method, timeoutMs = 10000) {
+    if (this.closed) {
+      return Promise.reject(new Error(`CDP 连接不可用，无法等待事件 ${method}：${this.closeReason || '已关闭'}`));
+    }
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error(`等待事件 ${method} 超时`)), timeoutMs);
       const list = this.eventWaiters.get(method) || [];
-      list.push((params) => { clearTimeout(timer); resolve(params); });
+      list.push({ res: resolve, rej: reject, timer });
       this.eventWaiters.set(method, list);
     });
   }
 
   close() {
+    this.closed = true;
     try { this.ws?.close(); } catch { /* ignore */ }
   }
 }
 
-async function launchIsolatedChrome(chromeBin, userDataDir) {
+async function launchIsolatedChrome(chromeBin, userDataDir, { timeoutMs = 12000 } = {}) {
   const child = spawn(chromeBin, [
     '--headless=new',
     '--no-first-run',
@@ -189,24 +362,41 @@ async function launchIsolatedChrome(chromeBin, userDataDir) {
     'about:blank',
   ], { stdio: ['ignore', 'pipe', 'pipe'] });
 
+  // 子进程自身出错（二进制不可执行等）时，避免 Promise 永远等不到 stderr/exit
+  child.on('error', () => { /* 由下方 exit/timeout 分支统一兜底 */ });
+
   const wsBrowserUrl = await new Promise((resolve, reject) => {
     let stderrBuf = '';
-    const timer = setTimeout(() => reject(new Error(`启动 Headless Chrome 超时：${stderrBuf.slice(-300)}`)), 12000);
+    let settled = false;
+    const finish = (fn, arg) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fn(arg);
+    };
+    const timer = setTimeout(
+      () => finish(reject, new Error(`启动 Headless 浏览器超时（${timeoutMs}ms）：${stderrBuf.slice(-300)}`)),
+      timeoutMs,
+    );
     child.stderr.on('data', (chunk) => {
       stderrBuf += chunk.toString('utf8');
       const m = /DevTools listening on (ws:\/\/[^\s]+)/.exec(stderrBuf);
-      if (m) { clearTimeout(timer); resolve(m[1]); }
+      if (m) finish(resolve, m[1]);
     });
-    child.on('exit', (code) => {
-      clearTimeout(timer);
-      reject(new Error(`Headless Chrome 提前退出 (code=${code})：${stderrBuf.slice(-300)}`));
+    child.on('error', (e) => {
+      finish(reject, new Error(`启动 Headless 浏览器失败：${e.message || e}`));
+    });
+    child.on('exit', (code, signal) => {
+      finish(reject, new Error(`Headless 浏览器提前退出 (code=${code}, signal=${signal || '-'})：${stderrBuf.slice(-300)}`));
     });
   });
 
   const u = new URL(wsBrowserUrl);
-  const targets = await (await fetch(`http://${u.host}/json/list`)).json();
+  const targets = await (await fetch(`http://${u.host}/json/list`, {
+    signal: AbortSignal.timeout(Math.min(timeoutMs, 10000)),
+  })).json();
   const pageTarget = targets.find((t) => t.type === 'page' && t.webSocketDebuggerUrl) || targets[0];
-  if (!pageTarget?.webSocketDebuggerUrl) throw new Error('未能获取 Chrome 页面调试目标');
+  if (!pageTarget?.webSocketDebuggerUrl) throw new Error('未能获取浏览器页面调试目标');
   return { child, pageWsUrl: pageTarget.webSocketDebuggerUrl };
 }
 
@@ -220,27 +410,33 @@ export async function runChromeAudit({
   viewport = { width: 390, height: 844, dpr: 1, mobile: true },
   steps = [],
   chromeBin = findChromeBinary(),
+  launchTimeoutMs = 20000,
 }) {
   const absOut = path.resolve(outDir);
   fs.mkdirSync(absOut, { recursive: true });
 
+  const untestedResult = (error, extra = {}) => ({
+    ok: false,
+    build_id: buildId,
+    url,
+    error,
+    error_kind: classifyBrowserFailure(error),
+    hint: browserFailureHint(error),
+    ...extra,
+    steps: steps.map((s) => ({
+      id: s.id,
+      label: s.label,
+      precondition: s.precondition || '',
+      expected: s.expected || '',
+      actual: null,
+      status: '未测',
+      evidence: null,
+    })),
+    functional: { total: steps.length, passed: 0, failed: 0, untested: steps.length },
+  });
+
   if (!chromeBin) {
-    return {
-      ok: false,
-      build_id: buildId,
-      url,
-      error: '本机未找到 Chrome/Chromium 浏览器，全部步骤标记为「未测」',
-      steps: steps.map((s) => ({
-        id: s.id,
-        label: s.label,
-        precondition: s.precondition || '',
-        expected: s.expected || '',
-        actual: null,
-        status: '未测',
-        evidence: null,
-      })),
-      functional: { total: steps.length, passed: 0, failed: 0, untested: steps.length },
-    };
+    return untestedResult('本机未找到 Chrome/Chromium/Edge 浏览器，全部步骤标记为「未测」');
   }
 
   const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'figma-qa-chrome-'));
@@ -248,10 +444,10 @@ export async function runChromeAudit({
   let cdp = null;
 
   try {
-    const launched = await launchIsolatedChrome(chromeBin, profileDir);
+    const launched = await launchIsolatedChrome(chromeBin, profileDir, { timeoutMs: launchTimeoutMs });
     chromeProc = launched.child;
-    cdp = new CdpSession(launched.pageWsUrl);
-    await cdp.connect();
+    cdp = new CdpSession(launched.pageWsUrl, { defaultTimeoutMs: 30000 });
+    await cdp.connect({ timeoutMs: launchTimeoutMs });
 
     await cdp.send('Page.enable');
     await cdp.send('Runtime.enable');
@@ -387,6 +583,10 @@ export async function runChromeAudit({
       steps: stepResults,
       functional: { total: stepResults.length, passed, failed, untested },
     };
+  } catch (err) {
+    // 浏览器不可用 / 启动失败 / 连接中断等环境问题：降级为「未测」并给出可操作指引，
+    // 不把环境问题伪装成产品缺陷，也不再让调用方永久等待。
+    return untestedResult(`隔离 Headless 浏览器无法执行验收：${err?.message || err}`);
   } finally {
     cdp?.close();
     if (chromeProc) {

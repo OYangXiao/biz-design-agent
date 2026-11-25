@@ -36,11 +36,45 @@ function positionals(args) {
   return out;
 }
 
+/** 把 doctor 的结构化结果渲染成人类可读报告，浏览器问题单列并附解决步骤。 */
+function formatDoctorReport(info) {
+  const mark = (ok) => (ok ? '✓' : '✗');
+  const lines = [];
+  lines.push('biz-design-agent 环境自检');
+  lines.push('─'.repeat(52));
+  lines.push(`${mark(info.node?.ok)} Node          ${info.node?.recommended?.path || '未找到可用 Node'}${info.node?.recommended?.version ? ` (${String(info.node.recommended.version).replace(/^v/, 'v')})` : ''}`);
+  lines.push(`${mark(info.figma?.desktopInstalled)} Figma 客户端   ${info.figma?.desktopInstalled ? info.figma.desktopPath : '未安装（读写画布需要 Figma Desktop）'}`);
+  lines.push(`${mark(info.figma?.localPluginInstalled)} 本地插件       ${info.figma?.localPluginInstalled ? info.figma.localManifestPath : `未安装，运行 biz-design-agent setup 解出到 ${info.figma?.localManifestPath || ''}`}`);
+  lines.push(`${mark(info.bridge?.reachable)} 本地桥         ${info.bridge?.url || ''}${info.bridge?.reachable ? '' : '（未连通，运行 biz-design-agent bridge-ensure）'}`);
+  lines.push(`${mark(info.bridge?.pluginOnline)} 插件在线       ${info.bridge?.pluginOnline ? '已握手' : '未握手，请在 Figma Desktop 中打开插件'}`);
+
+  const b = info.browser;
+  if (b) {
+    const state = b.ok === null ? '已跳过' : b.ok ? '可用' : '不可用';
+    const reason = b.ok === false && b.reason && b.reason !== 'ok' ? `（${b.reason}）` : '';
+    lines.push(`${mark(b.ok === null ? true : b.ok)} 浏览器         ${b.path || '未找到'} → ${state}${reason}`);
+    if (b.ok === false) {
+      lines.push('');
+      lines.push('⚠ 浏览器不可用会影响「模式五：QA 功能验收与视觉对图」。');
+      lines.push('  QA 步骤将被标为「未测」，而不是判定为产品缺陷。');
+      lines.push('');
+      lines.push('  原因：' + String(b.detail || '').trim());
+      lines.push('');
+      lines.push(String(b.hint || '').split('\n').map((l) => '  ' + l).join('\n'));
+    }
+  }
+
+  lines.push('─'.repeat(52));
+  lines.push(info.ok ? '核心链路就绪（Node + 桥 + 插件在线）' : '核心链路未完全就绪，请按上方提示处理');
+  return lines.join('\n');
+}
+
 function printHelp() {
   console.log(`biz-design-agent — 纯 Node 多角色业务设计 Agent（全栈零 Python）
 
 用法:
-  biz-design-agent doctor [--json]                     检测 Node/nvm、npm 源、Figma 客户端与共享桥状态
+  biz-design-agent doctor [--json] [--no-browser]     检测 Node/nvm、npm 源、Figma 客户端、共享桥与隔离浏览器可用性
+                                                  浏览器不可用时给出可选解决方案（QA 验收依赖它）
   biz-design-agent setup [--workspace <dir>] [--harness auto|antigravity|claude-code|cursor|trae|windsurf]
                                                   安装本地插件到 ~/.biz-design-agent/plugin 并自动配置当前 Harness
   biz-design-agent bridge-ensure                       后台自启或复用共享 Figma 本地桥（:8787）
@@ -93,8 +127,14 @@ async function main() {
   }
 
   if (cmd === 'doctor') {
-    const info = await runDoctor();
-    console.log(JSON.stringify(info, null, 2));
+    const asJson = rest.includes('--json');
+    const info = await runDoctor({ probeChrome: !rest.includes('--no-browser') });
+    if (asJson) {
+      console.log(JSON.stringify(info, null, 2));
+    } else {
+      console.log(formatDoctorReport(info));
+    }
+    if (info.browser && info.browser.ok === false) process.exitCode = 1;
     return;
   }
 
@@ -278,6 +318,19 @@ async function main() {
       const plan = JSON.parse(fs.readFileSync(path.resolve(pos[0]), 'utf8'));
       const res = await runChromeAudit({ ...plan, outDir: pos[1] });
       console.log(JSON.stringify(res, null, 2));
+      // 环境问题导致的「未测」必须在 stderr 明确提示，避免用户误以为产品本身有问题
+      if (res.ok === false) {
+        console.error('');
+        console.error('⚠ 本次验收未能真实执行（所有步骤标记为「未测」，不代表产品缺陷）：');
+        console.error('  原因：' + String(res.error || '').trim());
+        if (res.hint) {
+          console.error('');
+          console.error(String(res.hint).split('\n').map((l) => '  ' + l).join('\n'));
+        }
+        console.error('');
+        console.error('  运行 biz-design-agent doctor 可查看完整环境自检与修复建议。');
+        process.exitCode = 1;
+      }
       return;
     }
     console.error(`未知 qa 子命令：${sub || '(空)'}，可选 menu-state | run`);

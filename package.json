@@ -40,7 +40,7 @@
     "setup": "node bin/biz-design-agent.mjs setup",
     "mcp": "node bin/biz-design-agent.mjs mcp",
     "serve-dist": "node bin/biz-design-agent.mjs serve-dist",
-    "test": "node --test test/design-contract.test.mjs test/prd-workflow.test.mjs test/distribution.test.mjs test/all-roles.test.mjs",
+    "test": "node --test test/design-contract.test.mjs test/prd-workflow.test.mjs test/distribution.test.mjs test/all-roles.test.mjs test/browser-fallback.test.mjs",
     "test:plugin": "node test/plugin.test.mjs",
     "check": "node specs/validate-spec.mjs",
     "status": "node tools/figma.mjs status",

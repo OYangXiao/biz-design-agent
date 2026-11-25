@@ -12,7 +12,7 @@ import { computeMenuState } from '../src/prd.mjs';
 import { computePrototypeMenuState } from '../src/prototype.mjs';
 import { computeVisualMenuState, deriveVisualFromPrototype, exportVisualBundle } from '../src/visual-design.mjs';
 import { computeDevMenuState, exportDevHandoff } from '../src/dev-handoff.mjs';
-import { computeQaMenuState, evaluateAssertion, findChromeBinary, runChromeAudit } from '../src/qa-verify.mjs';
+import { computeQaMenuState, evaluateAssertion, findChromeBinary, probeBrowser, runChromeAudit } from '../src/qa-verify.mjs';
 import { handleJsonRpc, MCP_TOOLS } from '../src/mcp-server.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -22,6 +22,11 @@ const EXAMPLES = path.join(ROOT, 'examples', 'app-delivery');
 const SAMPLE_PRD = path.join(EXAMPLES, 'prd-source.json');
 const SAMPLE_PROTO = path.join(EXAMPLES, 'prototype-source.json');
 const SAMPLE_VISUAL = path.join(EXAMPLES, 'visual-source.json');
+
+// 只在浏览器「真的能跑起来」时才做真实画布验收；仅检查文件存在会把
+// 「装了 Edge 但起不来」这类环境误判为可测，导致等待 CDP 握手而长时间挂起。
+const BROWSER = await probeBrowser({ timeoutMs: 15000 }).catch(() => ({ ok: false, reason: 'unknown', detail: '探测异常' }));
+const SKIP_BROWSER = BROWSER.ok ? false : `浏览器不可用（${BROWSER.reason}）：${String(BROWSER.detail || '').slice(0, 120)}`;
 
 test('所有五个工作模式对话菜单均提供「0. 退出当前模式」及明确的跨角色衔接选项', () => {
   const m1 = computeMenuState(JSON.parse(fs.readFileSync(SAMPLE_PRD, 'utf8')));
@@ -96,16 +101,40 @@ test('角色二（美工高保真）+ 角色三（研发提取）：视觉导出
   }
 });
 
-test('角色四（QA 功能验收）：严格区分 通过 / 失败 / 未测，并在真实隔离 Headless Chrome 中拦截 v1 缺陷与放行 v2 修复', async () => {
+test('角色四（QA 功能验收）：严格区分 通过 / 失败 / 未测，并在真实隔离 Headless Chrome 中拦截 v1 缺陷与放行 v2 修复', async (t) => {
   // 1) 契约三态校验
   assert.equal(evaluateAssertion({ mustContain: ['已收藏'] }, { evidence: 'a.txt', buildId: 'b2', visibleText: '按钮：已收藏' }, 'b2').status, '通过');
   assert.equal(evaluateAssertion({ mustContain: ['已收藏'] }, { evidence: 'a.txt', buildId: 'b2', visibleText: '按钮：收藏' }, 'b2').status, '失败');
   assert.equal(evaluateAssertion({ mustContain: ['已收藏'] }, { evidence: 'a.txt', buildId: 'b1', visibleText: '按钮：已收藏' }, 'b2').status, '未测');
   assert.equal(evaluateAssertion({ mustContain: ['已收藏'] }, null, 'b2').status, '未测');
 
-  // 2) 若本机装有 Chrome，实测真实隔离浏览器对 build-v1（失败）与 build-v2（通过）给出相反结论
-  if (!findChromeBinary()) return;
+  // 2) 浏览器环境不可用时，必须快速降级为「未测」并带回可操作指引，而不是挂起或冒充产品缺陷
+  if (!BROWSER.ok) {
+    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'role4-degraded-'));
+    const startedAt = Date.now();
+    const degraded = await runChromeAudit({
+      buildId: 'v1',
+      url: 'http://127.0.0.1:1/none.html',
+      outDir,
+      steps: [{ id: 'save', label: '点击收藏', expected: '显示已收藏' }],
+      chromeBin: BROWSER.bin || findChromeBinary(),
+      launchTimeoutMs: 12000,
+    });
+    const cost = Date.now() - startedAt;
+    fs.rmSync(outDir, { recursive: true, force: true });
 
+    assert.equal(degraded.ok, false, '浏览器不可用时不得声称验收成功');
+    assert.equal(degraded.functional.untested, 1, '环境问题应标记为未测，而非失败或通过');
+    assert.equal(degraded.functional.failed, 0, '不得把环境问题伪装成产品缺陷');
+    assert.equal(degraded.steps[0].status, '未测');
+    assert.ok(degraded.error_kind && degraded.error_kind !== 'unknown', '应给出可归类的原因');
+    assert.ok(typeof degraded.hint === 'string' && degraded.hint.length > 0, '应给出解决建议');
+    assert.ok(cost < 60000, `降级应在合理时间内返回，实际耗时 ${cost}ms`);
+    t.diagnostic(`浏览器不可用，已按「未测」降级并给出指引：${degraded.error_kind}，耗时 ${cost}ms`);
+    return;
+  }
+
+  // 3) 浏览器可用：实测真实隔离浏览器对 build-v1（失败）与 build-v2（通过）给出相反结论
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'role4-chrome-'));
   const server = http.createServer((req, res) => {
     const rel = new URL(req.url || '/', 'http://127.0.0.1').pathname.replace(/^\/+/, '');

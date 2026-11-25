@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { findChromeBinary, probeBrowser } from './qa-verify.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const PKG_ROOT = path.resolve(HERE, '..');
@@ -240,7 +241,7 @@ export function installLocalPlugin(targetDir = path.join(AGENT_HOME, 'plugin')) 
   };
 }
 
-export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL } = {}) {
+export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL, probeChrome = true } = {}) {
   const nodes = discoverNodeCandidates();
   const bestNode = nodes.find((n) => n.ok) || nodes[0] || null;
   const nvm = detectNvmInstalled();
@@ -249,6 +250,18 @@ export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL } = {}) {
   const feishu = detectFeishuCli(bestNode?.path);
   const localManifest = path.join(AGENT_HOME, 'plugin', 'manifest.json');
   const bridge = await checkBridgeStatus(bridgeUrl);
+
+  // QA 模式（模式五）依赖隔离 Headless 浏览器；这里做真实启动探测而非仅检查文件存在，
+  // 以便提前暴露「装了浏览器但跑不起来」的环境问题，并给出可直接照做的修复指引。
+  const browser = probeChrome
+    ? await probeBrowser({ timeoutMs: 20000 }).catch((e) => ({
+        ok: false,
+        bin: findChromeBinary(),
+        reason: 'unknown',
+        detail: String(e?.message || e),
+        hint: '浏览器探测异常，请检查本机 Node 与浏览器安装状态。',
+      }))
+    : { ok: null, bin: findChromeBinary(), reason: 'skipped', detail: '已跳过浏览器探测', hint: null };
 
   return {
     ok: Boolean(bestNode?.ok && bridge.reachable && bridge.pluginOnline),
@@ -273,6 +286,16 @@ export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL } = {}) {
       reachable: bridge.reachable,
       pluginOnline: Boolean(bridge.pluginOnline),
       pluginInfo: bridge.pluginInfo || null,
+    },
+    // 浏览器可用性：模式五（QA 验收与视觉对图）的必要条件
+    // ok 为 null 表示主动跳过探测（--no-browser），与「探测过但不可用」区分开
+    browser: {
+      ok: browser.ok === null ? null : Boolean(browser.ok),
+      path: browser.bin || null,
+      reason: browser.reason,
+      detail: browser.detail,
+      hint: browser.hint,
+      requiredFor: '模式五：QA 功能验收与视觉对图（隔离 Headless 浏览器实测）',
     },
   };
 }

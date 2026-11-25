@@ -325,7 +325,16 @@ export async function handleToolCall(name, args = {}) {
 
   if (name === 'qa_run_audit') {
     const plan = JSON.parse(fs.readFileSync(path.resolve(String(args.planPath)), 'utf8'));
-    return runChromeAudit({ ...plan, outDir: String(args.outDir) });
+    const result = await runChromeAudit({ ...plan, outDir: String(args.outDir) });
+    // 让 AI 助手能明确区分「环境不可用 → 未测」与「产品真的有缺陷 → 失败」，
+    // 并把修复指引原样带回，避免它自作主张宣布验收通过或失败。
+    if (result.ok === false) {
+      return {
+        ...result,
+        notice: '本次验收未真实执行：所有步骤为「未测」，不可据此判定产品通过或失败。请先按 hint 修复环境后重跑。',
+      };
+    }
+    return result;
   }
 
   if (name === 'visual_diff_png') {
