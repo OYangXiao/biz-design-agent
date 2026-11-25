@@ -75,7 +75,7 @@ function printHelp() {
 用法:
   biz-design-agent doctor [--json] [--no-browser]     检测 Node/nvm、npm 源、Figma 客户端、共享桥与隔离浏览器可用性
                                                   浏览器不可用时给出可选解决方案（QA 验收依赖它）
-  biz-design-agent setup [--workspace <dir>] [--harness auto|antigravity|claude-code|cursor|trae|windsurf]
+  biz-design-agent setup [--workspace <dir>] [--harness auto|antigravity|claude-code|cursor|trae|windsurf|generic]
                                                   安装本地插件到 ~/.biz-design-agent/plugin 并自动配置当前 Harness
   biz-design-agent bridge-ensure                       后台自启或复用共享 Figma 本地桥（:8787）
   biz-design-agent mcp                                 启动标准 stdio MCP Server（自动管理共享桥）

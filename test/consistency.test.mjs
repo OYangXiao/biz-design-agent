@@ -81,3 +81,34 @@ test('package.json test 脚本覆盖全部测试文件', () => {
   assert.deepEqual(missing, [], `test 脚本漏掉了：${missing.join(', ')}`);
   assert.ok(dedicated.includes('plugin.test.mjs'), 'test:plugin 脚本应包含 plugin.test.mjs');
 });
+
+test('dist/ 预打包引导存在且与当前版本一致（供 clone 后直接接入）', () => {
+  const distDir = path.join(ROOT, 'dist');
+  for (const f of ['bootstrap.md', 'index.html', 'meta.json']) {
+    const full = path.join(distDir, f);
+    assert.ok(fs.existsSync(full), `缺少预打包产物：dist/${f}（运行 npm run build:dist 生成）`);
+  }
+
+  const meta = JSON.parse(fs.readFileSync(path.join(distDir, 'meta.json'), 'utf8'));
+  assert.equal(meta.version, PKG.version, `dist/meta.json 版本 ${meta.version} 与 package.json ${PKG.version} 不一致`);
+
+  const bootstrap = fs.readFileSync(path.join(distDir, 'bootstrap.md'), 'utf8');
+  assert.ok(
+    bootstrap.includes(`v${PKG.version}`),
+    `dist/bootstrap.md 未包含当前版本 v${PKG.version}，产物已过期，请运行 npm run build:dist`,
+  );
+});
+
+test('dist/ 产物与 serve-dist 动态渲染保持一致', async () => {
+  const { renderBootstrapMarkdown } = await import('../server/dist-server.mjs');
+  const expected = renderBootstrapMarkdown({ baseUrl: 'http://localhost:8790' });
+  const actual = fs.readFileSync(path.join(ROOT, 'dist', 'bootstrap.md'), 'utf8');
+  assert.ok(
+    actual.includes(expected.trim()),
+    'dist/bootstrap.md 与 renderBootstrapMarkdown 输出不一致，产物已过期，请运行 npm run build:dist',
+  );
+});
+
+test('package.json files 包含 dist/，确保打包时代入预渲染引导', () => {
+  assert.ok((PKG.files || []).includes('dist/'), 'files 应包含 dist/');
+});

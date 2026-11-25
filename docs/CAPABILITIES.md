@@ -465,6 +465,7 @@ Figma 加新字段也不会丢。
 
 | 文档 | 内容 |
 |---|---|
+| **`SETUP.md`** | **接入指南**（面向 AI）：环境自检、Harness 配置、Figma 连接与验收清单 |
 | **`CAPABILITIES.md`**（本文） | 能力全表 + 用法 + 边界 |
 | [`ITERATING.md`](ITERATING.md) | 在现有稿上迭代的完整用法（当前主模式） |
 | [`SPEC_DSL.md`](SPEC_DSL.md) | 规格 DSL 完整参考（从零生成模式） |

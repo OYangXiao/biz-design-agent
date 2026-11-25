@@ -2,6 +2,9 @@
 out/
 dumps/
 
+# ---- 分发产物（dist/ 是预打包的接入引导，需随仓库提交，不可忽略）----
+!dist/
+
 # ---- Python ----
 __pycache__/
 *.py[cod]

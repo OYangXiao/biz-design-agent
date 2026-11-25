@@ -187,7 +187,7 @@ FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/biz-design-agent"
 `;
 }
 
-function renderIndexHtml(baseUrl) {
+export function renderIndexHtml(baseUrl) {
   const promptText = `请用 curl 读取 ${baseUrl}/bootstrap.md 并按步骤帮我检测环境、配置并连接 biz-design-agent`;
   return `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

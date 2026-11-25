@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>biz-design-agent 内网分发引导</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6fa;color:#0f172a;font:15px/1.7 system-ui,"PingFang SC",sans-serif;padding:40px 20px}
+main{max-width:760px;margin:auto;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:32px}
+h1{margin:0 0 8px;font-size:26px}p.sub{margin:0 0 24px;color:#475569}
+.box{background:#0f172a;color:#f8fafc;border-radius:10px;padding:16px 18px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;word-break:break-all}
+button{margin-top:12px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer}
+.links{margin-top:24px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px}a{color:#1d4ed8}
+</style></head><body><main>
+<h1>biz-design-agent 内网一键接入</h1>
+<p class="sub">在新机器的 AI 客户端（Antigravity / Claude Code / Cursor / Trae / Windsurf）中打开你的工作区，把下面这句话发给 AI 即可自动完成 Node/nvm 检测、内网源配置、客户端适配与 Figma 桥连通验收。</p>
+<div class="box" id="cmd">请用 curl 读取 http://localhost:8790/bootstrap.md 并按步骤帮我检测环境、配置并连接 biz-design-agent</div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('cmd').textContent);this.textContent='已复制，直接粘贴给 AI 即可'">复制给 AI 的引导口令</button>
+<div class="links"><a href="/bootstrap.md">查看原始 bootstrap.md</a><a href="/api/config.json">查看服务配置 JSON</a><a href="/health">健康检查</a></div>
+</main></body></html>
