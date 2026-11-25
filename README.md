@@ -103,6 +103,7 @@ npm run build:dist    # 重新生成 dist/ 预打包引导与多 Harness 插件�
 
 | 文档 | 内容 |
 |---|---|
+| [目录与文件结构](docs/STRUCTURE.md) | 仓库目录层级图（Mermaid）、协作链路与各文件功能速查 |
 | [接入指南](docs/SETUP.md) | 面向 AI 的完整接入流程与验收清单 |
 | [架构决策与试点](docs/DESIGN-AGENT.md) | 设计目标、边界与建设顺序 |
 | [能力手册](docs/CAPABILITIES.md) | 能力全表、用法与已知缺口 |
