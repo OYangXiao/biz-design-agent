@@ -1426,6 +1426,41 @@ await test('page 命名识别：无 -beta.N 的视为 release', async () => {
   }
 });
 
+await test('render 支持声明式原型跳转 spec.links 与预览起点 spec.flowStart', async () => {
+  const protoSpec = {
+    flowStart: { frameName: 'Proto 01 详情', name: '可交互主流程' },
+    frames: [
+      {
+        type: 'FRAME', name: 'Proto 01 详情', layout: 'V', w: 390, h: 844, x: 0, y: 0,
+        children: [{ type: 'FRAME', name: 'Btn · 收藏', layout: 'H', w: 'fill', h: 44, children: [{ type: 'TEXT', text: '收藏' }] }],
+      },
+      {
+        type: 'FRAME', name: 'Proto 02 已收藏', layout: 'V', w: 390, h: 844, x: 450, y: 0,
+        children: [{ type: 'FRAME', name: 'Btn · 取消', layout: 'H', w: 'fill', h: 44, children: [{ type: 'TEXT', text: '已收藏' }] }],
+      },
+    ],
+    links: [
+      { fromWithin: 'Proto 01 详情', fromName: 'Btn · 收藏', toName: 'Proto 02 已收藏', trigger: 'ON_CLICK', nav: 'NAVIGATE', transition: 'SMART_ANIMATE' },
+      { fromWithin: 'Proto 02 已收藏', fromName: 'Btn · 取消', toName: 'Proto 01 详情', trigger: 'ON_CLICK', nav: 'NAVIGATE', transition: 'PUSH', direction: 'RIGHT' },
+    ],
+  };
+  const r = await send(figma, 'render', { spec: protoSpec, pageName: 'Proto 点击预览测试' });
+  assert.equal(r.ok, true, r.error);
+  assert.equal(r.data.linksApplied, 2);
+  assert.equal(r.data.flowStartingPoints, 1);
+
+  const page = findPage(figma, 'Proto 点击预览测试');
+  assert.equal(page.flowStartingPoints.length, 1);
+  assert.equal(page.flowStartingPoints[0].name, '可交互主流程');
+
+  const rx = await send(figma, 'reactions', { pageName: 'Proto 点击预览测试', all: true });
+  assert.equal(rx.ok, true);
+  assert.equal(rx.data.count, 2);
+  assert.equal(rx.data.nodes[0].reactions[0].actions[0].destination.name, 'Proto 02 已收藏');
+  assert.equal(rx.data.nodes[1].reactions[0].actions[0].transition.direction, 'RIGHT');
+  assert.equal(rx.data.nodes[1].reactions[0].actions[0].transition.matchLayers, false);
+});
+
 /* ---------------------------------------------------------------- 汇总 */
 
 console.log(results.join('\n'));

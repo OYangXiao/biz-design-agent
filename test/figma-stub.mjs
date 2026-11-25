@@ -132,7 +132,11 @@ class TextNode extends Base {
 }
 
 class Page extends Base {
-  constructor(name) { super('PAGE', name); }
+  constructor(name) {
+    super('PAGE', name);
+    this.selection = [];
+    this.flowStartingPoints = [];
+  }
 }
 
 export function createFigma(opts = {}) {

@@ -1,0 +1,21 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":true,"hasTouch":true,"isLandscape":false,"width":390,"height":844}
+Emulating color scheme: light
+## Latest page snapshot
+uid=2_0 RootWebArea "给自己留十分钟 · 日间阅读" url="file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v1.html"
+  uid=2_1 banner
+    uid=2_2 "日间阅读"
+    uid=2_3 button "我的收藏"
+  uid=2_4 main
+    uid=2_5 "随笔 · 生活切片"
+    uid=2_6 "Nº 001"
+    uid=2_7 heading "给自己留十分钟" level="1"
+    uid=2_8 "日间编辑部"
+    uid=2_9 "约 1 分钟阅读"
+    uid=2_10 "水烧开以前，厨房里有一小段安静。我原本伸手去拿手机，却看见杯沿上落了一道光。"
+    uid=2_11 "把椅子往窗边挪一点。楼下有人收起晾干的床单，白布鼓了一下，又慢慢落回手里。原来十分钟，也够看完这样一件小事。"
+    uid=2_12 "水开了。我给自己倒了一杯，没有急着起身。"
+    uid=2_13 "FIN."
+  uid=2_14 contentinfo
+    uid=2_15 "READING NOTES"
+    uid=2_16 "日间阅读手记"
+    uid=2_17 button "已收藏" focusable focused pressed

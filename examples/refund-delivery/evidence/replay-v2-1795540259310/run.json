@@ -1,0 +1,49 @@
+{
+  "started": "2026-11-24T17:10:59.527Z",
+  "server": {
+    "name": "chrome_devtools",
+    "title": "Chrome DevTools MCP server",
+    "version": "1.14.0"
+  },
+  "chrome": "Google Chrome 158.0.8127.36",
+  "sources": {
+    "brief.html": "33ff821553cbbb5534049c6da272c422e866e0e7031f9cb591569fd842ccb792",
+    "design.html": "160e365be796b6d27a29b472d32e4a4f0077b2d567b62d769c583c3e89186658",
+    "build-v2.html": "6c7cd47307cbf873bade029bb797bb37eb94ea170a696922e92734cb5654064f"
+  },
+  "pages": {
+    "design": {
+      "stability": {
+        "count": 0,
+        "total": 1024000,
+        "box": null
+      }
+    },
+    "default": {
+      "stability": {
+        "count": 0,
+        "total": 1024000,
+        "box": null
+      }
+    },
+    "manager-pending": {
+      "clicked": "uid=6_20 button \"批准退款\""
+    }
+  },
+  "visual": {
+    "count": 0,
+    "total": 1024000,
+    "box": null
+  },
+  "checks": {
+    "manager-pending": true,
+    "manager-done": true,
+    "service-pending": true,
+    "service-done": true,
+    "after-click": true,
+    "reopen-manager": true,
+    "reopen-service": true
+  },
+  "finished": "2026-11-24T17:11:05.381Z",
+  "sourcesUnchanged": true
+}

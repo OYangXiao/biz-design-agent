@@ -530,13 +530,84 @@ async function cmdRender(p = {}) {
 
   const frames = spec.frames || (spec.root ? [spec.root] : []);
   const created = [];
+  const createdNodes = [];
   for (const frameSpec of frames) {
     const node = await build(frameSpec, page, tick);
     created.push(node.name);
+    createdNodes.push(node);
+  }
+
+  // 可选：声明式原型连线（spec.links）—— 全部顶层 Frame 建好后一次性绑定点击跳转
+  let linksApplied = 0;
+  const linkErrors = [];
+  if (Array.isArray(spec.links) && spec.links.length) {
+    for (const lnk of spec.links) {
+      try {
+        const scopeRoot = lnk.fromWithin
+          ? createdNodes.find((n) => n.name === lnk.fromWithin) || findByName(page, lnk.fromWithin)
+          : page;
+        if (!scopeRoot) { linkErrors.push(`找不到源容器「${lnk.fromWithin}」`); continue; }
+        const srcNode = scopeRoot.name === lnk.fromName ? scopeRoot : findByName(scopeRoot, lnk.fromName);
+        if (!srcNode) { linkErrors.push(`在「${lnk.fromWithin || page.name}」内找不到热区「${lnk.fromName}」`); continue; }
+        const destNode = createdNodes.find((n) => n.name === lnk.toName)
+          || page.children.find((n) => n.name === lnk.toName);
+        if (!destNode) { linkErrors.push(`找不到跳转目标顶层屏幕「${lnk.toName}」`); continue; }
+
+        const triggerType = pick(lnk.trigger, TRIGGERS, 'ON_CLICK', 'trigger');
+        const trigger = { type: triggerType };
+        if (triggerType === 'AFTER_TIMEOUT') trigger.timeout = Number(lnk.timeout ?? 1);
+        const isInstant = lnk.transition === false || String(lnk.transition || '').toUpperCase() === 'INSTANT';
+        const transType = isInstant ? null : pick(lnk.transition, TRANSITIONS, 'SMART_ANIMATE', 'transition');
+        const isDirectional = ['MOVE_IN', 'MOVE_OUT', 'PUSH', 'SLIDE_IN', 'SLIDE_OUT'].includes(transType);
+        const action = {
+          type: 'NODE',
+          destinationId: destNode.id,
+          navigation: pick(lnk.nav, NAVIGATIONS, 'NAVIGATE', 'nav'),
+          transition: isInstant ? null : {
+            type: transType,
+            ...(isDirectional ? { direction: String(lnk.direction || 'LEFT').toUpperCase(), matchLayers: Boolean(lnk.matchLayers) } : {}),
+            easing: { type: pick(lnk.easing, EASINGS, 'EASE_OUT', 'easing') },
+            duration: Number(lnk.duration ?? 0.25),
+          },
+          preserveScrollPosition: Boolean(lnk.preserveScroll),
+        };
+        const prev = safeCall(() => srcNode.reactions) || [];
+        const next = [...prev, { trigger, actions: [action] }];
+        if (typeof srcNode.setReactionsAsync === 'function') await srcNode.setReactionsAsync(next);
+        else srcNode.reactions = next;
+        linksApplied++;
+      } catch (e) {
+        linkErrors.push(String(e.message || e));
+      }
+    }
+  }
+
+  // 可选：设置 Figma 原型预览入口（flowStartingPoints，画布左上角显示蓝色 ▶ 播放标）
+  let flowStarts = 0;
+  if (spec.flowStart) {
+    const rawStarts = Array.isArray(spec.flowStart) ? spec.flowStart : [spec.flowStart];
+    const resolvedStarts = [];
+    for (const st of rawStarts) {
+      const targetName = typeof st === 'string' ? st : st?.frameName;
+      const flowLabel = (typeof st === 'object' && st?.name) ? String(st.name) : '主流程预览';
+      const entryNode = createdNodes.find((n) => n.name === targetName)
+        || page.children.find((n) => n.name === targetName);
+      if (entryNode) resolvedStarts.push({ nodeId: entryNode.id, name: flowLabel });
+    }
+    if (resolvedStarts.length) {
+      try {
+        page.flowStartingPoints = resolvedStarts;
+        flowStarts = resolvedStarts.length;
+      } catch (e) { /* ignore if unsupported */ }
+    }
   }
 
   if (page.children.length) figma.viewport.scrollAndZoomIntoView(page.children);
-  return { page: page.name, frames: created, total: page.children.length, nodes: done };
+  const out = { page: page.name, frames: created, total: page.children.length, nodes: done };
+  if (linksApplied || linkErrors.length) out.linksApplied = linksApplied;
+  if (linkErrors.length) out.linkErrors = linkErrors;
+  if (flowStarts) out.flowStartingPoints = flowStarts;
+  return out;
 }
 
 /** 画布现状：用来查证渲染到底完成了多少节点 */
@@ -1959,12 +2030,15 @@ async function cmdLink(p = {}) {
         dest = found[0];
       }
       if (!dest) throw new Error('要连到哪里？给 --to <节点id> / --to-name <名称> / --url <网址>');
+      const transType = p.transition === false ? null : pick(p.transition, TRANSITIONS, 'SMART_ANIMATE', 'transition');
+      const isDirectional = ['MOVE_IN', 'MOVE_OUT', 'PUSH', 'SLIDE_IN', 'SLIDE_OUT'].includes(transType);
       action = {
         type: 'NODE',
         destinationId: dest.id,
         navigation: pick(p.nav, NAVIGATIONS, 'NAVIGATE', 'nav'),
         transition: p.transition === false ? null : {
-          type: pick(p.transition, TRANSITIONS, 'SMART_ANIMATE', 'transition'),
+          type: transType,
+          ...(isDirectional ? { direction: String(p.direction || 'LEFT').toUpperCase(), matchLayers: Boolean(p.matchLayers) } : {}),
           easing: { type: pick(p.easing, EASINGS, 'EASE_OUT', 'easing') },
           duration: Number(p.duration ?? 0.3),
         },

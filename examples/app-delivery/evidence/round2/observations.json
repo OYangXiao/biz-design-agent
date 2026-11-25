@@ -1,0 +1,381 @@
+{
+  "time": "2026-11-24T17:16:47.298Z",
+  "chrome": "158.0.8127.36",
+  "options": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "deviceScaleFactor": 1,
+    "isMobile": true,
+    "hasTouch": true,
+    "colorScheme": "light",
+    "locale": "zh-CN"
+  },
+  "source": {
+    "design.html": "4e78f8741ebf36488e39c57164557f8f7c02c1b1435437341d37665ed47a92dd",
+    "build-v2.html": "6c309530e6688bc361bc0db27aeed5fe0a5cafe50836ad1b7e2de47a4044aa6e"
+  },
+  "states": {
+    "detail": {
+      "actual": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html",
+        "text": "日\n日间阅读\n我的收藏\nDAYLIGHT / ESSAYS\n10′\n时间练习\nPLATE 01\n随笔 · 生活切片\nNº 001\n给自己留十分钟\n日间编辑部\n约 1 分钟阅读\n\n水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。\n\nFIN.\nREADING NOTES\n日间阅读手记\n收藏",
+        "buttons": [
+          {
+            "name": "我的收藏",
+            "width": 91,
+            "height": 44,
+            "x": 275,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "收藏",
+            "width": 120,
+            "height": 48,
+            "x": 246,
+            "y": 780,
+            "pressed": "false",
+            "hit": true
+          }
+        ]
+      },
+      "design": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/design.html",
+        "text": "日\n日间阅读\n我的收藏\nDAYLIGHT / ESSAYS\n10′\n时间练习\nPLATE 01\n随笔 · 生活切片\nNº 001\n给自己留十分钟\n日间编辑部\n约 1 分钟阅读\n\n水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。\n\nFIN.\nREADING NOTES\n日间阅读手记\n收藏",
+        "buttons": [
+          {
+            "name": "我的收藏",
+            "width": 91,
+            "height": 44,
+            "x": 275,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "收藏",
+            "width": 120,
+            "height": 48,
+            "x": 246,
+            "y": 780,
+            "pressed": "false",
+            "hit": true
+          }
+        ]
+      },
+      "sameImage": true,
+      "sameText": true,
+      "sameButtons": true
+    },
+    "saved": {
+      "actual": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html",
+        "text": "日\n日间阅读\n我的收藏\nDAYLIGHT / ESSAYS\n10′\n时间练习\nPLATE 01\n随笔 · 生活切片\nNº 001\n给自己留十分钟\n日间编辑部\n约 1 分钟阅读\n\n水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。\n\nFIN.\nREADING NOTES\n日间阅读手记\n已收藏",
+        "buttons": [
+          {
+            "name": "我的收藏",
+            "width": 91,
+            "height": 44,
+            "x": 275,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "已收藏",
+            "width": 120,
+            "height": 48,
+            "x": 246,
+            "y": 780,
+            "pressed": "true",
+            "hit": true
+          }
+        ]
+      },
+      "design": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/design.html?saved=1",
+        "text": "日\n日间阅读\n我的收藏\nDAYLIGHT / ESSAYS\n10′\n时间练习\nPLATE 01\n随笔 · 生活切片\nNº 001\n给自己留十分钟\n日间编辑部\n约 1 分钟阅读\n\n水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。\n\nFIN.\nREADING NOTES\n日间阅读手记\n已收藏",
+        "buttons": [
+          {
+            "name": "我的收藏",
+            "width": 91,
+            "height": 44,
+            "x": 275,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "已收藏",
+            "width": 120,
+            "height": 48,
+            "x": 246,
+            "y": 780,
+            "pressed": "true",
+            "hit": true
+          }
+        ]
+      },
+      "sameImage": true,
+      "sameText": true,
+      "sameButtons": true
+    },
+    "one": {
+      "actual": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html?screen=list",
+        "text": "日\n日间阅读\n返回\n私人书架\nLIBRARY\n我的收藏\n文章目录\n01 篇\n10′\n给自己留十分钟\n随笔 · 生活切片\n›",
+        "buttons": [
+          {
+            "name": "返回",
+            "width": 44,
+            "height": 44,
+            "x": 322,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "10′\n给自己留十分钟\n随笔 · 生活切片\n›",
+            "width": 342,
+            "height": 121,
+            "x": 24,
+            "y": 242.1875,
+            "pressed": null,
+            "hit": true
+          }
+        ]
+      },
+      "design": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/design.html?screen=list&saved=1",
+        "text": "日\n日间阅读\n返回\n私人书架\nLIBRARY\n我的收藏\n文章目录\n01 篇\n10′\n给自己留十分钟\n随笔 · 生活切片\n›",
+        "buttons": [
+          {
+            "name": "返回",
+            "width": 44,
+            "height": 44,
+            "x": 322,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "10′\n给自己留十分钟\n随笔 · 生活切片\n›",
+            "width": 342,
+            "height": 121,
+            "x": 24,
+            "y": 242.1875,
+            "pressed": null,
+            "hit": true
+          }
+        ]
+      },
+      "sameImage": true,
+      "sameText": true,
+      "sameButtons": true
+    },
+    "empty": {
+      "actual": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html?screen=list",
+        "text": "日\n日间阅读\n返回\n私人书架\nLIBRARY\n我的收藏\n文章目录\n00 篇\n∅\n还没有收藏\n\n在文章页点「收藏」，就能在这里重读。",
+        "buttons": [
+          {
+            "name": "返回",
+            "width": 44,
+            "height": 44,
+            "x": 322,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          }
+        ]
+      },
+      "design": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/design.html?screen=list&saved=0",
+        "text": "日\n日间阅读\n返回\n私人书架\nLIBRARY\n我的收藏\n文章目录\n00 篇\n∅\n还没有收藏\n\n在文章页点「收藏」，就能在这里重读。",
+        "buttons": [
+          {
+            "name": "返回",
+            "width": 44,
+            "height": 44,
+            "x": 322,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          }
+        ]
+      },
+      "sameImage": true,
+      "sameText": true,
+      "sameButtons": true
+    }
+  },
+  "reopen": [
+    {
+      "label": "saved",
+      "allBuildTabsClosed": true,
+      "before": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html",
+        "text": "日\n日间阅读\n我的收藏\nDAYLIGHT / ESSAYS\n10′\n时间练习\nPLATE 01\n随笔 · 生活切片\nNº 001\n给自己留十分钟\n日间编辑部\n约 1 分钟阅读\n\n水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。\n\nFIN.\nREADING NOTES\n日间阅读手记\n已收藏",
+        "buttons": [
+          {
+            "name": "我的收藏",
+            "width": 91,
+            "height": 44,
+            "x": 275,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "已收藏",
+            "width": 120,
+            "height": 48,
+            "x": 246,
+            "y": 780,
+            "pressed": "true",
+            "hit": true
+          }
+        ]
+      },
+      "after": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html",
+        "text": "日\n日间阅读\n我的收藏\nDAYLIGHT / ESSAYS\n10′\n时间练习\nPLATE 01\n随笔 · 生活切片\nNº 001\n给自己留十分钟\n日间编辑部\n约 1 分钟阅读\n\n水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。\n\nFIN.\nREADING NOTES\n日间阅读手记\n已收藏",
+        "buttons": [
+          {
+            "name": "我的收藏",
+            "width": 91,
+            "height": 44,
+            "x": 275,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "已收藏",
+            "width": 120,
+            "height": 48,
+            "x": 246,
+            "y": 780,
+            "pressed": "true",
+            "hit": true
+          }
+        ]
+      },
+      "list": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html?screen=list",
+        "text": "日\n日间阅读\n返回\n私人书架\nLIBRARY\n我的收藏\n文章目录\n01 篇\n10′\n给自己留十分钟\n随笔 · 生活切片\n›",
+        "buttons": [
+          {
+            "name": "返回",
+            "width": 44,
+            "height": 44,
+            "x": 322,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "10′\n给自己留十分钟\n随笔 · 生活切片\n›",
+            "width": 342,
+            "height": 121,
+            "x": 24,
+            "y": 242.1875,
+            "pressed": null,
+            "hit": true
+          }
+        ]
+      }
+    },
+    {
+      "label": "removed",
+      "allBuildTabsClosed": true,
+      "before": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html",
+        "text": "日\n日间阅读\n我的收藏\nDAYLIGHT / ESSAYS\n10′\n时间练习\nPLATE 01\n随笔 · 生活切片\nNº 001\n给自己留十分钟\n日间编辑部\n约 1 分钟阅读\n\n水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。\n\nFIN.\nREADING NOTES\n日间阅读手记\n收藏",
+        "buttons": [
+          {
+            "name": "我的收藏",
+            "width": 91,
+            "height": 44,
+            "x": 275,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "收藏",
+            "width": 120,
+            "height": 48,
+            "x": 246,
+            "y": 780,
+            "pressed": "false",
+            "hit": true
+          }
+        ]
+      },
+      "after": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html",
+        "text": "日\n日间阅读\n我的收藏\nDAYLIGHT / ESSAYS\n10′\n时间练习\nPLATE 01\n随笔 · 生活切片\nNº 001\n给自己留十分钟\n日间编辑部\n约 1 分钟阅读\n\n水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。\n\nFIN.\nREADING NOTES\n日间阅读手记\n收藏",
+        "buttons": [
+          {
+            "name": "我的收藏",
+            "width": 91,
+            "height": 44,
+            "x": 275,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          },
+          {
+            "name": "收藏",
+            "width": 120,
+            "height": 48,
+            "x": 246,
+            "y": 780,
+            "pressed": "false",
+            "hit": true
+          }
+        ]
+      },
+      "list": {
+        "url": "file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html?screen=list",
+        "text": "日\n日间阅读\n返回\n私人书架\nLIBRARY\n我的收藏\n文章目录\n00 篇\n∅\n还没有收藏\n\n在文章页点「收藏」，就能在这里重读。",
+        "buttons": [
+          {
+            "name": "返回",
+            "width": 44,
+            "height": 44,
+            "x": 322,
+            "y": 12.5,
+            "pressed": null,
+            "hit": true
+          }
+        ]
+      }
+    }
+  ],
+  "extras": {
+    "prototype": [
+      "日间阅读 · 可点线框",
+      "给自己留十分钟",
+      "收藏"
+    ],
+    "demo": [
+      [
+        "详情点「收藏」，按钮变为「已收藏」。",
+        "已收藏"
+      ],
+      [
+        "进入「我的收藏」，只有一条。点「返回」，详情仍是「已收藏」。",
+        "给自己留十分钟"
+      ],
+      [
+        "详情点「已收藏」取消，再进「我的收藏」，显示「还没有收藏」。",
+        "还没有收藏"
+      ]
+    ]
+  }
+}

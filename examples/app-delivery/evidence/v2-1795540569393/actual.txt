@@ -1,0 +1,20 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":true,"hasTouch":true,"isLandscape":false,"width":390,"height":844}
+Emulating color scheme: light
+## Latest page snapshot
+uid=2_0 RootWebArea "给自己留十分钟 · 日间阅读" url="file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v2.html"
+  uid=2_1 banner
+    uid=2_2 "日间阅读"
+    uid=2_3 button "我的收藏"
+  uid=2_4 main
+    uid=2_5 "随笔 · 生活切片"
+    uid=2_6 "Nº 001"
+    uid=2_7 heading "给自己留十分钟" level="1"
+    uid=2_8 "日间编辑部"
+    uid=2_9 "约 1 分钟阅读"
+    uid=2_10 "水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。"
+    uid=2_11 "茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。"
+    uid=2_12 "FIN."
+  uid=2_13 contentinfo
+    uid=2_14 "READING NOTES"
+    uid=2_15 "日间阅读手记"
+    uid=2_16 button "收藏"

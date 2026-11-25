@@ -3,7 +3,27 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "让 AI Agent 直接在 Figma 画布上创建 App 原型（本地桥 + Figma 插件渲染引擎）",
+  "bin": {
+    "figma-agent": "./bin/figma-agent.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "bridge/",
+    "plugin/",
+    "tools/",
+    "server/",
+    "specs/validate-spec.mjs",
+    "docs/PRD-WORKFLOW.md",
+    "docs/PROTOTYPE-WORKFLOW.md",
+    "docs/VISUAL-DESIGN-WORKFLOW.md",
+    "docs/DEV-HANDOFF-WORKFLOW.md",
+    "docs/QA-VERIFY-WORKFLOW.md",
+    "docs/DESIGN-AGENT.md",
+    "docs/TEAM-INTAKE.md",
+    "AGENTS.md"
+  ],
+  "description": "纯 Node 多角色业务设计 Agent（Figma 本地桥 + MCP + PRD 双端生成 + 视觉对图 + 内网自举分发）",
   "keywords": [
     "figma",
     "plugin",

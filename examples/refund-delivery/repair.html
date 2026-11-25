@@ -1,0 +1,7 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>R-17｜退回开发的两件事</title><style>body{font:17px/1.75 system-ui;color:#243c32;background:#f6f7f0;max-width:48rem;padding:24px;margin:auto}article{background:white;border-left:4px solid #c87a43;padding:12px 20px;margin:18px 0}a{color:#14583e}</style>
+<a href="index.html#results">← 回培训手册</a><h1>R-17：请改这两处，再按原条件点一次</h1>
+<p>来自首轮实测。两例缺陷为教学预设；以下观察来自浏览器。需求和设计稿都不换，第一版留下，新交第二版。</p>
+<article><h2>1. 客服应看不见按钮</h2><p><a href="build-v1.html?role=service&amp;state=pending">客服打开待审单</a>：现在显示灰色「批准退款」，虽然点不动，仍和需求不符。请去掉客服的入口，保留主管待审时的可点按钮。</p><a href="evidence/v1/service-pending.txt">查看浏览器读到的按钮和状态</a></article>
+<article><h2>2. 主管按钮低了 20 像素</h2><p>同一台机器、1280×800、DPR 1。设计稿按钮顶边约 363.77，第一版约 383.77。请对齐原稿，再用主管待审首屏重截，不拿已处理页来比较。</p><a href="evidence/v1/diff.png">打开差异图</a> · <a href="evidence/v1/design.json">设计尺寸</a> · <a href="evidence/v1/default.json">页面尺寸</a></article>
+<h2>这次把「交班」说具体</h2><p>本课只验同一浏览器：用一份新的本地测试数据，客服查单 → 主管批准 → 两种身份分别重开，两边都应显示「已处理」，不能再批。跨设备、真实身份校验、真实退款记账仍需在有后端的环境另验。</p>
+<p><b>交回：</b>开发给第二版链接；QA 按原来的四种组合复测；模拟门店另走一遍交班。不要用第二版截图覆盖第一版。</p></html>

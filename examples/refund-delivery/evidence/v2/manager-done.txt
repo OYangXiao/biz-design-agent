@@ -1,0 +1,21 @@
+## Latest page snapshot
+uid=5_0 RootWebArea "退款审批 · 门店工作台" url="file:///Users/oyx/GitHub/figma-agent/examples/refund-delivery/build-v2.html?role=manager&state=done"
+  uid=5_1 banner
+    uid=5_2 "门店工作台"
+    uid=5_3 "当前身份 · 主管"
+  uid=5_4 main
+    uid=5_5 "门店运营 / 交班单据"
+    uid=5_6 heading "退款审批" level="1"
+    uid=5_7 "先核对单号、门店和金额，再确认审批状态。"
+    uid=5_8 "01 / 退款单号"
+    uid=5_9 heading "R-17" level="2"
+    uid=5_10 "青禾路店"
+    uid=5_11 "退款金额"
+    uid=5_12 "¥28.00"
+    uid=5_13 "退款原因"
+    uid=5_14 "配送少了一盒餐"
+    uid=5_15 "02 / 审批"
+    uid=5_16 heading "处理状态" level="2"
+    uid=5_17 status atomic live="polite" relevant="additions text"
+      uid=5_18 "已处理"
+    uid=5_19 "本单退款已处理，无需再次审批。"

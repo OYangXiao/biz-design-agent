@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>给自己留十分钟 · 日间阅读</title>
+<!-- 390×844 视觉探索稿：纸白与墨绿模拟书刊，朱橙刻度标记阅读主题。
+     标题 32px、正文 17px/1.9、按钮 15px；所有按钮热区至少 44×44px。
+     收藏状态保存在本机浏览器中。 -->
+<style>
+:root{color-scheme:light;--paper:#faf8f0;--ink:#203d34;--muted:#5f6d60;--line:#cacdc0;--accent:#ac4529;--serif:"Songti SC","Noto Serif CJK SC","STSong",serif}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;color:var(--ink);background:#e4e4da;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.app{max-width:390px;min-height:100vh;min-height:100svh;margin:auto;background:var(--paper);display:flex;flex-direction:column}
+header,footer,.hero-foot,.eyebrow,.meta,.catalog{display:flex;align-items:center;justify-content:space-between}
+header{height:70px;margin:0 24px;border-bottom:1px solid var(--ink)}
+.brand{font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:.08em;display:flex;align-items:center;gap:9px}
+.logo{display:grid;place-items:center;width:27px;height:27px;background:var(--ink);color:var(--paper);font:19px/1 var(--serif)}
+button{min-height:44px;min-width:44px;color:inherit;font:500 15px/1.4 inherit;font-family:inherit;font-size:15px;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header button,.save{display:flex;align-items:center;justify-content:center;gap:7px}
+.mark{width:12px;height:16px;background:currentColor;clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%,0 0,14% 12%,14% 78%,50% 56%,86% 78%,86% 12%,14% 12%)}
+main{padding:24px;flex:1}
+.mono{font:600 11px/1.4 ui-monospace,Menlo,monospace;letter-spacing:.09em}
+.cover{height:174px;background:#edd8ac;color:#593621;position:relative;overflow:hidden;border-radius:3px;isolation:isolate}
+.cover:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,#7756270a 3px 4px)}
+.dial{position:absolute;width:210px;height:210px;border-radius:50%;right:-49px;top:-27px;background:repeating-conic-gradient(from -90deg,#8d3922 0 1deg,transparent 1deg 6deg);border:1px solid #a35332}
+.dial:before{content:"";position:absolute;inset:9px;border-radius:50%;background:repeating-linear-gradient(0deg,#ce6c42 0 2px,#d7794c 2px 4px);border:1px solid #a35332}
+.dial:after{content:"";position:absolute;left:5%;right:50%;top:50%;height:2px;background:#643225;transform:rotate(-34deg);transform-origin:right}
+.plate,.hero-foot,.numeral{position:absolute;left:17px}
+.plate{top:14px}
+.numeral{top:32px;font:italic 91px/.98 Georgia,serif;letter-spacing:-.08em}
+.hero-foot{bottom:12px;right:17px;border-top:1px solid #794a2c80;padding-top:7px}
+.eyebrow{margin:27px 0 10px;color:var(--accent);font-size:12px;font-weight:650;letter-spacing:.12em}
+h1,h2,p{margin:0}
+h1{font:700 32px/1.4 var(--serif);letter-spacing:.02em}
+.meta{justify-content:flex-start;gap:10px;color:var(--muted);font-size:13px;margin-top:9px}
+.meta i{width:20px;height:1px;background:var(--line)}
+.prose{margin-top:23px;border-top:1px solid var(--line);padding-top:18px;font:17px/1.9 var(--serif);color:#30473c}
+.prose p+p{margin-top:12px}
+.end{margin-top:21px;display:flex;align-items:center;gap:8px;color:var(--muted)}
+.end:before{content:"";width:22px;height:2px;background:var(--accent)}
+footer{position:sticky;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding:12px 24px max(16px,env(safe-area-inset-bottom));gap:16px}
+footer small{display:block;color:var(--muted);margin-top:2px;font-size:12px}
+.save{min-width:120px;height:48px;border:1px solid var(--ink);border-radius:5px;background:var(--ink);color:var(--paper)}
+.save[aria-pressed=true]{background:#e7ebdf;color:var(--ink)}
+.save[aria-pressed=false]{transform:translateX(8px)}
+.save[aria-pressed=true] .mark{clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%)}
+.catalog{border-bottom:1px solid var(--ink);padding:24px 0 9px;color:var(--muted)}
+.entry{display:flex;align-items:center;gap:14px;width:100%;border-bottom:1px solid var(--line);padding:19px 0;text-align:left}
+.tile{background:#edd8ac;border-left:4px solid #cf7549;width:63px;height:82px;display:grid;place-items:center;font:italic 38px Georgia,serif}
+.entry strong{display:block;font:700 20px/1.5 var(--serif)}
+.entry small{color:var(--muted)}
+.arrow{margin-left:auto;font-size:22px}
+.empty{text-align:center;padding:68px 0;color:var(--muted)}
+.empty .tile{margin:0 auto 20px;transform:rotate(-5deg)}
+.empty h2{font:700 22px/1.5 var(--serif);color:var(--ink)}
+.empty p{font-size:14px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><span class="logo" aria-hidden="true">日</span>日间阅读</div>
+    <button type="button" id="nav"><span class="mark" aria-hidden="true"></span>我的收藏</button>
+  </header>
+  <main>
+    <article id="detail">
+      <div class="cover" aria-hidden="true">
+        <div class="dial"></div><span class="plate mono">DAYLIGHT / ESSAYS</span>
+        <span class="numeral">10′</span>
+        <div class="hero-foot mono"><span>时间练习</span><span>PLATE 01</span></div>
+      </div>
+      <div class="eyebrow"><span>随笔 · 生活切片</span><span class="mono">Nº 001</span></div>
+      <h1>给自己留十分钟</h1>
+      <div class="meta"><span>日间编辑部</span><i></i><span>约 1 分钟阅读</span></div>
+      <div class="prose">
+        <p>水烧开以前，厨房里有一小段安静。我原本伸手去拿手机，却看见杯沿上落了一道光。</p>
+        <p>把椅子往窗边挪一点。楼下有人收起晾干的床单，白布鼓了一下，又慢慢落回手里。原来十分钟，也够看完这样一件小事。</p>
+        <p>水开了。我给自己倒了一杯，没有急着起身。</p>
+      </div>
+      <div class="end mono">FIN.</div>
+    </article>
+    <section id="library" hidden>
+      <div class="eyebrow"><span>私人书架</span><span class="mono">LIBRARY</span></div>
+      <h1>我的收藏</h1>
+      <div class="catalog mono"><span>文章目录</span><span id="count"></span></div>
+      <button type="button" class="entry" id="entry" hidden>
+        <span class="tile" aria-hidden="true">10′</span>
+        <span><strong>给自己留十分钟</strong><small>随笔 · 生活切片</small></span>
+        <span class="arrow" aria-hidden="true">›</span>
+      </button>
+      <div class="empty" id="empty" hidden>
+        <span class="tile" aria-hidden="true">∅</span><h2>还没有收藏</h2>
+        <p>在文章页点「收藏」，就能在这里重读。</p>
+      </div>
+    </section>
+  </main>
+  <footer id="bar">
+    <div><span class="mono">READING NOTES</span><small>日间阅读手记</small></div>
+    <button type="button" class="save" id="save" aria-pressed="false"><span class="mark" aria-hidden="true"></span><span id="label">收藏</span></button>
+  </footer>
+</div>
+<script>
+const byId = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const list = params.get("screen") === "list";
+const storageKey = "daylight:app-delivery:v1:essay-001";
+let saved = localStorage.getItem(storageKey) === "1";
+function openState(showList) {
+  const url = new URL(location.href);
+  url.search = "";
+  if (showList) url.searchParams.set("screen", "list");
+  location.assign(url.href);
+}
+byId("detail").hidden = byId("bar").hidden = list;
+byId("library").hidden = !list;
+byId("entry").hidden = true;
+byId("empty").hidden = saved;
+byId("count").textContent = saved ? "01 篇" : "00 篇";
+function renderSave() {
+  byId("save").setAttribute("aria-pressed", String(saved));
+  byId("label").textContent = saved ? "已收藏" : "收藏";
+}
+renderSave();
+if (list) {
+  document.title = "我的收藏 · 日间阅读";
+  byId("nav").textContent = "返回";
+}
+byId("nav").onclick = () => openState(!list);
+byId("entry").onclick = () => openState(false);
+byId("save").onclick = () => {
+  saved = !saved;
+  if (saved) localStorage.setItem(storageKey, "1");
+  else localStorage.removeItem(storageKey);
+  renderSave();
+};
+</script>
+</body>
+</html>

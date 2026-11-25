@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日间阅读 · 需求与状态规则</title>
+<style>
+body{max-width:40rem;margin:auto;padding:2rem 1.25rem;background:#fffef9;color:#292b26;font:16px/1.8 system-ui,sans-serif}h1,h2{font-family:serif}h2{border-top:1px solid #aaa;padding-top:1rem;font-size:1.3rem}a{color:inherit}dt{font-weight:bold}dd{margin:0 0 .8rem}
+</style>
+<main><small>日间阅读 · 手机端探索稿</small><h1>把这篇留到下次读</h1>
+<h2>用户需求</h2><p>读者想在《给自己留十分钟》的详情页收藏文章，下次打开仍能找到；不再想读时，也能取消收藏。</p>
+<h2>状态规则</h2><dl>
+<dt>首次打开</dt><dd>详情显示「收藏」；进入「我的收藏」，显示「还没有收藏」。</dd>
+<dt>收藏后</dt><dd>点「收藏」变为「已收藏」。进入「我的收藏」，只有《给自己留十分钟》一条。</dd>
+<dt>返回与重开</dt><dd>点「返回」回到详情，仍是「已收藏」。同一浏览器从原地址重开线框，沿用上次状态。</dd>
+<dt>取消后</dt><dd>点「已收藏」切回「收藏」。再进列表显示「还没有收藏」，重开也不恢复已移除的文章。</dd>
+</dl>
+<h2>模拟反馈</h2><p>“返回后还能看到『已收藏』，我知道不用再点一次。”</p>
+<small>情境示例，非真实用户反馈。假设浏览器允许本地存储，不做账号同步。</small>
+<p><a href="prototype.html">打开可点线框</a>　<a href="demo.html">查看三步演示</a></p></main>
+</html>

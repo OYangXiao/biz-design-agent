@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>日间阅读 · 第二轮交付复核</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#faf8f0;color:#203d34;font:16px/1.65 system-ui,sans-serif}main{max-width:900px;margin:auto;padding:32px 20px 64px}header{border-bottom:2px solid;padding-bottom:16px}h1{line-height:1.2;margin:.25em 0}h2{font-size:1.35rem;margin:2em 0 .5em}a{color:#215a4a;text-underline-offset:3px}table{width:100%;border-collapse:collapse;background:white}td,th{padding:10px;text-align:left;border-bottom:1px solid #cad2c9;vertical-align:top}thead{background:#e4ebdf}small{color:#4f6459}details{padding:10px 0;border-bottom:1px solid #cad2c9}summary{cursor:pointer;font-weight:650}.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}figure{margin:10px 0}img{width:100%;height:auto;display:block;border:1px solid #c3cbbb}figcaption{margin:.4em 0}code{overflow-wrap:anywhere}@media(max-width:540px){td,th{padding:7px}main{padding:22px 12px}table{font-size:14px}}
+</style></head><body><main>
+<header><small>日间阅读　/　文章收藏　/　第二轮</small><h1>候选构建复核通过</h1>
+<p>在指定手机视口下，四个状态均与设计稿一致，未发现文案、按钮热区或状态偏差。收藏与取消都在关闭页签后保留。</p>
+<a href="../build-v2.html">打开候选构建</a> · <a href="../design.html">打开设计基准</a> · <a href="../brief.html">业务状态规则</a></header>
+<h2>四态对照</h2>
+<p>表中为设计与构建共同的实测结果。尺寸是可点击按钮的宽 × 高（CSS px），不是图标大小。所有可见按钮均达到设计稿的 44 × 44 下限，中心及上下左右四个近边点都命中按钮或其子元素。</p>
+<table><thead><tr><th>状态</th><th>页面所见</th><th>按钮热区</th></tr></thead><tbody>
+<tr><th>未收藏详情</th><td>《给自己留十分钟》；「收藏」未按下</td><td>我的收藏 91 × 44；收藏 120 × 48</td></tr>
+<tr><th>已收藏详情</th><td>同篇文章；「已收藏」呈按下态</td><td>我的收藏 91 × 44；已收藏 120 × 48</td></tr>
+<tr><th>列表一条</th><td>「01 篇」，仅《给自己留十分钟》，不显示空态</td><td>返回 44 × 44；整行 342 × 121</td></tr>
+<tr><th>空态</th><td>「00 篇」「还没有收藏」及「在文章页点『收藏』，就能在这里重读。」（按钮名在页面中用「」标注）；无文章行</td><td>仅返回 44 × 44</td></tr>
+</tbody></table>
+<p>逐态展开可看同尺度截图：左为设计，右为构建。连续两帧稳定后比较全视口 RGBA，未遮罩、未缩放、无容差；四组分别为 0 / 329,160 像素不同。</p>
+<details><summary>01　未收藏详情</summary><div class="pair"><figure><figcaption>设计</figcaption><img src="round2/detail-design.png" alt="未收藏详情设计稿"></figure><figure><figcaption>构建</figcaption><img src="round2/detail-build.png" alt="未收藏详情构建实测"></figure></div></details>
+<details><summary>02　已收藏详情</summary><div class="pair"><figure><figcaption>设计</figcaption><img src="round2/saved-design.png" alt="已收藏详情设计稿"></figure><figure><figcaption>构建</figcaption><img src="round2/saved-build.png" alt="已收藏详情构建实测"></figure></div></details>
+<details><summary>03　列表一条</summary><div class="pair"><figure><figcaption>设计</figcaption><img src="round2/one-design.png" alt="一条收藏设计稿"></figure><figure><figcaption>构建</figcaption><img src="round2/one-build.png" alt="一条收藏构建实测"></figure></div></details>
+<details><summary>04　空态</summary><div class="pair"><figure><figcaption>设计</figcaption><img src="round2/empty-design.png" alt="空书架设计稿"></figure><figure><figcaption>构建</figcaption><img src="round2/empty-build.png" alt="空书架构建实测"></figure></div></details>
+<h2>关掉页签，下次打开还能找到吗？</h2>
+<p>两次均关闭构建上下文中的唯一页签，确认页签数为零，再在<strong>同一浏览器上下文</strong>中新建页签，打开无参数的 <code>build-v2.html</code>。未刷新、未恢复旧页签，也未向存储写入测试值。</p>
+<ol><li><strong>收藏保留，通过。</strong>在详情点「收藏」，看到「已收藏」后关页。<a href="round2/saved-reopened.png">重开的详情</a>仍显示「已收藏」，进入「我的收藏」显示 01 篇及目标文章。</li>
+<li><strong>取消保留，通过。</strong>从列表点「返回」，在详情点「已收藏」取消，见「收藏」后关页。<a href="round2/removed-reopened.png">重开的详情</a>显示「收藏」，进入列表显示 00 篇及空态，文章未恢复。</li></ol>
+<h2>交付入口与复核范围</h2>
+<p><a href="../prototype.html">可点原型</a>实际打开，首屏可见文章标题和「收藏」。<a href="../demo.html">三步演示</a>实际打开并逐步点选，内嵌线框依次显示「已收藏」、目标文章、以及「还没有收藏」。这是模拟分镜，不作为构建持久化证据。</p>
+<p>环境：macOS，隔离 Chrome 158.0.8127.36，Playwright Core，390 × 844、DPR 1、移动触摸模拟、浅色、zh-CN。本地 HTML 同址重开；设计稿在独立上下文按状态参数打开。结论不覆盖真机、账号同步或浏览器进程重启，不代替设计师签收。</p>
+<a href="round2/observations.json">原始记录：时间、文件 SHA-256、逐态文案、按钮坐标及关页前后观测</a>
+</main></body></html>

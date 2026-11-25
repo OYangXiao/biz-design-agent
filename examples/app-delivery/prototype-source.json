@@ -1,0 +1,175 @@
+{
+  "title": "日间阅读 App · 文章收藏闭环可交互线稿原型",
+  "version": "v1.0",
+  "updated_at": "2026-11-25",
+  "surface": "mobile",
+  "flow_name": "收藏与取消收藏全闭环预览",
+  "entry_screen": "proto-detail-unsaved",
+  "prd_ref": {
+    "title": "日间阅读 App · 文章收藏与我的收藏夹 PRD",
+    "version": "v1.0",
+    "source_path": "examples/app-delivery/prd-source.json",
+    "summary": "在文章详情页提供状态明确的『收藏 / 已收藏』切换，并与『我的收藏』列表实时共享同一状态源。"
+  },
+  "screens": [
+    {
+      "id": "proto-detail-unsaved",
+      "name": "01 文章详情页 · 未收藏",
+      "state": "初始未收藏态",
+      "nav_title": "日间阅读",
+      "nav_right": {
+        "label": "我的收藏",
+        "link_to": "proto-list-empty",
+        "transition": "DISSOLVE"
+      },
+      "prd_refs": [
+        "对应 PRD 1.2 目标 #1：详情页提供文案明确的『收藏』主操作按钮",
+        "对应 PRD 3.2 分支：首次未收藏直入『我的收藏』应展示空态",
+        "对应 PRD 6.1 验收 AC-01：干净环境首次打开显示『收藏』，进列表为空态"
+      ],
+      "design_rationale": [
+        "线稿保留阅读页核心版心（随笔编号 + 标题 + 正文段落），避免多余卡片框干扰阅读沉浸感。",
+        "『收藏』按钮采用深色主按钮样式并保证 46px 点击高度（满足 PRD 5.2 防误触热区 >= 44px 要求），顶栏右侧固定『我的收藏』入口方便随时核对。"
+      ],
+      "elements": [
+        {
+          "kind": "article",
+          "eyebrow": "随笔 / 001",
+          "label": "给自己留十分钟",
+          "detail": "水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。"
+        },
+        {
+          "kind": "button",
+          "label": "收藏",
+          "detail": "点击切换为已收藏",
+          "variant": "primary",
+          "link_to": "proto-detail-saved",
+          "transition": "SMART_ANIMATE"
+        }
+      ],
+      "footer_note": "线稿原型 · 当前状态：未收藏（点击按钮或顶栏预览跳转）"
+    },
+    {
+      "id": "proto-detail-saved",
+      "name": "02 文章详情页 · 已收藏",
+      "state": "已收藏激活态",
+      "nav_title": "日间阅读",
+      "nav_right": {
+        "label": "我的收藏",
+        "link_to": "proto-list-saved",
+        "transition": "DISSOLVE"
+      },
+      "prd_refs": [
+        "对应 PRD 1.2 目标 #1 & #3：收藏后文案明确变为『已收藏』，返回/重开保持一致",
+        "对应 PRD 2.2 外部反馈 #04 & 内部评审：不只靠变色，必须显式写出『已收藏』",
+        "对应 PRD 3.2 分支 & 5.2 细则：隐私模式存储受限时底部轻量提示，不阻断当前会话操作"
+      ],
+      "design_rationale": [
+        "采用高辨识度的青色线框激活态 +『✓ 已收藏』显式文案（而非仅改图标颜色），让读者一眼确认已留存、无需重复点击；再次点击即可原位取消。",
+        "正文区与 01 屏保持像素级同位置，配合 SMART_ANIMATE 过渡实现原地无跳动状态切换；底部预留存储异常降级条示意位。"
+      ],
+      "elements": [
+        {
+          "kind": "article",
+          "eyebrow": "随笔 / 001",
+          "label": "给自己留十分钟",
+          "detail": "水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。\n\n茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。"
+        },
+        {
+          "kind": "button",
+          "label": "✓ 已收藏",
+          "detail": "再次点击取消收藏",
+          "variant": "active",
+          "link_to": "proto-detail-unsaved",
+          "transition": "SMART_ANIMATE"
+        },
+        {
+          "kind": "banner",
+          "label": "异常降级提示位（正常环境隐藏）",
+          "detail": "仅当浏览器禁用 localStorage 时提示：收藏仅在本次打开时有效"
+        }
+      ],
+      "footer_note": "线稿原型 · 当前状态：已收藏（可进列表核对或再点取消）"
+    },
+    {
+      "id": "proto-list-saved",
+      "name": "03 我的收藏 · 含 1 篇收藏",
+      "state": "列表有内容态",
+      "nav_title": "我的收藏",
+      "nav_left": {
+        "label": "← 返回",
+        "link_to": "proto-detail-saved",
+        "transition": "DISSOLVE"
+      },
+      "prd_refs": [
+        "对应 PRD 1.2 目标 #2：列表准确展示已收藏文章标题并支持点击回到原文",
+        "对应 PRD 3.1 主流程 STEP 02 & STEP 03：进列表核对条目 → 点击文章行或返回仍保持已收藏",
+        "对应 PRD 6.1 验收 AC-02 & AC-03：杜绝『计数显示 1 篇但列表为空』的假状态"
+      ],
+      "design_rationale": [
+        "整行做成高度 >= 48px 的通栏可点击卡片并带『打开 ↗』引导，读者既可点文章标题直达原文，也可点左上角『← 返回』，两条返回路径均稳定回到『02 已收藏详情』。",
+        "顶部放置状态切换分段示意，方便评审时在画布上快速对比『有内容态』与『空状态』。"
+      ],
+      "elements": [
+        {
+          "kind": "tabs",
+          "label": "列表状态对照",
+          "items": [
+            { "label": "有收藏（1 篇）", "active": true },
+            { "label": "模拟清空后空态", "active": false, "link_to": "proto-list-empty", "transition": "DISSOLVE" }
+          ]
+        },
+        {
+          "kind": "list",
+          "label": "阅读清单 · 已收藏文章",
+          "items": [
+            {
+              "label": "给自己留十分钟",
+              "detail": "随笔 / 001 · 点击条目回到文章详情（保持已收藏状态）",
+              "link_to": "proto-detail-saved",
+              "transition": "DISSOLVE"
+            }
+          ]
+        }
+      ],
+      "footer_note": "线稿原型 · 共 1 篇收藏（点击条目或返回均可回到详情）"
+    },
+    {
+      "id": "proto-list-empty",
+      "name": "04 我的收藏 · 空状态",
+      "state": "无收藏空态",
+      "nav_title": "我的收藏",
+      "nav_left": {
+        "label": "← 返回",
+        "link_to": "proto-detail-unsaved",
+        "transition": "DISSOLVE"
+      },
+      "prd_refs": [
+        "对应 PRD 2.1 基准图 IMG-02 & 3.2 分支：未收藏或取消收藏后展示明确空态文案",
+        "对应 PRD 3.1 主流程 STEP 04 & 6.1 验收 AC-04：取消收藏后再进列表显示『还没有收藏』"
+      ],
+      "design_rationale": [
+        "使用虚线框空状态容器与明确主文案『还没有收藏』替代容易被误认为加载白屏的空白区，并附带『去阅读文章』快捷返回热区，确保空态下用户操作不中断。"
+      ],
+      "elements": [
+        {
+          "kind": "tabs",
+          "label": "列表状态对照",
+          "items": [
+            { "label": "空状态（0 篇）", "active": true },
+            { "label": "查看有收藏态", "active": false, "link_to": "proto-list-saved", "transition": "DISSOLVE" }
+          ]
+        },
+        {
+          "kind": "empty",
+          "label": "还没有收藏",
+          "detail": "在文章详情页点击『收藏』后，文章会出现在这里供下次继续阅读",
+          "action_label": "返回文章页去收藏",
+          "link_to": "proto-detail-unsaved",
+          "transition": "DISSOLVE"
+        }
+      ],
+      "footer_note": "线稿原型 · 空状态（无残留条目）"
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "title": "日间阅读 App · 文章收藏高保真视觉源稿",
+  "version": "v1.0",
+  "updated_at": "2026-11-25",
+  "surface": "mobile",
+  "style_prefix": "DaylightReading",
+  "viewport": { "w": 390, "h": 844 },
+  "team_profile": {
+    "team": null,
+    "product": "daylight-reading",
+    "revision": null,
+    "approved_by": null,
+    "note": "演练用探索稿：纸白与墨绿模拟书刊阅读质感，朱橙作眉标强调；未经过真实设计负责人品牌签收。"
+  },
+  "source_prototype": {
+    "title": "日间阅读 App · 文章收藏闭环可交互线稿原型",
+    "path": "examples/app-delivery/prototype-source.json"
+  },
+  "tokens": {
+    "paper": "#FAF8F0",
+    "surface": "#FFFFFF",
+    "surfaceMuted": "#E7EBDF",
+    "ink": "#203D34",
+    "inkSecondary": "#30473C",
+    "muted": "#5F6D60",
+    "line": "#CACDC0",
+    "accent": "#AC4529",
+    "coverBg": "#EDD8AC",
+    "coverInk": "#593621",
+    "coverAccent": "#CE6C42",
+    "activeBg": "#E7EBDF",
+    "activeInk": "#203D34",
+    "displayFont": "Songti SC",
+    "bodyFont": "PingFang SC",
+    "monoFont": "Menlo"
+  },
+  "components": [
+    { "name": "Header/TopBar", "role": "顶栏导航：27×27 墨绿印章 + 品牌名 + 44px 高右操作区，底部 1px 墨绿细线" },
+    { "name": "Button/Favorite", "role": "底部固定收藏切换按钮：124×48px，未收藏深墨绿实心 / 已收藏浅灰绿底+墨绿描边+显式『已收藏』文案" },
+    { "name": "List/ArticleEntry", "role": "收藏列表行：63×82 暖黄徽标 + 标题与栏目副标 + 右箭头" }
+  ],
+  "entry_screen": "visual-detail-unsaved",
+  "flow_name": "高保真视觉全状态预览",
+  "screens": [
+    {
+      "id": "visual-detail-unsaved",
+      "name": "01 高保真详情 · 未收藏",
+      "state": "未收藏详情态",
+      "brand_title": "日间阅读",
+      "logo_char": "日",
+      "nav_is_back": false,
+      "nav_action": { "label": "我的收藏", "link_to": "visual-list-empty", "transition": "DISSOLVE" },
+      "elements": [
+        {
+          "kind": "editorial_cover",
+          "plate": "DAYLIGHT / ESSAYS",
+          "numeral": "10′",
+          "left_caption": "时间练习",
+          "right_caption": "PLATE 01"
+        },
+        {
+          "kind": "article",
+          "eyebrow": "随笔 · 生活切片",
+          "issue_no": "Nº 001",
+          "label": "给自己留十分钟",
+          "meta": "日间编辑部  —  约 1 分钟阅读",
+          "paragraphs": [
+            "水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。",
+            "茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。"
+          ],
+          "end_mark": "FIN."
+        }
+      ],
+      "footer": {
+        "mono_label": "READING NOTES",
+        "sub_label": "日间阅读手记",
+        "button_label": "收藏",
+        "pressed": false,
+        "link_to": "visual-detail-saved",
+        "transition": "SMART_ANIMATE"
+      },
+      "spec_notes": [
+        "视觉基准屏（390×844 @1x），作为研发还原与测试对图的第一基准",
+        "正文采用最终定稿文案（两段），按钮热区 124×48px 严格右对齐底栏 24px 边距"
+      ]
+    },
+    {
+      "id": "visual-detail-saved",
+      "name": "02 高保真详情 · 已收藏",
+      "state": "已收藏详情态",
+      "brand_title": "日间阅读",
+      "logo_char": "日",
+      "nav_is_back": false,
+      "nav_action": { "label": "我的收藏", "link_to": "visual-list-one", "transition": "DISSOLVE" },
+      "elements": [
+        {
+          "kind": "editorial_cover",
+          "plate": "DAYLIGHT / ESSAYS",
+          "numeral": "10′",
+          "left_caption": "时间练习",
+          "right_caption": "PLATE 01"
+        },
+        {
+          "kind": "article",
+          "eyebrow": "随笔 · 生活切片",
+          "issue_no": "Nº 001",
+          "label": "给自己留十分钟",
+          "meta": "日间编辑部  —  约 1 分钟阅读",
+          "paragraphs": [
+            "水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。",
+            "茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。"
+          ],
+          "end_mark": "FIN."
+        }
+      ],
+      "footer": {
+        "mono_label": "READING NOTES",
+        "sub_label": "日间阅读手记",
+        "button_label": "已收藏",
+        "pressed": true,
+        "link_to": "visual-detail-unsaved",
+        "transition": "SMART_ANIMATE"
+      },
+      "spec_notes": [
+        "按钮切换为浅灰绿底 #E7EBDF + 墨绿描边 #203D34 + 显式文案『已收藏』，不只靠颜色区分",
+        "正文与顶栏位置与 01 屏完全对齐，防止状态切换造成页面抖动"
+      ]
+    },
+    {
+      "id": "visual-list-one",
+      "name": "03 高保真列表 · 含 1 篇收藏",
+      "state": "列表有内容态",
+      "brand_title": "日间阅读",
+      "logo_char": "日",
+      "nav_is_back": true,
+      "nav_action": { "label": "返回", "link_to": "visual-detail-saved", "transition": "DISSOLVE" },
+      "elements": [
+        {
+          "kind": "section_heading",
+          "eyebrow": "私人书架",
+          "tag": "LIBRARY",
+          "label": "我的收藏",
+          "catalog_left": "文章目录",
+          "catalog_right": "01 篇"
+        },
+        {
+          "kind": "list",
+          "items": [
+            {
+              "badge": "10′",
+              "label": "给自己留十分钟",
+              "detail": "随笔 · 生活切片",
+              "link_to": "visual-detail-saved",
+              "transition": "DISSOLVE"
+            }
+          ]
+        }
+      ],
+      "spec_notes": [
+        "顶栏右侧切换为『← 返回』，与详情页共用同一 Header/TopBar 高度 70px",
+        "条目整行可点，须真实展示文章标题《给自己留十分钟》，不可只显示『01 篇』空目录"
+      ]
+    },
+    {
+      "id": "visual-list-empty",
+      "name": "04 高保真列表 · 空状态",
+      "state": "空列表态",
+      "brand_title": "日间阅读",
+      "logo_char": "日",
+      "nav_is_back": true,
+      "nav_action": { "label": "返回", "link_to": "visual-detail-unsaved", "transition": "DISSOLVE" },
+      "elements": [
+        {
+          "kind": "section_heading",
+          "eyebrow": "私人书架",
+          "tag": "LIBRARY",
+          "label": "我的收藏",
+          "catalog_left": "文章目录",
+          "catalog_right": "00 篇"
+        },
+        {
+          "kind": "empty",
+          "symbol": "∅",
+          "label": "还没有收藏",
+          "detail": "在文章页点「收藏」，就能在这里重读。",
+          "action_label": "回到文章页",
+          "link_to": "visual-detail-unsaved",
+          "transition": "DISSOLVE"
+        }
+      ],
+      "spec_notes": [
+        "首次未收藏或取消全部收藏后的视觉定稿：居中暖黄空态卡片 + 清晰引导文案",
+        "提供回到文章页热区，保持与顶栏『返回』一致的清晰退路"
+      ]
+    }
+  ]
+}

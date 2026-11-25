@@ -1,0 +1,15 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":true,"hasTouch":true,"isLandscape":false,"width":390,"height":844}
+Emulating color scheme: light
+## Latest page snapshot
+uid=8_0 RootWebArea "我的收藏 · 日间阅读" url="file:///Users/oyx/GitHub/figma-agent/examples/app-delivery/build-v1.html?screen=list"
+  uid=8_1 banner
+    uid=8_2 "日间阅读"
+    uid=8_3 button "返回"
+  uid=8_4 main
+    uid=8_5 "私人书架"
+    uid=8_6 "LIBRARY"
+    uid=8_7 heading "我的收藏" level="1"
+    uid=8_8 "文章目录"
+    uid=8_9 "00 篇"
+    uid=8_10 heading "还没有收藏" level="2"
+    uid=8_11 "在文章页点「收藏」，就能在这里重读。"

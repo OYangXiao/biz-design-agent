@@ -1,0 +1,70 @@
+{
+  "version": "v2",
+  "started": "2026-11-24T17:16:10.009Z",
+  "server": {
+    "name": "chrome_devtools",
+    "title": "Chrome DevTools MCP server",
+    "version": "1.14.0"
+  },
+  "chrome": "Google Chrome 158.0.8127.36",
+  "sources": {
+    "design.html": "4e78f8741ebf36488e39c57164557f8f7c02c1b1435437341d37665ed47a92dd",
+    "build-v2.html": "6c309530e6688bc361bc0db27aeed5fe0a5cafe50836ad1b7e2de47a4044aa6e"
+  },
+  "checks": [
+    {
+      "step": "点收藏 → 已收藏",
+      "status": "通过",
+      "actual": "文章操作显示已收藏",
+      "file": "01-save.txt"
+    },
+    {
+      "step": "我的收藏 → 仅一篇目标文章",
+      "status": "通过",
+      "actual": "列表有 1 个文章入口，目标文章 1 条",
+      "file": "02-list.txt"
+    },
+    {
+      "step": "返回 → 保持已收藏",
+      "status": "通过",
+      "actual": "文章操作显示已收藏",
+      "file": "03-return.txt"
+    },
+    {
+      "step": "刷新 → 保持已收藏",
+      "status": "通过",
+      "actual": "文章操作显示已收藏",
+      "file": "04-refresh.txt"
+    },
+    {
+      "step": "取消收藏 → 恢复收藏入口",
+      "status": "通过",
+      "actual": "按钮恢复为收藏",
+      "file": "05-remove.txt"
+    },
+    {
+      "step": "再进我的收藏 → 空态且无文章",
+      "status": "通过",
+      "actual": "空态可见；目标文章出现 0 次",
+      "file": "06-empty.txt"
+    }
+  ],
+  "stability": {
+    "design": {
+      "count": 0,
+      "total": 329160,
+      "box": null
+    },
+    "actual": {
+      "count": 0,
+      "total": 329160,
+      "box": null
+    }
+  },
+  "visual": {
+    "count": 0,
+    "total": 329160,
+    "box": null
+  },
+  "sourcesUnchanged": true
+}

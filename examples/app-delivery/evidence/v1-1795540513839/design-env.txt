@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"viewport":[390,844],"dpr":1,"touch":1,"scroll":[0,0],"lang":"zh-CN","theme":"light","buttons":[{"name":"我的收藏","box":{"x":275,"y":12.5,"width":91,"height":44,"top":12.5,"right":366,"bottom":56.5,"left":275},"background":"rgba(0, 0, 0, 0)"},{"name":"收藏","box":{"x":246,"y":780,"width":120,"height":48,"top":780,"right":366,"bottom":828,"left":246},"background":"rgb(32, 61, 52)"}]}
+```

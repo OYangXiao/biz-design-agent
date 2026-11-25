@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日间阅读 · 可点线框</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f3ee;color:#242520;font:16px/1.7 system-ui,sans-serif}main{max-width:430px;min-height:100vh;margin:auto;background:#fffef9;padding:24px}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid;padding-bottom:14px}header strong,h1,article p{font-family:serif}header strong{letter-spacing:.16em}small,footer{color:#606159}section{padding:32px 0}h1{margin:8px 0 20px;font-size:30px}article p{font-size:18px;line-height:1.95}button{font:inherit;color:inherit;background:transparent;border:1px solid #77786f;border-radius:4px;min-height:44px;padding:6px 16px;cursor:pointer}#toggle{background:#30332d;color:white;min-width:105px}#row{width:100%;text-align:left}footer{padding-top:12px;border-top:1px solid #ddd;font-size:13px}
+</style>
+<main>
+<header><strong>日间阅读</strong><button id="nav">我的收藏</button></header>
+<section id="detail">
+<small>随笔 / 001</small>
+<h1>给自己留十分钟</h1>
+<article><p>水烧开了，我没有马上去拿手机。把杯子挪到窗边，看楼下的人推着车，慢慢走过那段上坡。</p>
+<p>茶凉到刚好入口，才发现这十分钟没有被谁占走。明天，也给自己留一会儿。</p></article>
+<button id="toggle" aria-pressed="false">收藏</button>
+</section>
+<section id="list" hidden><small>阅读清单</small><h1>我的收藏</h1>
+<button id="row" hidden>给自己留十分钟</button><p id="empty">还没有收藏</p></section>
+<footer>交互线框 · 模拟数据</footer><p id="warning" role="status"></p>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const key = 'daylight-reading.favorite.ten-minutes.v1';
+const scene = new URLSearchParams(location.search).get('scene');
+const simulated = ['detail','list','empty'].includes(scene);
+let saved = simulated && scene !== 'empty';
+let listing = simulated && scene !== 'detail';
+const warn = () => $('warning').textContent = '浏览器存储不可用，收藏仅在本次打开时有效。';
+if (!simulated) {
+  try { saved = localStorage.getItem(key) === '1'; } catch { warn(); }
+}
+function render() {
+  $('detail').hidden = listing;
+  $('list').hidden = !listing;
+  $('nav').textContent = listing ? '返回' : '我的收藏';
+  $('toggle').textContent = saved ? '已收藏' : '收藏';
+  $('toggle').setAttribute('aria-pressed', String(saved));
+  $('row').hidden = !saved;
+  $('empty').hidden = saved;
+}
+$('nav').onclick = () => { listing = !listing; render(); };
+$('row').onclick = () => { listing = false; render(); $('toggle').focus(); };
+$('toggle').onclick = () => {
+  saved = !saved;
+  if (!simulated) {
+    try { localStorage.setItem(key, saved ? '1' : '0'); } catch { warn(); }
+  }
+  render();
+};
+render();
+</script>
+</html>

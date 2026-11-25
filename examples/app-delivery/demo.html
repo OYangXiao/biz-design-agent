@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日间阅读 · 三步演示</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:20px;background:#ebece6;color:#252721;font:16px/1.6 system-ui,sans-serif}main{max-width:440px;margin:auto}h1{font: bold 26px serif;margin:8px 0}nav{display:flex;gap:6px}button{flex:1;min-height:44px;font:inherit;border:1px solid #73756d;color:inherit;background:transparent;border-radius:4px;cursor:pointer}button[aria-current=step]{background:#30332d;color:white}iframe{display:block;width:100%;height:32rem;border:1px solid #73756d;background:white}a{color:inherit}
+</style>
+<main><small>日间阅读 / 模拟演示</small><h1>一篇文章的收藏过程</h1>
+<p>点分镜看结果，也可在线框内操作。</p>
+<nav aria-label="演示分镜">
+<button aria-current="step">1 收藏</button><button>2 查看</button><button>3 取消</button></nav>
+<p id="caption" aria-live="polite">详情点「收藏」，按钮变为「已收藏」。</p>
+<iframe id="screen" src="prototype.html?scene=detail" title="本步结果：可点线框"></iframe>
+<p><a href="prototype.html">打开独立线框，试试重开保留</a></p></main>
+<script>
+const frames = [
+  ['detail','详情点「收藏」，按钮变为「已收藏」。'],
+  ['list','进入「我的收藏」，只有一条。点「返回」，详情仍是「已收藏」。'],
+  ['empty','详情点「已收藏」取消，再进「我的收藏」，显示「还没有收藏」。']
+];
+const buttons = document.querySelectorAll('nav button');
+buttons.forEach((button,i) => button.onclick = () => {
+  buttons.forEach(b => b.removeAttribute('aria-current'));
+  button.setAttribute('aria-current','step');
+  document.getElementById('caption').textContent = frames[i][1];
+  document.getElementById('screen').src = 'prototype.html?scene=' + frames[i][0];
+});
+</script></html>

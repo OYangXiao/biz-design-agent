@@ -94,6 +94,41 @@ function walk(n, pathStr, depth, parentAuto) {
 
 for (const f of spec.frames) walk(f, f.name, 0, false);
 
+// 校验声明式原型跳转（spec.links 与 spec.flowStart）
+const topFrameMap = new Map((spec.frames || []).map((f) => [f.name, f]));
+function hasDescendantNamed(node, targetName) {
+  if (!node) return false;
+  if (node.name === targetName) return true;
+  for (const c of node.children || []) {
+    if (hasDescendantNamed(c, targetName)) return true;
+  }
+  return false;
+}
+for (const [idx, lnk] of (spec.links || []).entries()) {
+  const tag = `links[${idx}]`;
+  if (!lnk.fromName) problems.push(`${tag}: 缺少 fromName`);
+  if (!lnk.toName) problems.push(`${tag}: 缺少 toName`);
+  if (lnk.toName && !topFrameMap.has(lnk.toName)) {
+    problems.push(`${tag}: 跳转目标顶层屏幕「${lnk.toName}」不在 frames 中`);
+  }
+  if (lnk.fromWithin) {
+    const within = topFrameMap.get(lnk.fromWithin);
+    if (!within) problems.push(`${tag}: 源屏幕「${lnk.fromWithin}」不在 frames 中`);
+    else if (lnk.fromName && !hasDescendantNamed(within, lnk.fromName)) {
+      problems.push(`${tag}: 在「${lnk.fromWithin}」中找不到可点击节点「${lnk.fromName}」`);
+    }
+  }
+}
+if (spec.flowStart) {
+  const rawStarts = Array.isArray(spec.flowStart) ? spec.flowStart : [spec.flowStart];
+  for (const st of rawStarts) {
+    const fname = typeof st === 'string' ? st : st?.frameName;
+    if (!fname || !topFrameMap.has(fname)) {
+      problems.push(`flowStart: 起点屏幕「${fname}」不在顶层 frames 中`);
+    }
+  }
+}
+
 console.log('统计:', stats);
 console.log(`问题数: ${problems.length}`);
 const shown = problems.slice(0, 40);
