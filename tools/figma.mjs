@@ -109,7 +109,7 @@ async function requirePlugin() {
   const { json: st } = await api('/status', null, 5_000);
   if (st.unreachable) die(st.error);
   if (!st.pluginOnline) {
-    die('Figma 插件未连接。请在 Figma 中运行 Plugins → Development → FIMG Agent Plugin。');
+    die('Figma 插件未连接。请在 Figma 中运行 Plugins → Development → Biz Design Agent。');
   }
   // 心跳可能刚过期，做一次真实往返确认在线
   const { json } = await api('/cmd', { cmd: 'ping' }, 30_000);
@@ -126,7 +126,7 @@ switch (cmd) {
     if (json.unreachable) die(json.error);
     console.log(json.pluginOnline
       ? `● 插件在线（${Math.round(json.pluginSeenAgo / 1000)}s 前有心跳）`
-      : '○ 插件离线（在 Figma 里运行 Plugins → Development → FIMG Agent Plugin）');
+      : '○ 插件离线（在 Figma 里运行 Plugins → Development → Biz Design Agent）');
     if (json.pluginInfo) console.log('  ', JSON.stringify(json.pluginInfo));
     if (json.progress) console.log(`   进度 ${json.progress.cmd}: 已创建 ${json.progress.done} 节点`);
     console.log(`   队列 ${json.queue} / 在途 ${json.inflight} / 端口 ${json.port}`);

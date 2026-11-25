@@ -10,4 +10,4 @@
 
 先读 [架构方案](docs/DESIGN-AGENT.md)。本仓库不提供默认业务团队、品牌、流程或发布页命名；不从旧截图、生成器或历史说明中推断团队偏好。缺团队规范时可做标明假设的探索稿，不能声称符合其规范。
 
-全栈均已纯 Node 化（零 Python 依赖），统一入口为 `bin/biz-design-agent.mjs`（或 `./fimg prd` / `./fimg proto` / `./fimg visual` / `./fimg dev-handoff` / `./fimg qa` / `./fimg visual-diff` / `./fimg setup` / `./fimg mcp` / `./fimg serve-dist`）。契约与全角色测试运行 `node --test test/design-contract.test.mjs test/prd-workflow.test.mjs test/distribution.test.mjs test/all-roles.test.mjs`；若修改插件，运行 `./fimg test` 并在目标文件的测试副本做真机验证。不要把合约测试、模拟数据、真实工具调用和设计师签收混为一种证据。
+全栈均已纯 Node 化（零 Python 依赖），统一入口为 `bin/biz-design-agent.mjs`（或 `./fimg prd` / `./fimg proto` / `./fimg visual` / `./fimg dev-handoff` / `./fimg qa` / `./fimg visual-diff` / `./fimg setup` / `./fimg mcp` / `./fimg serve-dist`）。契约与全角色测试运行 `node --test test/design-contract.test.mjs test/prd-workflow.test.mjs test/distribution.test.mjs test/all-roles.test.mjs test/browser-fallback.test.mjs test/consistency.test.mjs`；若修改插件，运行 `./fimg test` 并在目标文件的测试副本做真机验证。不要把合约测试、模拟数据、真实工具调用和设计师签收混为一种证据。

@@ -140,7 +140,7 @@ test('内网分发服务：动态生成 /bootstrap.md（含自动配置 nvm + �
     assert.match(md, /lark-cli config init --new/);
     assert.match(md, /open\.feishu\.cn\/document\/mcp_open_tools\/feishu-cli-let-ai-actually-do-your-work-in-feishu/);
     assert.match(md, /doctor --json/);
-    assert.match(md, /FIMG Agent Plugin/);
+    assert.match(md, /Biz Design Agent/);
 
     const html = await (await fetch(`${base}/`)).text();
     assert.match(html, /bootstrap\.md/);

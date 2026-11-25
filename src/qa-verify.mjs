@@ -211,7 +211,7 @@ export function browserFailureHint(message = '') {
         '浏览器进程启动后立即崩溃退出。',
         '常见解法：',
         '  1) 升级或重装浏览器；',
-        '  2) 清理临时 profile 目录（系统临时目录下的 biz-design-agent-* 与 figma-qa-chrome-*）；',
+        '  2) 清理临时 profile 目录（系统临时目录下的 biz-design-agent-*（含 -probe- 与 -qa- 前缀））；',
         '  3) 用 CHROME_BIN 指向另一个已知可用的 Chromium 内核浏览器。',
       ].join('\n');
     case 'timeout':
@@ -415,14 +415,13 @@ export async function runChromeAudit({
   const absOut = path.resolve(outDir);
   fs.mkdirSync(absOut, { recursive: true });
 
-  const untestedResult = (error, extra = {}) => ({
+  const untestedResult = (error) => ({
     ok: false,
     build_id: buildId,
     url,
     error,
     error_kind: classifyBrowserFailure(error),
     hint: browserFailureHint(error),
-    ...extra,
     steps: steps.map((s) => ({
       id: s.id,
       label: s.label,
@@ -439,7 +438,7 @@ export async function runChromeAudit({
     return untestedResult('本机未找到 Chrome/Chromium/Edge 浏览器，全部步骤标记为「未测」');
   }
 
-  const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'figma-qa-chrome-'));
+  const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'biz-design-agent-qa-'));
   let chromeProc = null;
   let cdp = null;
 

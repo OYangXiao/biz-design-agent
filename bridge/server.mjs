@@ -168,7 +168,7 @@ function failInflightWhenOffline() {
       ok: false,
       offline: true,
       error: `插件已离线（等待 ${Math.round((now - entry.ts) / 1000)}s 无响应）。`
-        + '请在 Figma 里重新运行插件 —— Plugins → Development → FIMG Agent Plugin。',
+        + '请在 Figma 里重新运行插件 —— Plugins → Development → Biz Design Agent。',
     });
   }
   const seen = state.pluginSeenAt ? `${Math.round((now - state.pluginSeenAt) / 1000)}s 前` : '从未';

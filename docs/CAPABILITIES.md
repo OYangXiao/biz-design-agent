@@ -1,9 +1,9 @@
 # 能力与用法总表
 
-> 这是 fimg-agent-plugin 的**完整能力清单**：能做什么、怎么调、边界在哪。
+> 这是 biz-design-agent 的**完整能力清单**：能做什么、怎么调、边界在哪。
 > 面向"想用"和"想审查"两种读者 —— 每个能力都标了**真机验证状态**。
 >
-> 相关文档见文末「文档索引」。当前插件版本 **v1.5.0**。
+> 相关文档见文末「文档索引」。当前插件版本 **v1.5.1**。
 
 ---
 
@@ -14,7 +14,7 @@
 ./fimg bridge
 
 # ② 在 Figma 里运行插件（这一步只能手动）
-#    Plugins → Development → FIMG Agent Plugin
+#    Plugins → Development → Biz Design Agent
 #    ⚠ 面板别关：关掉 = 长轮询断开 = 所有命令失败
 
 # ③ 确认链路
@@ -457,7 +457,7 @@ Figma 加新字段也不会丢。
 | 7 | **SPEC_DSL 不建组件/交互** | 从零生成模式下无法产出 COMPONENT/INSTANCE |
 | 8 | **`npm` 环境未测** | `package.json` 里的 scripts 保留着，但本项目一直在无 npm 环境跑 |
 
-完整清单与优先级见 [`ROADMAP.md`](ROADMAP.md)。
+完整清单与优先级见本文「已知缺口」一节。
 
 ---
 
@@ -466,11 +466,8 @@ Figma 加新字段也不会丢。
 | 文档 | 内容 |
 |---|---|
 | **`CAPABILITIES.md`**（本文） | 能力全表 + 用法 + 边界 |
-| [`REVIEW.md`](REVIEW.md) | **审查指南**：代码索引、已验证矩阵、高风险区、如何复现 |
 | [`ITERATING.md`](ITERATING.md) | 在现有稿上迭代的完整用法（当前主模式） |
 | [`SPEC_DSL.md`](SPEC_DSL.md) | 规格 DSL 完整参考（从零生成模式） |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | 数据流、协议、设计决策 |
-| [`PITFALLS.md`](PITFALLS.md) | **27 个坑**的现象 / 根因 / 修法 |
-| [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md) | 症状 → 诊断 → 修复 |
-| [`ROADMAP.md`](ROADMAP.md) | 已验证/未验证、已知问题、后续方向 |
+| [`DESIGN-AGENT.md`](DESIGN-AGENT.md) | 架构方案与设计决策 |
+| [`ROLE-SIMULATION-REPORT.md`](ROLE-SIMULATION-REPORT.md) | 四角色真机模拟验证报告 |
 | [`../AGENTS.md`](../AGENTS.md) | 开发者交接（先读这份） |

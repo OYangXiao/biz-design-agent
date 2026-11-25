@@ -22,7 +22,7 @@ if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then
 fi
 
 echo "启动桥： http://localhost:$PORT  (node: $NODE)"
-echo "在 Figma 里运行插件： Plugins → Development → FIMG Agent Plugin"
+echo "在 Figma 里运行插件： Plugins → Development → Biz Design Agent"
 echo "状态查询： curl -s localhost:$PORT/status"
 echo
 exec "$NODE" bridge/server.mjs

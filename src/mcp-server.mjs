@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline';
+import { fileURLToPath } from 'node:url';
 import { DEFAULT_BRIDGE_URL, checkBridgeStatus, ensureBridgeRunning } from './env-doctor.mjs';
 import { computeMenuState, exportPrdBundle, inspectWordDocument, syncPrdToFeishu } from './prd.mjs';
 import { computePrototypeMenuState, derivePrototypeFromPrd, exportPrototypeBundle } from './prototype.mjs';
@@ -10,7 +11,9 @@ import { computeDevMenuState, exportDevHandoff } from './dev-handoff.mjs';
 import { computeQaMenuState, runChromeAudit } from './qa-verify.mjs';
 import { visualDiffPng } from './visual-diff.mjs';
 
-const SERVER_INFO = { name: 'biz-design-agent', version: '2.0.0' };
+// 版本号以 package.json 为唯一来源，避免 MCP 握手报出的版本与包版本不一致
+const PKG = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf8'));
+const SERVER_INFO = { name: 'biz-design-agent', version: PKG.version };
 const PROTOCOL_VERSION = '2024-11-05';
 
 export const MCP_TOOLS = [
@@ -223,7 +226,7 @@ async function callBridgeCmd(cmd, payload = {}) {
     return {
       ok: false,
       pluginOnline: false,
-      error: '本地桥已在线，但 Figma 插件尚未连接。请在 Figma Desktop 中运行 Plugins → Development → FIMG Agent Plugin。',
+      error: '本地桥已在线，但 Figma 插件尚未连接。请在 Figma Desktop 中运行 Plugins → Development → Biz Design Agent。',
     };
   }
   const res = await fetch(`${DEFAULT_BRIDGE_URL}/cmd`, {

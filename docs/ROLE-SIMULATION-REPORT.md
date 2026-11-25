@@ -22,6 +22,10 @@
 
 ## 二、真机演练产物索引
 
+> **注意**：以下产物均生成在 `out/live-simulation/` 下，而 `out/` 已被 `.gitignore` 忽略、不随仓库分发。
+> 因此在克隆后的仓库中这些链接**不可点击**属于预期行为——它们记录的是当次真机演练的落盘位置，
+> 需在本机重新执行对应角色流程后才会实际存在。本文的文字结论不依赖这些文件。
+
 - 演练汇总数据：[simulation-summary.json](../out/live-simulation/simulation-summary.json)
 - 角色一（PRD）：[PRD.docx](../out/live-simulation/01-prd/PRD.docx) · [Figma 单页导图](../out/live-simulation/01-prd/figma-exports/PRD_单页看板_·_日间阅读_App_·_文章收藏与我的收藏夹_PRD.png)
 - 角色一（可交互线稿原型）：[Prototype-Guide.md](../out/live-simulation/02-prototype/Prototype-Guide.md) · [首屏线稿导图](../out/live-simulation/02-prototype/figma-exports/01_文章详情页_·_未收藏.png) · [屏外 PRD 与设计理由卡](../out/live-simulation/02-prototype/figma-exports/PRD映射与设计说明_·_01_文章详情页_·_未收藏.png)

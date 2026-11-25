@@ -13,7 +13,7 @@ const PKG = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'))
 
 export function renderBootstrapMarkdown({
   baseUrl,
-  packageName = PKG.name || 'fimg-agent-plugin',
+  packageName = PKG.name || 'biz-design-agent',
   version = PKG.version || '1.0.0',
   npmRegistry = '',
   npmScope = '',
@@ -163,7 +163,7 @@ FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/biz-design-agent"
    - **若 \`bridge.pluginOnline\` 为 false**：
      1. 提示用户：本地免费账号读写画布依赖 **Figma Desktop 桌面客户端**加载插件（位于 \`~/.biz-design-agent/plugin/manifest.json\`，全局只需导入一次）。
      2. 自动帮用户在系统文件管理器高亮插件目录（macOS：\`open -R "$HOME/.biz-design-agent/plugin/manifest.json"\`；Windows：\`explorer /select,"$HOME\\.biz-design-agent\\plugin\\manifest.json"\`）。
-     3. 给出 3 步指引：在 Figma Desktop 打开任意设计稿 → 顶部菜单 \`Plugins → Development → Import plugin from manifest...\` 选中该 \`manifest.json\` → 运行 \`FIMG Agent Plugin\` 看到面板显示已连接。
+     3. 给出 3 步指引：在 Figma Desktop 打开任意设计稿 → 顶部菜单 \`Plugins → Development → Import plugin from manifest...\` 选中该 \`manifest.json\` → 运行 \`Biz Design Agent\` 看到面板显示已连接。
      4. 提示用户：**“在 Figma 点开插件后回复『好了』，我立刻做真机握手验证。”**
    - 用户回复后，执行真机往返验证：
      \`\`\`bash

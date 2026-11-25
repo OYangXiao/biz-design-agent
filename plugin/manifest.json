@@ -1,6 +1,6 @@
 {
-  "name": "FIMG Agent Plugin",
-  "id": "fimg-agent-plugin-local",
+  "name": "Biz Design Agent",
+  "id": "biz-design-agent-local",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
