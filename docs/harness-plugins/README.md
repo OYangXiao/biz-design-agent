@@ -231,6 +231,81 @@ Antigravity 用 `mcp_config.json`：
 
 ---
 
+## 3.5 实测：Claude Code 插件链路（**已验证，含真实项目 MCP**）
+
+**环境**：`codex-cli` 无关；本节用的是 `claude` 2.1.332（`~/.local/bin/claude`）。
+**验证方式**：`claude plugin validate` + `claude -p ... --plugin-dir <dir>`。
+**结论**：四类组件全部可用，且**本项目真实的 MCP server 成功在插件内被调起**。
+
+### E-1. 组件验证矩阵
+
+| 组件 | 验证方式 | 结果 |
+|---|---|---|
+| manifest | `claude plugin validate` | ✅ 通过 |
+| skills | 让模型按 skill 指示作答 | ✅ 返回预期标记（证明 skill 进入上下文） |
+| agents | 调用子代理 | ✅ 正确识别为 `<plugin>:<agent>` |
+| MCP server（自建） | 调用 echo 工具 | ✅ 回传参数 |
+| **MCP server（本项目真实）** | 调用 `figma_status` | ✅ **返回真实桥状态 JSON** |
+
+最后一项最关键：把 `~/Projects/biz-design-agent` 的 `bin/` 与 `src/` 挂进插件目录，用 `${CLAUDE_PLUGIN_ROOT}` 定位，模型真实调起了 `figma_status` 并拿到桥接数据（`reachable: true`, `port: 8787`）。
+
+### E-2. 关键确认：`${CLAUDE_PLUGIN_ROOT}` 在 `.mcp.json` 中确实生效
+
+这一条消除了原先的「风险 1」。实测可用的形态：
+
+```json
+{
+  "mcpServers": {
+    "biz-design-agent": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/bin/biz-design-agent.mjs", "mcp"]
+    }
+  }
+}
+```
+
+工具名被正确命名空间化为 `mcp__plugin_<plugin>_<server>__<tool>`，与文档描述一致。
+
+**含义**：**不需要**走「发 npm 全局包」的兜底路线，插件自包含即可。
+
+### E-3. 插件目录校验强制要求 README 与 LICENSE
+
+首次 `validate` 直接被拒：
+
+```console
+✘ README.md: README missing (README_MISSING)
+✘ LICENSE: License missing (LICENSE_MISSING)
+```
+
+补齐后才 `✔ Validation passed`。补充要求：
+
+- README **至少 40 词**，建议包含一行 marketplace 安装指令（否则只给 Advice）
+- LICENSE 文件，或在 `plugin.json` 里写 `license`（SPDX id）
+- 图标为 **warning 非 error**：`plugin.json` 的 `icon` 或 `.claude-plugin/icon.png`，要求方形 PNG/JPEG、512–2048 px、< 2 MB（**不接受 SVG/WebP**）
+
+### E-4. `claude plugin install` 不支持本地目录（与 Antigravity 的关键差异）
+
+| | Antigravity | Claude Code |
+|---|---|---|
+| 装本地目录 | `agy plugin install <dir>` ✅ | ❌ **不支持** |
+| 本地目录加载方式 | 直接 install | 只能 `claude --plugin-dir <dir>` 临时加载 |
+| 永久安装 | `install` | **必须经 marketplace**（`/plugin install <name>@<mp>`） |
+
+`claude plugin install` 的帮助明确写着「Install a plugin from available marketplaces」。
+所以 Claude Code 的分发**必须**配一个 marketplace，否则用户体验只能是每次带 `--plugin-dir`。
+
+### E-5. 对交付方式的影响
+
+| Harness | 推荐分发路径 |
+|---|---|
+| Antigravity | `agy plugin install <dir>` —— 最短路径 |
+| **Claude Code** | 建 marketplace（`.claude-plugin/marketplace.json`），用户 `/plugin install biz-design-agent@<mp>` |
+| Codex | 与 Claude 共用 marketplace 体系（待验证，见风险 8） |
+
+> 因此 `dist/plugin/` **必须同时产出 marketplace 清单**，不能只有 plugin.json。
+
+---
+
 ## 4. 未验证的技术风险（**请重点评估**）
 
 这几项在文档中没有明确答案，是方案落地的真实风险，二次规划时必须覆盖。
@@ -268,25 +343,50 @@ Codex 文档提到可引用 "Agent Plugins 1.0 packages"，但未给出规范定
 若 Codex 复用 `.claude-plugin/plugin.json` 时也沿用 `skills/` 布局（合理解推断，但未获文档确认），则三者天然统一。
 **验证方法**：构造一个含 `skills/` 的最小插件，装进 Codex 后用 `@` 菜单看 skill 是否出现。
 
-### 风险 6：~~Antigravity CLI 未安装~~ → **已消除（管理面已验证）**
+### 风险 6：~~Antigravity CLI 未安装~~ → **已消除**
 
-`agy plugin validate` / `install` / `list` / `uninstall` 已实测通过，结论见「发现 D」。
+`agy plugin validate` / `install` / `list` / `uninstall` 已实测通过（管理面），见「发现 D」。
+运行时（真实会话中的加载行为）**仍未验证**。
 
-**但仍有一部分未验证**：插件在**真实模型会话**中的行为（skill 是否进入 context、MCP 工具是否注册成功）需要一次实际会话才能确认，本次**未做**。
+### 风险 7：~~Claude Code CLI 未安装~~ → **已消除**
 
-### 风险 7：Claude Code / Codex 的 CLI 本机未安装
+`claude plugin validate` 与 `--plugin-dir` 加载均已实测，**含本项目真实 MCP server**，见 §3.5。
 
-| CLI | 状态 |
-|---|---|
-| `agy`（Antigravity） | ✅ 已安装并通过插件管理面验证 |
-| `claude`（Claude Code） | ❌ 未安装 |
-| `codex`（Codex） | ❌ 未安装 |
-| `cursor`（Cursor） | ❌ 未安装 |
-| `dsh`（DeepSeek Harness） | ✅ 已安装 |
+当前 CLI 状态：
 
-**含义**：`claude plugin validate` 与 Codex 侧的加载测试**无法执行**。这两家的结论仍停留在文档层面。
+| CLI | 状态 | 验证程度 |
+|---|---|---|
+| `agy`（Antigravity） | ✅ 已装 | 管理面 + 格式转换已验证；运行时未验证 |
+| `claude`（Claude Code） | ✅ 已装 | **完整链路已验证**（skill/agent/MCP 全部跑通） |
+| `codex`（Codex） | ✅ 已装 0.172.0 | ❌ 卡在登录，**未能验证** |
+| `cursor`（Cursor） | ❌ 未装 | 文档未抓取 |
+| `dsh`（DeepSeek Harness） | ✅ 已装 | 分发机制已梳理 |
 
-**注意**：Antigravity 已验证的是**管理面**（能装、能列、能卸），不等于**运行时**可用。两者差距见「发现 D-5」。
+### 风险 8：Codex 侧完全未验证
+
+`codex` CLI 已安装（0.172.0），但**未能登录**，因此 Codex 的插件加载路径**没有任何实测**。
+
+Codex 的认证方式（据 [`raw/codex-plugins.md`](raw/codex-plugins.md) 与 llms-full 抽取）：
+
+| 方式 | 命令 / 配置 | 前提 |
+|---|---|---|
+| API key | `printenv OPENAI_API_KEY \| codex login --with-api-key` | 需 OpenAI Platform 账号 |
+| Access token | `codex login --with-access-token` | 需已有 token |
+| ChatGPT 登录 | 浏览器 OAuth | 账号需符合地区要求 |
+| **自定义 provider** | `[model_providers.<id>]` + `env_key` | **provider 必须支持 Responses API** |
+
+**关键阻塞点**：`wire_api` 的**唯一受支持值是 `responses`**（文档原文：`responses` is the only supported value）。文档进一步明确：
+
+> A working Chat Completions or Anthropic Messages endpoint doesn't establish Responses compatibility.
+
+即：**没有一个能跑 Chat Completions 的网关不能直接接 Codex**。若要用公司网关接 Codex，必须在其前面加一层 Responses API 适配（自建代理或网关侧改造），这属于额外工程量。
+
+**二次规划建议**：Codex 这一路要么
+1. 用真实 OpenAI API key（需 Platform 账号，按 API 价计费），或
+2. 写一个 Chat Completions → Responses 的转换代理，或
+3. 明确列为「暂不支持」，先交付另两家。
+
+在 Codex 登录问题解决前，插件在 Codex 侧的兼容性只能依据文档推断（它读 `.claude-plugin/` 布局）。
 
 ---
 
@@ -299,7 +399,8 @@ Codex 文档提到可引用 "Agent Plugins 1.0 packages"，但未给出规范定
 ```text
 dist/plugin/                          # 构建产物（一条命令生成，不手工维护）
 ├── .claude-plugin/
-│   └── plugin.json                   # ★ 三家共用（Antigravity 安装时自动转换）
+│   ├── plugin.json                   # ★ 三家共用（Antigravity 安装时自动转换）
+│   └── marketplace.json              # ★ 必需：Claude Code 只能经 marketplace 安装
 ├── .agents/
 │   └── plugins/
 │       └── marketplace.json          # 可选：Codex 本地市场入口
@@ -312,8 +413,12 @@ dist/plugin/                          # 构建产物（一条命令生成，不�
 ├── bin/                              # CLI + MCP server 入口
 ├── src/                              # MCP server 依赖模块（必需）
 ├── plugin/                           # Figma 插件（需人工导入，无法自动安装）
-└── README.md
+├── LICENSE                           # ★ 必需：claude plugin validate 强制
+└── README.md                         # ★ 必需：≥40 词，建议含 marketplace 安装指令
 ```
+
+> **上表中标 ★ 的三项（`marketplace.json`、`LICENSE`、`README.md`）来自实测**：
+> 缺 README/LICENSE 会让 `claude plugin validate` 直接失败；缺 marketplace 则 Claude Code 用户无法永久安装（见 §3.5 E-3、E-4）。
 
 ### 5.2 增强方案（上 Marketplace 时）：补原生 manifest
 
@@ -399,9 +504,16 @@ dist/plugin/                          # 构建产物（一条命令生成，不�
 | 项 | 值 |
 |---|---|
 | `agy` 版本 | 1.5.1（Gemini App 内置：`/Applications/Gemini.app/Contents/Helpers/agy`） |
-| 验证范围 | `plugin validate` / `install` / `list` / `uninstall` |
-| 是否消耗模型额度 | **否**，全部为本地管理面操作 |
-| 测试产物 | 验证后已 `uninstall` 清理，未留残留 |
+| `agy` 验证范围 | `plugin validate` / `install` / `list` / `uninstall` |
+| `agy` 是否消耗模型额度 | **否**，全部为本地管理面操作 |
+| `claude` 版本 | 2.1.332（`~/.local/bin/claude`） |
+| `claude` 验证范围 | `plugin validate` + `-p --plugin-dir` 运行时加载 |
+| `claude` 是否消耗模型额度 | **是**，4 次极短会话（提示词均在 100 token 内） |
+| `codex` 版本 | 0.172.0，**未登录，未验证** |
+| 测试产物 | 全部临时目录已删除；`claude plugin list` 无残留；源仓库 `git status` 干净 |
+
+**模型来源说明**：`claude` 的实测会话走的是自定义网关（`ANTHROPIC_BASE_URL` 指向第三方端点），非 Anthropic 官方 API。
+这不影响插件加载链路的结论——插件解析、组件注册、MCP 挂载都在客户端侧完成，与模型供应商无关。
 
 **`agy` 版本差异提醒**：Gemini App 内置的 `agy` 与独立安装的 CLI 版本可能不同（本次分别为 1.5.1 与 1.5.16）。
 两者的 `plugin` 子命令行为可能随版本演进，复现时请以实际 `agy plugin --help` 输出为准。
