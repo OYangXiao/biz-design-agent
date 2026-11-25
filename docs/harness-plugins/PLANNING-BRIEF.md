@@ -39,8 +39,11 @@
 
 - **Codex 原生兼容 Claude 格式**：目录下有 `.claude-plugin/plugin.json` 即可（且无 marketplace 清单时按 standalone plugin 处理）。原始引用见 [`raw/codex-marketplace-sync.md`](raw/codex-marketplace-sync.md)。
 - **Antigravity 官方支持多 provider 仓库**：`.antigravity-plugin/plugin.json` 与 `.claude-plugin/plugin.json` 可共存，且文档专门列出「别家文件被安全忽略」的表。见 [`raw/antigravity-build-plugins.md`](raw/antigravity-build-plugins.md)。
+- **Antigravity 还会自动转换 Claude 格式（已实测）**：纯 `.claude-plugin/plugin.json` 在 `agy plugin validate` 下会报错，但 `agy plugin install` 能成功安装并自动生成根 `plugin.json`，`plugin list` 标记 `Source: claude-code`。详见 [`README.md`](README.md) 的「发现 D」。
 
-→ 只需 **2 份 manifest + 2 份 MCP 配置**，其余共享。
+→ 首发只需 **1 份 manifest + 2 份 MCP 配置**，其余共享。
+
+> **转换的代价**：自动转换只搬运 `name` / `version` / `description`，`logo`、`suggestedPrompts`、`author` 等 Antigravity 专有字段会丢失。要上 Marketplace 展示时才需要补原生 `.antigravity-plugin/plugin.json`。
 
 ### 结论 2：DSH 无法并入同一产物
 
@@ -49,12 +52,19 @@ DSH 没有「插件目录」概念，只有 **npm bundle + Cordis patch**，且�
 
 → 需要**独立的第二个构建目标** `dist/dsh/`。
 
-### 结论 3：真实风险集中在「未验证」
+### 结论 3：验证进度——Antigravity 管理面已验证，其余未验证
 
-本机**只装了 DSH**，`agy` / `claude` / `codex` 均未安装。
-所以「三家可装」目前只是**文档层面成立**，**尚未经过任何实际加载测试**。
+| 验证项 | 状态 |
+|---|---|
+| `agy plugin validate` / `install` / `list` / `uninstall` | ✅ **已实测通过** |
+| Antigravity 自动转换 Claude 格式 | ✅ **已实测通过** |
+| 插件在**真实模型会话**中被正确加载（skill 进 context、MCP 工具注册） | ❌ 未验证 |
+| Claude Code 插件加载 | ❌ 未验证（本机无 `claude` CLI） |
+| Codex 插件加载 | ❌ 未验证（本机无 `codex` CLI） |
 
-规划时必须把「验证阶段」作为独立交付物，不能默认可用。
+**关键区分**：已验证的是 Antigravity 的**管理面**（能装、能列、能卸、组件计数正确），**不等于运行时可用**。
+
+规划时仍应把「真实会话验证」作为独立交付物。
 
 ---
 
@@ -116,9 +126,13 @@ Antigravity 文档提到 `.cursor-plugin/plugin.json` 也是可共存位置，�
 1. **抽 skill**：把 `PRD_SKILL_MD` 从 `harness-setup.mjs` 移到 `skills/biz-design-agent/SKILL.md`（零风险，纯重构）
 2. **写构建脚本**：`packaging/build-harness-plugin.mjs` → `dist/plugin/`
 3. **本地静态校验**：JSON schema、路径存在性、版本一致性（可自动化，不需装 CLI）
-4. **安装真机验证**（需装 CLI）：Antigravity 优先 → Claude → Codex
-5. **导出 DSH bundle**：`packaging/build-dsh-bundle.mjs` → `dist/dsh/`
-6. **更新文档**：`docs/SETUP.md` 增加四条安装路径
+4. **Antigravity 落地验证**：`agy plugin validate` → `agy plugin install` → `agy plugin list` 确认组件计数（**管理面，已验证可行**）
+5. **运行时验证**（需占用一次模型会话）：确认 skill 进入 context、MCP 工具出现在工具表
+6. **Claude Code / Codex 验证**（需装对应 CLI）
+7. **导出 DSH bundle**：`packaging/build-dsh-bundle.mjs` → `dist/dsh/`
+8. **更新文档**：`docs/SETUP.md` 增加四条安装路径
+
+> 第 4 步与第 5 步是两件事：能安装不等于能加载。已实测的只是第 4 步。
 
 ---
 
@@ -126,8 +140,9 @@ Antigravity 文档提到 `.cursor-plugin/plugin.json` 也是可共存位置，�
 
 | 项 | 判定 |
 |---|---|
-| 版本一致 | 两份 manifest 的 `version` == `package.json` 的 `version` |
+| 版本一致 | 生成的 manifest `version` == `package.json` 的 `version` |
 | 路径有效 | manifest 引用的每个文件真实存在 |
+| Antigravity 可装 | `agy plugin install` 成功且 `plugin list` 显示正确组件数 |
 | MCP 可启动 | 插件安装后 MCP server 能完成 `initialize` 握手 |
 | 工具可见 | 用户侧能看到全部 17 个工具（或明确说明可见数量） |
 | skill 可加载 | `@` 菜单或 `/` 命令能看到该 skill |

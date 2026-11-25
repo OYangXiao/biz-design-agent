@@ -1,20 +1,23 @@
 # 多 Harness 插件打包：架构对比与方案
 
 > **本文用途**：给另一个 AI 或工程师做二次规划的输入材料。
-> **依据**：Antigravity / Claude Code / Codex 三家的官方插件文档，原文归档在同目录 [`raw/`](raw/)。
+> **依据**：Antigravity / Claude Code / Codex 三家的官方插件文档（原文归档在同目录 [`raw/`](raw/)），以及对 `agy` 插件管理面的**实测验证**。
 > **抓取日期**：2026-11-25。
-> **结论先行**：可以做**一份源码、一次构建、产出三家可装**的插件，因为 Codex 原生兼容 Claude 的插件格式。
+> **结论先行**：可以做**一份源码、一次构建、产出三家可装**的插件。Codex 原生兼容 Claude 格式；Antigravity 经实测**也会在安装时自动转换** Claude 格式。
 
 ---
 
 ## 0. 一句话结论
 
-三家的 `skills/` 目录约定**完全一致**，Codex 又**直接支持** `.claude-plugin/plugin.json`。
+三家的 `skills/` 目录约定一致，Codex **直接支持** `.claude-plugin/plugin.json`，Antigravity 经实测**安装时自动转换**同格式。
 因此只需要：
 
-- **2 份 manifest**（Claude/Codex 共用一份，Antigravity 单独一份）
+- **1 份 manifest**（`.claude-plugin/plugin.json`，三家共用；Antigravity 如需 Marketplace 展示再补原生一份）
 - **2 份 MCP 配置**（文件名和路径变量名不同，无法合并）
 - **其余全部共享**（skills、agents、scripts、bin）
+
+> 状态标记：本节结论中，「1 份 manifest 可装三家」的 Antigravity 部分**已实测**（见 §2 发现 D）；
+> Claude Code 与 Codex 两侧仍为**文档层面结论**，未做真机加载（见风险 7）。
 
 ---
 
@@ -22,7 +25,7 @@
 
 | 维度 | Antigravity | Claude Code | Codex |
 |---|---|---|---|
-| manifest 路径 | `plugin.json` 或 `.antigravity-plugin/plugin.json` | `.claude-plugin/plugin.json` | `.codex-plugin/plugin.json`，**或复用 `.claude-plugin/plugin.json`** |
+| manifest 路径 | `plugin.json` 或 `.antigravity-plugin/plugin.json`；<br>**也可直接吃 `.claude-plugin/plugin.json`（安装时自动转换，已实测）** | `.claude-plugin/plugin.json` | `.codex-plugin/plugin.json`，**或复用 `.claude-plugin/plugin.json`** |
 | skills | `skills/<name>/SKILL.md` | `skills/<name>/SKILL.md` | 支持插件内 skill（**目录名未公开**，见风险 5） |
 | agents | `agents/<name>.md` | `agents/<name>.md` | 兼容 Claude 布局 |
 | MCP 配置 | **`mcp_config.json`** | **`.mcp.json`** | 同 Claude（`.mcp.json`） |
@@ -106,6 +109,94 @@ skill 写一次，Antigravity 与 Claude 都从 `skills/<name>/SKILL.md` 读，f
 
 **Codex 侧的证据强度不同**：文档确认「插件可包含一个或多个 skill」「bundled skills 在安装后开新会话即可用」，但**未在已抓取页面中公开插件内 skill 的目录名**。可能沿用 Claude 布局（因为它兼容 `.claude-plugin/`），但这是**推断而非文档明确**，列入风险 5。
 
+### 发现 D：Antigravity 的 `plugin install` 会自动转换 Claude 格式（**已实测**）
+
+这一条推翻了「必须为 Antigravity 单独准备 manifest」的假设，是本次调研中唯一经过真机验证的结论。
+
+**实测环境**：`agy` 1.5.1（Gemini App 内置版本，`/Applications/Gemini.app/Contents/Helpers/agy`）。全部为本地操作，未产生模型调用。
+
+#### D-1. 原生格式校验通过
+
+最小插件（`plugin.json` + `skills/<name>/SKILL.md`）：
+
+```console
+$ agy plugin validate . --strict
+Validating probe-test (plugin.json)
+  · plugin.json: no logo: the plugin shows a generic icon. Add "logo": "assets/logo.svg" ...
+  skills 1 · agents 0 · rules 0 · hooks 0 · mcpServers 0 · sidecars 0
+✔ Validation passed
+```
+
+`--strict` 下通过，唯一提示是缺 logo——即 **logo 属 Marketplace 展示要求，不阻断本地加载**。
+
+#### D-2. 安装落盘路径
+
+```console
+$ agy plugin install .
+  [ok]    probe-test
+          ✔ skills      : 1 installed (probe)
+          Installed to /Users/oyx/.gemini/config/plugins/probe-test
+$ agy plugin list
+Installed plugins:
+- probe-test (enabled, 1.0.0)
+    Source:     antigravity
+    Components: 1 skill
+```
+
+`plugin list` 会报告 `Source` 与组件统计，可作为 CI 中的落地校验手段。
+
+#### D-3. 纯 Claude 格式：`validate` 拒绝，`install` 自动转换（关键结论）
+
+只放 `.claude-plugin/plugin.json`（无根 manifest）时：
+
+```console
+$ agy plugin validate .
+  ✗ plugin.json: no plugin.json found at the plugin root or in .antigravity-plugin or .gemini-plugin.
+    This looks like a Claude Code plugin: `plugin install` converts it, but it doesn't load as is
+Error: validation failed: 1 error, 0 warnings
+```
+
+但 `install` 照常成功，并**自动生成根 `plugin.json`**：
+
+```console
+$ agy plugin install .
+  [ok]    probe-claude-fmt
+          ✔ skills      : 1 installed (probe2)
+          Installed to /Users/oyx/.gemini/config/plugins/probe-claude-fmt
+$ agy plugin list
+- probe-claude-fmt (enabled, 1.0.0)
+    Source:     claude-code          ← 识别为 Claude 来源
+    Components: 1 skill
+```
+
+生成的根 manifest 只搬运了三个字段：
+
+```json
+{
+  "description": "Claude-format plugin to verify Antigravity compatibility.",
+  "name": "probe-claude-fmt",
+  "version": "1.0.0"
+}
+```
+
+#### D-4. 对打包方案的影响
+
+| 原假设 | 实测结论 |
+|---|---|
+| 必须写 `.antigravity-plugin/plugin.json` 才能装 | ❌ 不必。`install` 会转换 `.claude-plugin/` 格式 |
+| 三份 manifest 变两份 | ✅ 可进一步收敛为**一份 Claude 格式首发** |
+| Antigravity 专有字段能否保留 | ⚠️ 转换只搬 `name`/`version`/`description`，**`logo`、`suggestedPrompts`、`author` 等会丢失** |
+
+**建议**：
+- **首发用统一 Claude 格式**，Antigravity 用户 `agy plugin install` 即可，路径最短；
+- 若后续要上 Marketplace 或重视详情页展示，再补原生 `.antigravity-plugin/plugin.json`（含 logo 与 suggestedPrompts）；
+- CI 中对 Antigravity 侧用 `agy plugin validate`（**不带 `--strict`**），因为纯 Claude 格式在 `--strict` 下会报错但 `install` 可用。
+
+#### D-5. 本次未覆盖的部分
+
+`plugin validate` / `install` / `list` / `uninstall` 属于管理面操作，**全部本地完成**。
+但插件在真实会话中是否被正确注入（skill 是否进入 context、MCP 工具是否出现）需要一次模型调用，**本次未验证**，仍列在风险章节。
+
 ---
 
 ## 3. 唯一无法共享的部分：MCP 配置
@@ -177,33 +268,38 @@ Codex 文档提到可引用 "Agent Plugins 1.0 packages"，但未给出规范定
 若 Codex 复用 `.claude-plugin/plugin.json` 时也沿用 `skills/` 布局（合理解推断，但未获文档确认），则三者天然统一。
 **验证方法**：构造一个含 `skills/` 的最小插件，装进 Codex 后用 `@` 菜单看 skill 是否出现。
 
-### 风险 6：Antigravity / Claude / Codex 的 CLI 本机均未安装
+### 风险 6：~~Antigravity CLI 未安装~~ → **已消除（管理面已验证）**
 
-实测本机 `PATH`：
+`agy plugin validate` / `install` / `list` / `uninstall` 已实测通过，结论见「发现 D」。
+
+**但仍有一部分未验证**：插件在**真实模型会话**中的行为（skill 是否进入 context、MCP 工具是否注册成功）需要一次实际会话才能确认，本次**未做**。
+
+### 风险 7：Claude Code / Codex 的 CLI 本机未安装
 
 | CLI | 状态 |
 |---|---|
-| `agy`（Antigravity） | ❌ 未安装 |
+| `agy`（Antigravity） | ✅ 已安装并通过插件管理面验证 |
 | `claude`（Claude Code） | ❌ 未安装 |
 | `codex`（Codex） | ❌ 未安装 |
 | `cursor`（Cursor） | ❌ 未安装 |
-| `dsh`（DeepSeek Harness） | ✅ 已安装（`~/.nvm/.../bin/dsh`） |
+| `dsh`（DeepSeek Harness） | ✅ 已安装 |
 
-**含义**：`agy plugin validate` 与 `claude plugin validate` **在当前机器上都无法执行**。
-二次规划若要在本机验证，需先安装相应 CLI；否则只能靠文档对照 + 结构审查，无法做真实的加载测试。
+**含义**：`claude plugin validate` 与 Codex 侧的加载测试**无法执行**。这两家的结论仍停留在文档层面。
 
-这一条对方案影响最大：**「三家可装」目前是文档层面的结论，尚未经过任何一家的实际加载验证。**
+**注意**：Antigravity 已验证的是**管理面**（能装、能列、能卸），不等于**运行时**可用。两者差距见「发现 D-5」。
 
 ---
 
 ## 5. 目标产物结构
 
+### 5.1 首发方案（推荐）：统一 Claude 格式
+
+依据「发现 D」实测结论，Antigravity 的 `install` 会自动转换 Claude 格式，因此首发只需一份 manifest：
+
 ```text
 dist/plugin/                          # 构建产物（一条命令生成，不手工维护）
 ├── .claude-plugin/
-│   └── plugin.json                   # → Claude Code + Codex
-├── .antigravity-plugin/
-│   └── plugin.json                   # → Antigravity
+│   └── plugin.json                   # ★ 三家共用（Antigravity 安装时自动转换）
 ├── .agents/
 │   └── plugins/
 │       └── marketplace.json          # 可选：Codex 本地市场入口
@@ -212,12 +308,24 @@ dist/plugin/                          # 构建产物（一条命令生成，不�
 │       └── SKILL.md                  # ★ 三家共用
 ├── agents/                           # 可选
 ├── .mcp.json                         # Claude + Codex
-├── mcp_config.json                   # Antigravity
+├── mcp_config.json                   # Antigravity（MCP 文件名无法共用，仍需单独一份）
 ├── bin/                              # CLI + MCP server 入口
 ├── src/                              # MCP server 依赖模块（必需）
 ├── plugin/                           # Figma 插件（需人工导入，无法自动安装）
 └── README.md
 ```
+
+### 5.2 增强方案（上 Marketplace 时）：补原生 manifest
+
+```text
+├── .antigravity-plugin/
+│   └── plugin.json                   # 含 logo / suggestedPrompts / author
+```
+
+自动转换只会搬 `name`/`version`/`description` 三个字段，**Logo 与 starter prompts 会丢失**。
+如果需要 Antigravity 详情页的展示效果，才值得为它单独维护一份原生 manifest。
+
+> 注意：`.antigravity-plugin/plugin.json` 存在时**优先于**根 `plugin.json`，而 `install` 的自动转换生成的是根 `plugin.json`，两者可共存不冲突。
 
 ### 为什么 `bin/` + `src/` 都要打包
 
@@ -237,7 +345,7 @@ dist/plugin/                          # 构建产物（一条命令生成，不�
 | 按客户端分别写配置 | `src/harness-setup.mjs` 的 `configureHarness()` | 🔶 插件化后对新三家不再需要；保留作为「其它 harness」兜底 |
 | Figma 插件 | `plugin/manifest.json`、`code.js`、`ui.html` | ❌ 三家 harness 插件**都无法**自动安装它，必须人工 Import |
 | 接入引导 | `dist/bootstrap.md`、`docs/SETUP.md` | 🔶 插件化后 SETUP 增加插件安装路径，bootstrap 保留给非插件场景 |
-| 一致性测试 | `test/consistency.test.mjs` | ✅ 应扩展：校验生成的两份 manifest 与源 package.json 版本一致 |
+| 一致性测试 | `test/consistency.test.mjs` | ✅ 应扩展：校验生成的 manifest 与源 package.json 版本一致 |
 
 ---
 
@@ -281,3 +389,20 @@ dist/plugin/                          # 构建产物（一条命令生成，不�
 > - `developers.openai.com/plugins/build/plugins` 返回 403，未能获取，故 Codex 侧以 `learn.chatgpt.com` 的 `llms-full.txt` 抽取为准。
 > - 未抓取 Cursor 官方插件文档。
 > - 所有原文以 markdown twin（URL 加 `.md`）形式获取，可能略去站点内的交互式目录树组件。
+
+---
+
+## 附：验证环境说明
+
+本文件中的实测结论（「发现 D」）在如下环境取得，供复现参考：
+
+| 项 | 值 |
+|---|---|
+| `agy` 版本 | 1.5.1（Gemini App 内置：`/Applications/Gemini.app/Contents/Helpers/agy`） |
+| 验证范围 | `plugin validate` / `install` / `list` / `uninstall` |
+| 是否消耗模型额度 | **否**，全部为本地管理面操作 |
+| 测试产物 | 验证后已 `uninstall` 清理，未留残留 |
+
+**`agy` 版本差异提醒**：Gemini App 内置的 `agy` 与独立安装的 CLI 版本可能不同（本次分别为 1.5.1 与 1.5.16）。
+两者的 `plugin` 子命令行为可能随版本演进，复现时请以实际 `agy plugin --help` 输出为准。
+
