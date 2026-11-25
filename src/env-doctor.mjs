@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const PKG_ROOT = path.resolve(HERE, '..');
-export const AGENT_HOME = path.join(os.homedir(), '.figma-agent');
+export const AGENT_HOME = path.join(os.homedir(), '.biz-design-agent');
 export const DEFAULT_BRIDGE_URL = process.env.BRIDGE || `http://localhost:${process.env.DSH_FIGMA_PORT || 8787}`;
 
 function parseMajor(ver) {

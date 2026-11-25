@@ -1,10 +1,10 @@
 {
-  "name": "fimg-agent-plugin",
+  "name": "biz-design-agent",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "bin": {
-    "figma-agent": "./bin/figma-agent.mjs"
+    "biz-design-agent": "./bin/biz-design-agent.mjs"
   },
   "files": [
     "bin/",
@@ -36,10 +36,10 @@
   },
   "scripts": {
     "bridge": "./scripts/start-bridge.sh",
-    "doctor": "node bin/figma-agent.mjs doctor",
-    "setup": "node bin/figma-agent.mjs setup",
-    "mcp": "node bin/figma-agent.mjs mcp",
-    "serve-dist": "node bin/figma-agent.mjs serve-dist",
+    "doctor": "node bin/biz-design-agent.mjs doctor",
+    "setup": "node bin/biz-design-agent.mjs setup",
+    "mcp": "node bin/biz-design-agent.mjs mcp",
+    "serve-dist": "node bin/biz-design-agent.mjs serve-dist",
     "test": "node --test test/design-contract.test.mjs test/prd-workflow.test.mjs test/distribution.test.mjs test/all-roles.test.mjs",
     "test:plugin": "node test/plugin.test.mjs",
     "check": "node specs/validate-spec.mjs",

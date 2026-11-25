@@ -11,7 +11,7 @@ import { syncPrdToFeishu } from '../src/prd.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
-const CLI = path.join(ROOT, 'bin', 'figma-agent.mjs');
+const CLI = path.join(ROOT, 'bin', 'biz-design-agent.mjs');
 const VALIDATOR = path.join(ROOT, 'specs', 'validate-spec.mjs');
 const SAMPLE_SOURCE = path.join(ROOT, 'examples', 'app-delivery', 'prd-source.json');
 const SAMPLE_PROTO_SOURCE = path.join(ROOT, 'examples', 'app-delivery', 'prototype-source.json');

@@ -77,9 +77,9 @@ test('多 Harness 自动检测与落盘：绝对路径绑定 NODE_BIN、写入�
     });
     assert.equal(resClaude.harness, 'claude-code');
     const claudeMcp = JSON.parse(fs.readFileSync(path.join(wsClaude, '.mcp.json'), 'utf8'));
-    assert.equal(claudeMcp.mcpServers['figma-agent'].command, '/custom/nvm/v24/bin/node');
-    assert.equal(claudeMcp.mcpServers['figma-agent'].args[1], 'mcp');
-    assert.ok(fs.existsSync(path.join(wsClaude, '.claude', 'skills', 'figma-agent-prd', 'SKILL.md')));
+    assert.equal(claudeMcp.mcpServers['biz-design-agent'].command, '/custom/nvm/v24/bin/node');
+    assert.equal(claudeMcp.mcpServers['biz-design-agent'].args[1], 'mcp');
+    assert.ok(fs.existsSync(path.join(wsClaude, '.claude', 'skills', 'biz-design-agent-prd', 'SKILL.md')));
     assert.ok(fs.existsSync(path.join(pluginDir, 'manifest.json')));
 
     // 3) Cursor 配置落盘
@@ -91,8 +91,8 @@ test('多 Harness 自动检测与落盘：绝对路径绑定 NODE_BIN、写入�
       pluginTargetDir: pluginDir,
     });
     const cursorMcp = JSON.parse(fs.readFileSync(path.join(wsCursor, '.cursor', 'mcp.json'), 'utf8'));
-    assert.equal(cursorMcp.mcpServers['figma-agent'].command, '/custom/nvm/v24/bin/node');
-    assert.ok(fs.existsSync(path.join(wsCursor, '.cursor', 'rules', 'figma-agent.mdc')));
+    assert.equal(cursorMcp.mcpServers['biz-design-agent'].command, '/custom/nvm/v24/bin/node');
+    assert.ok(fs.existsSync(path.join(wsCursor, '.cursor', 'rules', 'biz-design-agent.mdc')));
 
     // 4) Antigravity 配置落盘
     const wsAgy = path.join(tmp, 'ws-agy');
@@ -102,7 +102,7 @@ test('多 Harness 自动检测与落盘：绝对路径绑定 NODE_BIN、写入�
       nodeBin: '/custom/nvm/v24/bin/node',
       pluginTargetDir: pluginDir,
     });
-    assert.ok(fs.existsSync(path.join(wsAgy, '.agents', 'skills', 'figma-agent-prd', 'SKILL.md')));
+    assert.ok(fs.existsSync(path.join(wsAgy, '.agents', 'skills', 'biz-design-agent-prd', 'SKILL.md')));
     assert.ok(fs.existsSync(path.join(wsAgy, 'AGENTS.md')));
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
@@ -151,7 +151,7 @@ test('内网分发服务：动态生成 /bootstrap.md（含自动配置 nvm + �
 
 test('标准 MCP Server：完整支持 initialize、tools/list 及无外部依赖工具调用（prd_menu_state / visual_diff_png）', async () => {
   const init = await handleJsonRpc({ jsonrpc: '2.0', id: 1, method: 'initialize', params: {} });
-  assert.equal(init.result.serverInfo.name, 'figma-agent');
+  assert.equal(init.result.serverInfo.name, 'biz-design-agent');
 
   const list = await handleJsonRpc({ jsonrpc: '2.0', id: 2, method: 'tools/list' });
   assert.equal(list.result.tools.length, MCP_TOOLS.length);

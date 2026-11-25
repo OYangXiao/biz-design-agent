@@ -97,11 +97,11 @@ function mergeJsonMcp(filePath, serverName, serverDef) {
 }
 
 const PRD_SKILL_MD = `---
-name: figma-agent-workflow
+name: biz-design-agent-workflow
 description: 多角色业务开发全流程技能（业务设计 PRD & 可点击原型、美工高保真视觉、研发规格提取与提测、QA 功能验收与像素对图，所有模式均带 0 退出切换主菜单）。
 ---
 
-# figma-agent · 多角色全流程对话菜单
+# biz-design-agent · 多角色全流程对话菜单
 
 ## 顶层主菜单（进入工作区或从任意子模式输入 0 退出时展示）
 1. **业务设计 · 开发或更新产品 PRD**（同源输出 Figma 单页看板 + 可编辑 Word + 同步飞书文档）
@@ -126,9 +126,9 @@ description: 多角色业务开发全流程技能（业务设计 PRD & 可点击
 - 1. 配置测试 URL / Build ID 与设计基准屏 ｜ 2. 隔离 Chrome 功能实测（\`qa_run_audit\`，严分 通过/失败/未测） ｜ 3. Figma 基准图 vs 实测图视觉对图（\`visual_diff_png\`） ｜ 4. 生成双轨报告与退回单（可选写 Figma 走查副本页） ｜ 5. 按新 Build ID 同基准复验（保留历史轮次） ｜ **0. 退出当前模式返回主菜单**
 `;
 
-const WORKSPACE_AGENTS_SNIPPET = `# figma-agent 工作区协作入口
+const WORKSPACE_AGENTS_SNIPPET = `# biz-design-agent 工作区协作入口
 
-当用户提出使用 \`figma-agent\`（或从任一子模式输入 \`0\` 退出当前模式）时，展示**顶层五模式主菜单**：
+当用户提出使用 \`biz-design-agent\`（或从任一子模式输入 \`0\` 退出当前模式）时，展示**顶层五模式主菜单**：
 1. 业务设计 · 开发或更新产品 PRD（Figma 单页 + Word）
 2. 业务设计 · 生成或迭代可操作预览原型图（Figma 点击跳转 + 线稿细节样式 + PRD 映射与设计理由卡）
 3. 美工 / UI 设计师 · 制作高保真视觉稿（团队规范/组件/样式 + 全状态源稿 + 1x 基准图）
@@ -136,14 +136,14 @@ const WORKSPACE_AGENTS_SNIPPET = `# figma-agent 工作区协作入口
 5. 测试 & 美工走查 · 页面功能验收与设计还原对图（隔离 Chrome 功能验收 + Figma 像素对图 + 退回复验）
 
 - **所有五个子模式菜单**每轮均保留 \`0. 退出当前模式（保存进度，返回主菜单切换角色/任务）\`。
-- 工具调用优先使用已配置的 \`figma-agent\` MCP 工具（\`figma_*\` / \`prd_*\` / \`proto_*\` / \`visual_*\` / \`dev_*\` / \`qa_*\` / \`visual_diff_png\`）；未重载 MCP 时也可直接运行 CLI \`figma-agent <子命令>\`。
+- 工具调用优先使用已配置的 \`biz-design-agent\` MCP 工具（\`figma_*\` / \`prd_*\` / \`proto_*\` / \`visual_*\` / \`dev_*\` / \`qa_*\` / \`visual_diff_png\`）；未重载 MCP 时也可直接运行 CLI \`biz-design-agent <子命令>\`。
 `;
 
 export function configureHarness({
   workspaceDir = process.cwd(),
   harness = 'auto',
   nodeBin = process.execPath,
-  agentEntry = path.join(PKG_ROOT, 'bin', 'figma-agent.mjs'),
+  agentEntry = path.join(PKG_ROOT, 'bin', 'biz-design-agent.mjs'),
   pluginTargetDir = null,
 } = {}) {
   const ws = path.resolve(workspaceDir);
@@ -160,8 +160,8 @@ export function configureHarness({
   const pluginInfo = pluginTargetDir ? installLocalPlugin(pluginTargetDir) : installLocalPlugin();
 
   if (chosen === 'claude-code') {
-    writtenFiles.push(mergeJsonMcp(path.join(ws, '.mcp.json'), 'figma-agent', mcpServerDef));
-    const skillPath = path.join(ws, '.claude', 'skills', 'figma-agent-prd', 'SKILL.md');
+    writtenFiles.push(mergeJsonMcp(path.join(ws, '.mcp.json'), 'biz-design-agent', mcpServerDef));
+    const skillPath = path.join(ws, '.claude', 'skills', 'biz-design-agent-prd', 'SKILL.md');
     fs.mkdirSync(path.dirname(skillPath), { recursive: true });
     fs.writeFileSync(skillPath, PRD_SKILL_MD, 'utf8');
     writtenFiles.push(skillPath);
@@ -172,21 +172,21 @@ export function configureHarness({
       writtenFiles.push(claudeMd);
     }
   } else if (chosen === 'cursor') {
-    writtenFiles.push(mergeJsonMcp(path.join(ws, '.cursor', 'mcp.json'), 'figma-agent', mcpServerDef));
-    const rulePath = path.join(ws, '.cursor', 'rules', 'figma-agent.mdc');
+    writtenFiles.push(mergeJsonMcp(path.join(ws, '.cursor', 'mcp.json'), 'biz-design-agent', mcpServerDef));
+    const rulePath = path.join(ws, '.cursor', 'rules', 'biz-design-agent.mdc');
     fs.mkdirSync(path.dirname(rulePath), { recursive: true });
-    fs.writeFileSync(rulePath, `---\ndescription: figma-agent 多角色协作与 PRD 迭代规范\nalwaysApply: true\n---\n\n${WORKSPACE_AGENTS_SNIPPET}`, 'utf8');
+    fs.writeFileSync(rulePath, `---\ndescription: biz-design-agent 多角色协作与 PRD 迭代规范\nalwaysApply: true\n---\n\n${WORKSPACE_AGENTS_SNIPPET}`, 'utf8');
     writtenFiles.push(rulePath);
   } else if (chosen === 'antigravity') {
-    writtenFiles.push(mergeJsonMcp(path.join(ws, '.mcp.json'), 'figma-agent', mcpServerDef));
-    const skillPath = path.join(ws, '.agents', 'skills', 'figma-agent-prd', 'SKILL.md');
+    writtenFiles.push(mergeJsonMcp(path.join(ws, '.mcp.json'), 'biz-design-agent', mcpServerDef));
+    const skillPath = path.join(ws, '.agents', 'skills', 'biz-design-agent-prd', 'SKILL.md');
     fs.mkdirSync(path.dirname(skillPath), { recursive: true });
     fs.writeFileSync(skillPath, PRD_SKILL_MD, 'utf8');
     writtenFiles.push(skillPath);
   } else if (chosen === 'trae' || chosen === 'windsurf') {
-    writtenFiles.push(mergeJsonMcp(path.join(ws, `.${chosen}`, 'mcp.json'), 'figma-agent', mcpServerDef));
+    writtenFiles.push(mergeJsonMcp(path.join(ws, `.${chosen}`, 'mcp.json'), 'biz-design-agent', mcpServerDef));
   } else {
-    writtenFiles.push(mergeJsonMcp(path.join(ws, '.mcp.json'), 'figma-agent', mcpServerDef));
+    writtenFiles.push(mergeJsonMcp(path.join(ws, '.mcp.json'), 'biz-design-agent', mcpServerDef));
   }
 
   // 所有 Harness 均确保工作区有 AGENTS.md（已存在则不覆盖用户仓库自有入口）

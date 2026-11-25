@@ -28,15 +28,15 @@ export function renderBootstrapMarkdown({
 
   const installCmd = registryConfigured
     ? `"$NPM_BIN" install -g "${packageName}" --registry="${registryDisplay}"`
-    : `"$NPM_BIN" install -g "${baseUrl}/packages/figma-agent.tgz"`;
+    : `"$NPM_BIN" install -g "${baseUrl}/packages/biz-design-agent.tgz"`;
 
   const mirrorLine = nodeMirror
     ? `export NVM_NODEJS_ORG_MIRROR="${nodeMirror}"\n`
     : `# 若内网访问外网受限，可在此指定内网/镜像源：\n# export NVM_NODEJS_ORG_MIRROR="https://npmmirror.com/mirrors/node"\n`;
 
-  return `# figma-agent 内网自动化配置与就绪引导（v${version}）
+  return `# biz-design-agent 内网自动化配置与就绪引导（v${version}）
 
-> **给 AI 助手的执行指令**：你正在协助用户在当前工作区完成 \`figma-agent\` 的全自动环境检测、安装与 Figma 画布连通性验收。
+> **给 AI 助手的执行指令**：你正在协助用户在当前工作区完成 \`biz-design-agent\` 的全自动环境检测、安装与 Figma 画布连通性验收。
 > 请严格按 **Step 1 → Step 5** 顺序执行：**每一步必须先真实检测，不通过时给出明确选项或修复操作，并允许用户在对话中反复回复「继续 / 复测」直到该步通过**；严禁跳过校验谎报就绪。
 
 - 分发服务地址：\`${baseUrl}\`
@@ -111,13 +111,13 @@ ${registryCmd}
 "$NPM_BIN" ping --registry="${registryDisplay}"
 \`\`\`
 2. 若报证书错误（\`UNABLE_TO_GET_ISSUER_CERT_LOCALLY\`）、认证错误（\`401/403\`）或超时，向用户说明具体原因并引导配置内网 CA / 登录凭证，回复「继续」后复测，直至通过。` : `1. 当前分发服务尚未绑定正式内网 npm registry（可在服务端启动时传入 \`FIGMA_AGENT_REGISTRY=http://<内网源>\`）。
-2. 如用户此刻提供了内网 registry 地址，先执行 \`"$NPM_BIN" config set registry <用户提供的地址>\` 并 \`npm ping\` 验证；若暂未提供，Step 3 可直接从本分发服务 \`${baseUrl}/packages/figma-agent.tgz\` 安装离线包。`}
+2. 如用户此刻提供了内网 registry 地址，先执行 \`"$NPM_BIN" config set registry <用户提供的地址>\` 并 \`npm ping\` 验证；若暂未提供，Step 3 可直接从本分发服务 \`${baseUrl}/packages/biz-design-agent.tgz\` 安装离线包。`}
 
 ---
 
-## Step 3：安装 \`figma-agent\` 与飞书 CLI（\`@larksuite/cli\`），并自动配置当前 Harness
+## Step 3：安装 \`biz-design-agent\` 与飞书 CLI（\`@larksuite/cli\`），并自动配置当前 Harness
 
-1. 安装纯 Node 版 \`figma-agent\`（零 Python 依赖、零原生 C++ 编译）：
+1. 安装纯 Node 版 \`biz-design-agent\`（零 Python 依赖、零原生 C++ 编译）：
 \`\`\`bash
 ${installCmd}
 \`\`\`
@@ -126,9 +126,9 @@ ${installCmd}
 PATH="$(dirname "$NODE_BIN"):$PATH" "$NPM_BIN" install -g @larksuite/cli
 \`\`\`
 （若内网 registry 尚未同步 \`@larksuite/cli\`，可提示用户先切公共源安装或暂时跳过、后续再装。）
-3. 结合你当前运行的 AI 客户端身份，执行 \`setup\` 自动生成对应 Harness（Antigravity / Claude Code / Cursor / Trae / Windsurf / 通用）的原生 MCP（绑定绝对路径 \`NODE_BIN\`，避免 GUI 客户端丢 PATH）、工作区 Skills 与 \`AGENTS.md\`，同时把 Figma 插件解出到本机固定目录 \`~/.figma-agent/plugin/\`：
+3. 结合你当前运行的 AI 客户端身份，执行 \`setup\` 自动生成对应 Harness（Antigravity / Claude Code / Cursor / Trae / Windsurf / 通用）的原生 MCP（绑定绝对路径 \`NODE_BIN\`，避免 GUI 客户端丢 PATH）、工作区 Skills 与 \`AGENTS.md\`，同时把 Figma 插件解出到本机固定目录 \`~/.biz-design-agent/plugin/\`：
 \`\`\`bash
-FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/figma-agent"
+FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/biz-design-agent"
 "$NODE_BIN" "$FIGMA_AGENT_BIN" setup --workspace "$(pwd)" --harness auto --node "$NODE_BIN"
 \`\`\`
 （若自动识别结果为 \`generic\` 且你明确知道当前客户端类型，请传入具体 \`--harness antigravity|claude-code|cursor|trae|windsurf\`。）
@@ -161,8 +161,8 @@ FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/figma-agent"
 3. **Figma Bridge 与桌面端插件握手（检查 \`bridge.reachable\` 与 \`bridge.pluginOnline\`）**：
    - **若 \`bridge.reachable\` 为 false**：运行 \`"$NODE_BIN" "$FIGMA_AGENT_BIN" bridge-ensure\` 拉起后台共享桥后复测。
    - **若 \`bridge.pluginOnline\` 为 false**：
-     1. 提示用户：本地免费账号读写画布依赖 **Figma Desktop 桌面客户端**加载插件（位于 \`~/.figma-agent/plugin/manifest.json\`，全局只需导入一次）。
-     2. 自动帮用户在系统文件管理器高亮插件目录（macOS：\`open -R "$HOME/.figma-agent/plugin/manifest.json"\`；Windows：\`explorer /select,"$HOME\\.figma-agent\\plugin\\manifest.json"\`）。
+     1. 提示用户：本地免费账号读写画布依赖 **Figma Desktop 桌面客户端**加载插件（位于 \`~/.biz-design-agent/plugin/manifest.json\`，全局只需导入一次）。
+     2. 自动帮用户在系统文件管理器高亮插件目录（macOS：\`open -R "$HOME/.biz-design-agent/plugin/manifest.json"\`；Windows：\`explorer /select,"$HOME\\.biz-design-agent\\plugin\\manifest.json"\`）。
      3. 给出 3 步指引：在 Figma Desktop 打开任意设计稿 → 顶部菜单 \`Plugins → Development → Import plugin from manifest...\` 选中该 \`manifest.json\` → 运行 \`FIMG Agent Plugin\` 看到面板显示已连接。
      4. 提示用户：**“在 Figma 点开插件后回复『好了』，我立刻做真机握手验证。”**
    - 用户回复后，执行真机往返验证：
@@ -177,7 +177,7 @@ FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/figma-agent"
 
 全部检查项均通过后，向用户汇报简明就绪清单（Node 版本、npm 源、飞书 CLI 授权状态、已配置的 Harness、已连接的 Figma 文件名；如首次写入 MCP 配置则顺便提醒“重载一次窗口即可原生调用 MCP，当前会话也已可直接开工”），并立刻发起业务入口提问：
 
-> “✅ \`figma-agent\` 环境、飞书文档能力与 Figma 画布桥已全部准备就绪！
+> “✅ \`biz-design-agent\` 环境、飞书文档能力与 Figma 画布桥已全部准备就绪！
 > 这次想进入哪个工作模式？
 > 1. 业务设计 · 开发或更新 PRD（Figma 单页 + Word + 飞书文档同步）
 > 2. 业务设计 · 生成可操作预览原型图（点击跳转 + PRD 说明卡）
@@ -188,10 +188,10 @@ FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/figma-agent"
 }
 
 function renderIndexHtml(baseUrl) {
-  const promptText = `请用 curl 读取 ${baseUrl}/bootstrap.md 并按步骤帮我检测环境、配置并连接 figma-agent`;
+  const promptText = `请用 curl 读取 ${baseUrl}/bootstrap.md 并按步骤帮我检测环境、配置并连接 biz-design-agent`;
   return `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>figma-agent 内网分发引导</title>
+<title>biz-design-agent 内网分发引导</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f4f6fa;color:#0f172a;font:15px/1.7 system-ui,"PingFang SC",sans-serif;padding:40px 20px}
 main{max-width:760px;margin:auto;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:32px}
@@ -200,7 +200,7 @@ h1{margin:0 0 8px;font-size:26px}p.sub{margin:0 0 24px;color:#475569}
 button{margin-top:12px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer}
 .links{margin-top:24px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px}a{color:#1d4ed8}
 </style></head><body><main>
-<h1>figma-agent 内网一键接入</h1>
+<h1>biz-design-agent 内网一键接入</h1>
 <p class="sub">在新机器的 AI 客户端（Antigravity / Claude Code / Cursor / Trae / Windsurf）中打开你的工作区，把下面这句话发给 AI 即可自动完成 Node/nvm 检测、内网源配置、客户端适配与 Figma 桥连通验收。</p>
 <div class="box" id="cmd">${promptText}</div>
 <button onclick="navigator.clipboard.writeText(document.getElementById('cmd').textContent);this.textContent='已复制，直接粘贴给 AI 即可'">复制给 AI 的引导口令</button>
@@ -211,7 +211,7 @@ button{margin-top:12px;background:#1d4ed8;color:#fff;border:none;border-radius:8
 let cachedTarballPath = null;
 function ensureTarball() {
   if (cachedTarballPath && fs.existsSync(cachedTarballPath)) return cachedTarballPath;
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'figma-agent-pack-'));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'biz-design-agent-pack-'));
   const binDir = path.dirname(process.execPath);
   const npmBin = path.join(binDir, process.platform === 'win32' ? 'npm.cmd' : 'npm');
   const env = { ...process.env, PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}` };
@@ -249,7 +249,7 @@ export function createDistServer(options = {}) {
         npmScope: npmScope || null,
         nodeMirror: nodeMirror || null,
         bootstrapUrl: `${baseUrl}/bootstrap.md`,
-        tarballUrl: `${baseUrl}/packages/figma-agent.tgz`,
+        tarballUrl: `${baseUrl}/packages/biz-design-agent.tgz`,
       }, null, 2));
       return;
     }
@@ -261,7 +261,7 @@ export function createDistServer(options = {}) {
       return;
     }
 
-    if (urlObj.pathname === '/packages/figma-agent.tgz') {
+    if (urlObj.pathname === '/packages/biz-design-agent.tgz') {
       try {
         const tgz = ensureTarball();
         res.writeHead(200, {

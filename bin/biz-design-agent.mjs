@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// figma-agent 统一纯 Node CLI / MCP / 内网分发入口（零 Python 依赖）
+// biz-design-agent 统一纯 Node CLI / MCP / 内网分发入口（零 Python 依赖）
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -37,47 +37,47 @@ function positionals(args) {
 }
 
 function printHelp() {
-  console.log(`figma-agent — 纯 Node 多角色业务设计 Agent（全栈零 Python）
+  console.log(`biz-design-agent — 纯 Node 多角色业务设计 Agent（全栈零 Python）
 
 用法:
-  figma-agent doctor [--json]                     检测 Node/nvm、npm 源、Figma 客户端与共享桥状态
-  figma-agent setup [--workspace <dir>] [--harness auto|antigravity|claude-code|cursor|trae|windsurf]
-                                                  安装本地插件到 ~/.figma-agent/plugin 并自动配置当前 Harness
-  figma-agent bridge-ensure                       后台自启或复用共享 Figma 本地桥（:8787）
-  figma-agent mcp                                 启动标准 stdio MCP Server（自动管理共享桥）
+  biz-design-agent doctor [--json]                     检测 Node/nvm、npm 源、Figma 客户端与共享桥状态
+  biz-design-agent setup [--workspace <dir>] [--harness auto|antigravity|claude-code|cursor|trae|windsurf]
+                                                  安装本地插件到 ~/.biz-design-agent/plugin 并自动配置当前 Harness
+  biz-design-agent bridge-ensure                       后台自启或复用共享 Figma 本地桥（:8787）
+  biz-design-agent mcp                                 启动标准 stdio MCP Server（自动管理共享桥）
 
-  figma-agent prd export <source.json> <outDir>   同源生成 Figma 单页 PRD.figma.json、PRD.docx 与 PRD.md
-  figma-agent prd sync-feishu <PRD.md> [--title "<标题>"] [--doc "<飞书文档URL>"]
+  biz-design-agent prd export <source.json> <outDir>   同源生成 Figma 单页 PRD.figma.json、PRD.docx 与 PRD.md
+  biz-design-agent prd sync-feishu <PRD.md> [--title "<标题>"] [--doc "<飞书文档URL>"]
                                                   同步 PRD 到飞书云文档（新建或就地更新）
-  figma-agent prd inspect <doc.docx> [--extract-dir <dir>]
+  biz-design-agent prd inspect <doc.docx> [--extract-dir <dir>]
                                                   读取 Word 需求原稿或参考 PRD 范本（正文/表格/批注/嵌图）
-  figma-agent prd menu-state <source.json>        检查 PRD 对话菜单状态（含选项 3 解锁与 0 退出模式）
+  biz-design-agent prd menu-state <source.json>        检查 PRD 对话菜单状态（含选项 3 解锁与 0 退出模式）
 
-  figma-agent proto from-prd <prd.json> <proto.json>
+  biz-design-agent proto from-prd <prd.json> <proto.json>
                                                   从已完成 PRD 自动继承生成可交互原型草稿
-  figma-agent proto menu-state <proto.json>       检查原型图对话菜单状态（含断链检查与 0 退出模式）
-  figma-agent proto export <proto.json> <outDir>  生成带 Figma 点击跳转预览与 PRD 说明卡的 Prototype.figma.json
+  biz-design-agent proto menu-state <proto.json>       检查原型图对话菜单状态（含断链检查与 0 退出模式）
+  biz-design-agent proto export <proto.json> <outDir>  生成带 Figma 点击跳转预览与 PRD 说明卡的 Prototype.figma.json
 
-  figma-agent visual from-proto <proto.json> <visual.json>
+  biz-design-agent visual from-proto <proto.json> <visual.json>
                                                   从线稿原型推导高保真视觉草稿（模式 3）
-  figma-agent visual menu-state <visual.json>     检查美工高保真对话菜单状态（含 0 退出模式）
-  figma-agent visual export <visual.json> <outDir>
+  biz-design-agent visual menu-state <visual.json>     检查美工高保真对话菜单状态（含 0 退出模式）
+  biz-design-agent visual export <visual.json> <outDir>
                                                   生成高保真源稿 Visual.figma.json 与样式指令
 
-  figma-agent dev extract <dump.json> <outDir> [--prd <prd.json>]
+  biz-design-agent dev extract <dump.json> <outDir> [--prd <prd.json>]
                                                   从 Figma dump 与 PRD 提取前端开发规格包（模式 4）
-  figma-agent dev menu-state <dev-state.json>     检查研发联调对话菜单状态（含 0 退出模式）
+  biz-design-agent dev menu-state <dev-state.json>     检查研发联调对话菜单状态（含 0 退出模式）
 
-  figma-agent qa menu-state <qa-state.json>       检查 QA 验收与视觉对图对话菜单状态（含 0 退出模式）
-  figma-agent qa run <plan.json> <outDir>         启动隔离 Headless Chrome 执行功能验收与截屏取证
+  biz-design-agent qa menu-state <qa-state.json>       检查 QA 验收与视觉对图对话菜单状态（含 0 退出模式）
+  biz-design-agent qa run <plan.json> <outDir>         启动隔离 Headless Chrome 执行功能验收与截屏取证
 
-  figma-agent visual-diff <base.png> <actual.png> [--out <diff.png>] [--threshold 8]
+  biz-design-agent visual-diff <base.png> <actual.png> [--out <diff.png>] [--threshold 8]
                                                   纯 Node 像素级视觉还原对图（零 Pillow）
 
-  figma-agent serve-dist [--port 8790] [--registry <url>] [--scope <@org>] [--node-mirror <url>]
+  biz-design-agent serve-dist [--port 8790] [--registry <url>] [--scope <@org>] [--node-mirror <url>]
                                                   启动内网分发服务（托管 / 与动态 /bootstrap.md）
 
-  figma-agent <status|ping|list|dump|render|patch|export|page|link|...>
+  biz-design-agent <status|ping|list|dump|render|patch|export|page|link|...>
                                                   透传全部 Figma 画布读写与导出指令`);
 }
 
@@ -121,7 +121,7 @@ async function main() {
     const pos = positionals(subRest);
     if (sub === 'export') {
       if (pos.length < 2) {
-        console.error('用法：figma-agent prd export <prd-source.json> <outDir>');
+        console.error('用法：biz-design-agent prd export <prd-source.json> <outDir>');
         process.exit(2);
       }
       console.log(JSON.stringify(exportPrdBundle(pos[0], pos[1]), null, 2));
@@ -129,7 +129,7 @@ async function main() {
     }
     if (sub === 'inspect') {
       if (pos.length < 1) {
-        console.error('用法：figma-agent prd inspect <doc.docx> [--extract-dir <dir>]');
+        console.error('用法：biz-design-agent prd inspect <doc.docx> [--extract-dir <dir>]');
         process.exit(2);
       }
       const extractDir = flag(subRest, 'extract-dir', null);
@@ -138,7 +138,7 @@ async function main() {
     }
     if (sub === 'menu-state') {
       if (pos.length < 1) {
-        console.error('用法：figma-agent prd menu-state <prd-source.json>');
+        console.error('用法：biz-design-agent prd menu-state <prd-source.json>');
         process.exit(2);
       }
       const raw = JSON.parse(fs.readFileSync(path.resolve(pos[0]), 'utf8'));
@@ -147,7 +147,7 @@ async function main() {
     }
     if (sub === 'sync-feishu') {
       if (pos.length < 1) {
-        console.error('用法：figma-agent prd sync-feishu <PRD.md> [--title "<标题>"] [--doc "<飞书文档URL>"]');
+        console.error('用法：biz-design-agent prd sync-feishu <PRD.md> [--title "<标题>"] [--doc "<飞书文档URL>"]');
         process.exit(2);
       }
       const title = flag(subRest, 'title', null);
@@ -166,7 +166,7 @@ async function main() {
     const pos = positionals(subRest);
     if (sub === 'from-prd') {
       if (pos.length < 2) {
-        console.error('用法：figma-agent proto from-prd <prd-source.json> <out-proto.json>');
+        console.error('用法：biz-design-agent proto from-prd <prd-source.json> <out-proto.json>');
         process.exit(2);
       }
       const prdRaw = JSON.parse(fs.readFileSync(path.resolve(pos[0]), 'utf8'));
@@ -179,7 +179,7 @@ async function main() {
     }
     if (sub === 'menu-state') {
       if (pos.length < 1) {
-        console.error('用法：figma-agent proto menu-state <prototype-source.json>');
+        console.error('用法：biz-design-agent proto menu-state <prototype-source.json>');
         process.exit(2);
       }
       const raw = JSON.parse(fs.readFileSync(path.resolve(pos[0]), 'utf8'));
@@ -188,7 +188,7 @@ async function main() {
     }
     if (sub === 'export') {
       if (pos.length < 2) {
-        console.error('用法：figma-agent proto export <prototype-source.json> <outDir>');
+        console.error('用法：biz-design-agent proto export <prototype-source.json> <outDir>');
         process.exit(2);
       }
       console.log(JSON.stringify(exportPrototypeBundle(pos[0], pos[1]), null, 2));
@@ -203,7 +203,7 @@ async function main() {
     const pos = positionals(subRest);
     if (sub === 'from-proto') {
       if (pos.length < 2) {
-        console.error('用法：figma-agent visual from-proto <proto.json> <out-visual.json>');
+        console.error('用法：biz-design-agent visual from-proto <proto.json> <out-visual.json>');
         process.exit(2);
       }
       const protoRaw = JSON.parse(fs.readFileSync(path.resolve(pos[0]), 'utf8'));
@@ -216,7 +216,7 @@ async function main() {
     }
     if (sub === 'menu-state') {
       if (pos.length < 1) {
-        console.error('用法：figma-agent visual menu-state <visual-source.json>');
+        console.error('用法：biz-design-agent visual menu-state <visual-source.json>');
         process.exit(2);
       }
       const raw = JSON.parse(fs.readFileSync(path.resolve(pos[0]), 'utf8'));
@@ -225,7 +225,7 @@ async function main() {
     }
     if (sub === 'export') {
       if (pos.length < 2) {
-        console.error('用法：figma-agent visual export <visual-source.json> <outDir>');
+        console.error('用法：biz-design-agent visual export <visual-source.json> <outDir>');
         process.exit(2);
       }
       console.log(JSON.stringify(exportVisualBundle(pos[0], pos[1]), null, 2));
@@ -240,7 +240,7 @@ async function main() {
     const pos = positionals(subRest);
     if (sub === 'extract') {
       if (pos.length < 2) {
-        console.error('用法：figma-agent dev extract <figma-dump.json> <outDir> [--prd <prd.json>]');
+        console.error('用法：biz-design-agent dev extract <figma-dump.json> <outDir> [--prd <prd.json>]');
         process.exit(2);
       }
       const prdPath = flag(subRest, 'prd', null);
@@ -272,7 +272,7 @@ async function main() {
     }
     if (sub === 'run') {
       if (pos.length < 2) {
-        console.error('用法：figma-agent qa run <qa-plan.json> <outDir>');
+        console.error('用法：biz-design-agent qa run <qa-plan.json> <outDir>');
         process.exit(2);
       }
       const plan = JSON.parse(fs.readFileSync(path.resolve(pos[0]), 'utf8'));
@@ -287,7 +287,7 @@ async function main() {
   if (cmd === 'visual-diff') {
     const pos = positionals(rest);
     if (pos.length < 2) {
-      console.error('用法：figma-agent visual-diff <baseline.png> <actual.png> [--out <diff.png>] [--threshold 8]');
+      console.error('用法：biz-design-agent visual-diff <baseline.png> <actual.png> [--out <diff.png>] [--threshold 8]');
       process.exit(2);
     }
     const outDiffPath = flag(rest, 'out', null);
@@ -306,7 +306,7 @@ async function main() {
     const publicUrl = flag(rest, 'public-url', process.env.FIGMA_AGENT_PUBLIC_URL || '');
     const downloadsDir = flag(rest, 'downloads-dir', process.env.FIGMA_AGENT_DOWNLOADS_DIR || null);
     const info = await startDistServer({ port, npmRegistry, npmScope, nodeMirror, publicUrl, downloadsDir });
-    console.log(`figma-agent 内网分发服务已启动：http://${info.host}:${info.port}`);
+    console.log(`biz-design-agent 内网分发服务已启动：http://${info.host}:${info.port}`);
     console.log(`在线引导文档：http://localhost:${info.port}/bootstrap.md`);
     return;
   }

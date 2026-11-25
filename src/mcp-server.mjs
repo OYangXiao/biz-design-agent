@@ -10,7 +10,7 @@ import { computeDevMenuState, exportDevHandoff } from './dev-handoff.mjs';
 import { computeQaMenuState, runChromeAudit } from './qa-verify.mjs';
 import { visualDiffPng } from './visual-diff.mjs';
 
-const SERVER_INFO = { name: 'figma-agent', version: '2.0.0' };
+const SERVER_INFO = { name: 'biz-design-agent', version: '2.0.0' };
 const PROTOCOL_VERSION = '2024-11-05';
 
 export const MCP_TOOLS = [

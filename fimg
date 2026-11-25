@@ -31,17 +31,17 @@ CMD="${1:-help}"
 
 case "$CMD" in
   # —— 项目自带工具
-  doctor)          exec "$NODE" bin/figma-agent.mjs doctor "$@" ;;
-  setup)           exec "$NODE" bin/figma-agent.mjs setup "$@" ;;
-  mcp)             exec "$NODE" bin/figma-agent.mjs mcp "$@" ;;
-  prd)             exec "$NODE" bin/figma-agent.mjs prd "$@" ;;
-  proto)           exec "$NODE" bin/figma-agent.mjs proto "$@" ;;
-  visual)          exec "$NODE" bin/figma-agent.mjs visual "$@" ;;
-  dev-handoff)     exec "$NODE" bin/figma-agent.mjs dev "$@" ;;
-  qa)              exec "$NODE" bin/figma-agent.mjs qa "$@" ;;
-  visual-diff)     exec "$NODE" bin/figma-agent.mjs visual-diff "$@" ;;
-  serve-dist)      exec "$NODE" bin/figma-agent.mjs serve-dist "$@" ;;
-  bridge-ensure)   exec "$NODE" bin/figma-agent.mjs bridge-ensure "$@" ;;
+  doctor)          exec "$NODE" bin/biz-design-agent.mjs doctor "$@" ;;
+  setup)           exec "$NODE" bin/biz-design-agent.mjs setup "$@" ;;
+  mcp)             exec "$NODE" bin/biz-design-agent.mjs mcp "$@" ;;
+  prd)             exec "$NODE" bin/biz-design-agent.mjs prd "$@" ;;
+  proto)           exec "$NODE" bin/biz-design-agent.mjs proto "$@" ;;
+  visual)          exec "$NODE" bin/biz-design-agent.mjs visual "$@" ;;
+  dev-handoff)     exec "$NODE" bin/biz-design-agent.mjs dev "$@" ;;
+  qa)              exec "$NODE" bin/biz-design-agent.mjs qa "$@" ;;
+  visual-diff)     exec "$NODE" bin/biz-design-agent.mjs visual-diff "$@" ;;
+  serve-dist)      exec "$NODE" bin/biz-design-agent.mjs serve-dist "$@" ;;
+  bridge-ensure)   exec "$NODE" bin/biz-design-agent.mjs bridge-ensure "$@" ;;
   test)            exec "$NODE" test/plugin.test.mjs ;;
   bridge|start)    exec ./scripts/start-bridge.sh ;;
   check|validate)  exec "$NODE" specs/validate-spec.mjs "$@" ;;
@@ -49,6 +49,6 @@ case "$CMD" in
 
   # —— 其余全部转给 CLI（status/ping/stats/list/sel/dump/patch/insert/rm/render/export/clear）
   help|-h|--help|"")
-                   exec "$NODE" bin/figma-agent.mjs help ;;
+                   exec "$NODE" bin/biz-design-agent.mjs help ;;
   *)               exec "$NODE" tools/figma.mjs "$CMD" "$@" ;;
 esac
