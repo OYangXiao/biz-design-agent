@@ -50,9 +50,11 @@ function formatDoctorReport(info) {
 
   const b = info.browser;
   if (b) {
-    const state = b.ok === null ? '已跳过' : b.ok ? '可用' : '不可用';
+    // 跳过探测用「-」而非 ✓，避免让用户误以为浏览器已验证可用
+    const stateMark = b.ok === null ? '-' : b.ok ? '✓' : '✗';
+    const state = b.ok === null ? '未探测（--no-browser，模式五可用性未知）' : b.ok ? '可用' : '不可用';
     const reason = b.ok === false && b.reason && b.reason !== 'ok' ? `（${b.reason}）` : '';
-    lines.push(`${mark(b.ok === null ? true : b.ok)} 浏览器         ${b.path || '未找到'} → ${state}${reason}`);
+    lines.push(`${stateMark} 浏览器         ${b.path || '未找到'} → ${state}${reason}`);
     if (b.ok === false) {
       lines.push('');
       lines.push('⚠ 浏览器不可用会影响「模式五：QA 功能验收与视觉对图」。');
