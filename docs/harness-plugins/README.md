@@ -3,6 +3,7 @@
 > **本文用途**：给另一个 AI 或工程师做二次规划的输入材料。
 > **依据**：Antigravity / Claude Code / Codex 三家的官方插件文档（原文归档在同目录 [`raw/`](raw/)），以及对 `agy` 插件管理面的**实测验证**。
 > **抓取日期**：2026-11-25。
+> **验证交接单**：需要独立复核时读 [`VERIFICATION-HANDOFF.md`](VERIFICATION-HANDOFF.md)（列明已验证/待验证项与验证方法）。
 > **结论先行**：可以做**一份源码、一次构建、产出三家可装**的插件。Codex 原生兼容 Claude 格式；Antigravity 经实测**也会在安装时自动转换** Claude 格式。
 
 ---
@@ -281,7 +282,9 @@ Antigravity 用 `mcp_config.json`：
 
 - README **至少 40 词**，建议包含一行 marketplace 安装指令（否则只给 Advice）
 - LICENSE 文件，或在 `plugin.json` 里写 `license`（SPDX id）
-- 图标为 **warning 非 error**：`plugin.json` 的 `icon` 或 `.claude-plugin/icon.png`，要求方形 PNG/JPEG、512–2048 px、< 2 MB（**不接受 SVG/WebP**）
+- 图标为 **warning 非 error**：`plugin.json` 的 `icon`，或 `.claude-plugin/icon.png` / `assets/icon.png` 等路径。要求**方形 PNG/JPEG、512–2048 px、< 2 MB**。
+  validator 的查找列表里虽含 `icon.svg`，但原文写明「SVG and WebP are not accepted」——即 **SVG 不能作为商店 listing 图标**。
+  另注：图标只在**首次**保存/提交时锁定，之后改动不生效。
 
 ### E-4. `claude plugin install` 不支持本地目录（与 Antigravity 的关键差异）
 

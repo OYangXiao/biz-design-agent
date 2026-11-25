@@ -472,4 +472,5 @@ Figma 加新字段也不会丢。
 | [`DESIGN-AGENT.md`](DESIGN-AGENT.md) | 架构方案与设计决策 |
 | [`ROLE-SIMULATION-REPORT.md`](ROLE-SIMULATION-REPORT.md) | 四角色真机模拟验证报告 |
 | [`harness-plugins/README.md`](harness-plugins/README.md) | 多 Harness 插件打包：Antigravity / Claude Code / Codex / DSH 架构对比 |
+| [`harness-plugins/VERIFICATION-HANDOFF.md`](harness-plugins/VERIFICATION-HANDOFF.md) | 插件打包的验证交接单：已证实/待验证项与验证方法 |
 | [`../AGENTS.md`](../AGENTS.md) | 开发者交接（先读这份） |
