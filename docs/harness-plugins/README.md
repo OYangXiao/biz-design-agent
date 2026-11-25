@@ -304,23 +304,72 @@ Antigravity 用 `mcp_config.json`：
 
 > 因此 `dist/plugin/` **必须同时产出 marketplace 清单**，不能只有 plugin.json。
 
+### E-6. Codex 实测：登录**可以**绕过，但协议层挡住（本次唯一实测结论）
+
+好消息是：Codex **不强制 OpenAI 登录**。用 `[model_providers.<id>]` + `env_key` 即可跳过登录直接跑，实测已跑通到网络层：
+
+```toml
+model = "<model-id>"
+model_provider = "company"
+
+[model_providers.company]
+name = "Company Gateway"
+base_url = "http://<gateway>/v1"
+env_key = "COMPANY_API_KEY"
+```
+
+`codex login status` 显示 `Not logged in`，但 `codex exec` 仍会发起请求——**登录不是硬门槛**。
+
+坏消息是请求被网关拒绝：
+
+```
+ERROR: {"code":812,"msg":"当前模型不支持responses接口"}
+```
+
+尝试改协议时收到明确报错：
+
+```console
+$ # 在 provider 配置里加 wire_api = "chat"
+Error loading config.toml: `wire_api = "chat"` is no longer supported.
+How to fix: set `wire_api = "responses"` in your provider config.
+```
+
+即 **`chat` 协议在 Codex 中已被移除**，只剩 `responses`。这与官方文档一致：
+> A working Chat Completions or Anthropic Messages endpoint doesn't establish Responses compatibility.
+
+**结论**：公司网关（Chat Completions 协议）**无法**直接接 Codex。要在 Codex 侧落地，必须满足其一：
+
+1. **网关侧支持 `/v1/responses`**（最干净，需基础设施配合）
+2. **加一层 Chat Completions → Responses 转换代理**（可自建，工程量为一个中间服务）
+3. **用真实 OpenAI API key**（需 Platform 账号，按 API 价计费，与订阅额度无关）
+4. **Codex 侧暂不支持**，先交付 Antigravity + Claude Code 两家
+
+> 在 Codex 接入打通前，其插件兼容性只能依据文档推断（它读 `.claude-plugin/` 布局）。
+> 代码层面的插件产物无需为 Codex 单独准备——等接入通了直接复用 Claude 那份。
+
 ---
 
-## 4. 未验证的技术风险（**请重点评估**）
+---
 
-这几项在文档中没有明确答案，是方案落地的真实风险，二次规划时必须覆盖。
+## 4. 风险清单（含已消除项，保留以便追溯）
 
-### 风险 1：Codex 的 MCP 配置是否做路径变量替换？
+下表记录全部待评估项及其当前状态。**已标记「已消除」的项不必再投入调研**；剩余真实风险集中在 Codex 侧。
 
-- Claude 文档明确：`${CLAUDE_PLUGIN_ROOT}` 在 `command`、`args`、`env` 中替换。
-- Antigravity 文档明确：`${PLUGIN_ROOT}` 在 `args`、`cwd`、自定义 `env` 中替换。
-- **Codex 文档只说明 hooks 会设置 `PLUGIN_ROOT` / `PLUGIN_DATA` / `CLAUDE_PLUGIN_ROOT` / `CLAUDE_PLUGIN_DATA` 环境变量，没有说明 `.mcp.json` 的 `args` 是否替换。**
+### 风险 1：路径变量替换 —— **Claude Code 已消除，Codex 仍未知**
 
-**兜底方案**：`command` 用 `node`，`args` 指向 npm 全局包（如 `-y @scope/biz-design-agent mcp`），彻底绕开路径变量。
+| Harness | 状态 |
+|---|---|
+| Claude Code | ✅ **已实测**：`${CLAUDE_PLUGIN_ROOT}` 在 `.mcp.json` 的 `args` 中生效（见 §3.5 E-2） |
+| Antigravity | ✅ 文档明确：`${PLUGIN_ROOT}` 在 `args`、`cwd`、自定义 `env` 中替换 |
+| **Codex** | ❓ **未知**：文档只说明 hooks 会设置 `PLUGIN_ROOT` / `CLAUDE_PLUGIN_ROOT` 环境变量，未说明 `.mcp.json` 的 `args` 是否替换 |
 
-### 风险 2：`npx` / 全局包的可用性
+**影响**：因 Claude Code 已验证，主路径可用路径变量，**不需要** npm 全局包兜底。
+Codex 若将来接入，其 MCP 配置是否需改写仍待验证。
 
-若走 npm 方案，插件安装后仍需能解析到 CLI。需确认内网 registry 是否可达、是否允许 `npx -y`。
+### 风险 2：~~`npx` / 全局包的可用性~~ → **不再是阻塞项**
+
+原本作为风险 1 的兜底方案。既然 Claude Code 的路径变量已实测可用，插件可自包含，**无需强制走 npm 分发**。
+若将来仍要发 npm（如内网统一分发），才需要确认 registry 可达性与 `npx -y` 权限。
 
 ### 风险 3：hooks 路径约定不一致
 
@@ -375,20 +424,10 @@ Codex 的认证方式（据 [`raw/codex-plugins.md`](raw/codex-plugins.md) 与 l
 | ChatGPT 登录 | 浏览器 OAuth | 账号需符合地区要求 |
 | **自定义 provider** | `[model_providers.<id>]` + `env_key` | **provider 必须支持 Responses API** |
 
-**关键阻塞点**：`wire_api` 的**唯一受支持值是 `responses`**（文档原文：`responses` is the only supported value）。文档进一步明确：
+**关键阻塞点**：`wire_api` 的**唯一受支持值是 `responses`**。
 
-> A working Chat Completions or Anthropic Messages endpoint doesn't establish Responses compatibility.
+**该风险已实测确认**，详见 §3.5 的「E-6」：登录确实可以绕过，但协议层挡住，`wire_api = "chat"` 已被移除。
 
-即：**没有一个能跑 Chat Completions 的网关不能直接接 Codex**。若要用公司网关接 Codex，必须在其前面加一层 Responses API 适配（自建代理或网关侧改造），这属于额外工程量。
-
-**二次规划建议**：Codex 这一路要么
-1. 用真实 OpenAI API key（需 Platform 账号，按 API 价计费），或
-2. 写一个 Chat Completions → Responses 的转换代理，或
-3. 明确列为「暂不支持」，先交付另两家。
-
-在 Codex 登录问题解决前，插件在 Codex 侧的兼容性只能依据文档推断（它读 `.claude-plugin/` 布局）。
-
----
 
 ## 5. 目标产物结构
 
