@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "biz-design-agent": {
+      "command": "/bin/sh",
+      "args": [
+        "${PLUGIN_ROOT}/scripts/run-mcp"
+      ]
+    }
+  }
+}

@@ -4,7 +4,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { PKG_ROOT, ensureBridgeRunning, runDoctor } from '../src/env-doctor.mjs';
+import {
+  PKG_ROOT,
+  ensureBridgeRunning,
+  installLocalPlugin,
+  revealInFileManager,
+  runDoctor,
+} from '../src/env-doctor.mjs';
 import { configureHarness } from '../src/harness-setup.mjs';
 import { startMcpStdioServer } from '../src/mcp-server.mjs';
 import { computeMenuState, exportPrdBundle, inspectWordDocument, syncPrdToFeishu } from '../src/prd.mjs';
@@ -75,10 +81,12 @@ function printHelp() {
   console.log(`biz-design-agent — 纯 Node 多角色业务设计 Agent（全栈零 Python）
 
 用法:
-  biz-design-agent doctor [--json] [--no-browser]     检测 Node/nvm、npm 源、Figma 客户端、共享桥与隔离浏览器可用性
+  biz-design-agent doctor [--json] [--no-browser]     检测 Node/便携版 Node、npm 源、Figma 客户端、共享桥与隔离浏览器可用性
                                                   浏览器不可用时给出可选解决方案（QA 验收依赖它）
-  biz-design-agent setup [--workspace <dir>] [--harness auto|antigravity|claude-code|cursor|trae|windsurf|generic]
-                                                  安装本地插件到 ~/.biz-design-agent/plugin 并自动配置当前 Harness
+  biz-design-agent setup [--workspace <dir>] [--harness auto|antigravity|claude-code|cursor|trae|windsurf|generic] [--plugin-dir <dir>]
+                                                  解出 Figma 本地插件到 ~/Documents/BizDesignAgent-FigmaPlugin（或指定目录）并配置当前 Harness
+  biz-design-agent install-figma-plugin [--dir <dir>] [--reveal]
+                                                  仅解出 Figma Desktop 插件到可见目录，并可选在文件管理器中高亮 manifest.json
   biz-design-agent bridge-ensure                       后台自启或复用共享 Figma 本地桥（:8787）
   biz-design-agent mcp                                 启动标准 stdio MCP Server（自动管理共享桥）
 
@@ -110,8 +118,8 @@ function printHelp() {
   biz-design-agent visual-diff <base.png> <actual.png> [--out <diff.png>] [--threshold 8]
                                                   纯 Node 像素级视觉还原对图（零 Pillow）
 
-  biz-design-agent serve-dist [--port 8790] [--registry <url>] [--scope <@org>] [--node-mirror <url>]
-                                                  启动内网分发服务（托管 / 与动态 /bootstrap.md）
+  biz-design-agent serve-dist [--port 8790] [--registry <url>] [--scope <@org>] [--node-mirror <url>] [--portable-node-dir <dir>]
+                                                  启动内网分发服务（托管 /、动态 /bootstrap.md 与 /portable-node/）
 
   biz-design-agent <status|ping|list|dump|render|patch|export|page|link|...>
                                                   透传全部 Figma 画布读写与导出指令`);
@@ -151,10 +159,19 @@ async function main() {
     const ws = flag(rest, 'workspace', process.cwd());
     const harness = flag(rest, 'harness', 'auto');
     const nodeBin = flag(rest, 'node', process.execPath);
+    const pluginTargetDir = flag(rest, 'plugin-dir', null);
     const agentEntry = fileURLToPath(import.meta.url);
-    const result = configureHarness({ workspaceDir: ws, harness, nodeBin, agentEntry });
+    const result = configureHarness({ workspaceDir: ws, harness, nodeBin, agentEntry, pluginTargetDir });
     const bridge = await ensureBridgeRunning({ nodeBin });
     console.log(JSON.stringify({ ...result, bridge }, null, 2));
+    return;
+  }
+
+  if (cmd === 'install-figma-plugin') {
+    const targetDir = flag(rest, 'dir', null);
+    const info = installLocalPlugin(targetDir);
+    const reveal = rest.includes('--reveal') ? revealInFileManager(info.manifestPath) : null;
+    console.log(JSON.stringify({ ok: true, ...info, ...(reveal ? { reveal } : {}) }, null, 2));
     return;
   }
 
@@ -360,9 +377,11 @@ async function main() {
     const nodeMirror = flag(rest, 'node-mirror', process.env.FIGMA_AGENT_NODE_MIRROR || '');
     const publicUrl = flag(rest, 'public-url', process.env.FIGMA_AGENT_PUBLIC_URL || '');
     const downloadsDir = flag(rest, 'downloads-dir', process.env.FIGMA_AGENT_DOWNLOADS_DIR || null);
-    const info = await startDistServer({ port, npmRegistry, npmScope, nodeMirror, publicUrl, downloadsDir });
+    const portableNodeDir = flag(rest, 'portable-node-dir', process.env.BIZ_DESIGN_PORTABLE_NODE_DIR || null);
+    const info = await startDistServer({ port, npmRegistry, npmScope, nodeMirror, publicUrl, downloadsDir, portableNodeDir });
     console.log(`biz-design-agent 内网分发服务已启动：http://${info.host}:${info.port}`);
     console.log(`在线引导文档：http://localhost:${info.port}/bootstrap.md`);
+    console.log(`便携版 Node 目录：${info.portableNodeDir}（下载清单：http://localhost:${info.port}/portable-node/index.json）`);
     return;
   }
 

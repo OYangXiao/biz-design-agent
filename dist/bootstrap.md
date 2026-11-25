@@ -10,68 +10,90 @@
 > 请严格按 **Step 1 → Step 5** 顺序执行：**每一步必须先真实检测，不通过时给出明确选项或修复操作，并允许用户在对话中反复回复「继续 / 复测」直到该步通过**；严禁跳过校验谎报就绪。
 
 - 分发服务地址：`http://localhost:8790`
+- 便携版 Node 下载入口：`http://localhost:8790/portable-node/index.json`
 - 目标包名：`biz-design-agent`（版本 `v1.5.1`）
 - 内网 npm registry：`<待配置内网 npm registry 地址>`
 
 ---
 
-## Step 1：检测 Node.js（要求 >= 18），支持自动配置 `nvm` 并安装最新 LTS
+## Step 1：检测 Node.js（要求 >= 18），无可用环境时自动下载便携版 Node
 
-### 1.1 先深度扫描本机已有 Node（避免 GUI 客户端丢失 Shell PATH 导致误报）
+### 1.1 先深度扫描本机已有 Node（优先含已记录的便携版 Node，避免 GUI 客户端丢失 Shell PATH 导致误报）
 请在本机终端执行探测（macOS/Linux 用 zsh/bash，Windows 用 PowerShell）：
 
 ```bash
-# macOS / Linux：扫描 PATH、Homebrew、Volta 及 ~/.nvm 下全部 node，选最高 >= 18 版本
-for cand in "$(command -v node 2>/dev/null || true)" /opt/homebrew/bin/node /usr/local/bin/node "$HOME/.volta/bin/node" "$HOME/.nvm/versions/node"/*/bin/node; do
+# macOS / Linux：扫描便携版 Node、PATH、Homebrew、Volta 及 ~/.nvm 下全部 node，选最高 >= 18 版本
+PORTABLE_REC="$(cat "$HOME/.biz-design-agent/runtime/node-path.txt" 2>/dev/null || true)"
+for cand in "$PORTABLE_REC" "$HOME/.biz-design-agent/runtime/node/bin/node" "$(command -v node 2>/dev/null || true)" /opt/homebrew/bin/node /usr/local/bin/node "$HOME/.volta/bin/node" "$HOME/.nvm/versions/node"/*/bin/node; do
   [ -x "$cand" ] && echo "$cand => $("$cand" -v 2>/dev/null)"
 done
 ```
 
 ```powershell
-# Windows PowerShell：扫描 PATH、Program Files 与 nvm-windows
-foreach ($cand in @((Get-Command node -ErrorAction SilentlyContinue).Source, "$env:NVM_SYMLINK\node.exe", "C:\Program Files\nodejs\node.exe")) {
+# Windows PowerShell：扫描便携版 Node、PATH、Program Files 与 nvm-windows
+$PortableRec = if (Test-Path "$HOME\.biz-design-agent\runtime\node-path.txt") { (Get-Content "$HOME\.biz-design-agent\runtime\node-path.txt" -Raw).Trim() } else { $null }
+foreach ($cand in @($PortableRec, "$HOME\.biz-design-agent\runtime\node\node.exe", (Get-Command node -ErrorAction SilentlyContinue).Source, "$env:NVM_SYMLINK\node.exe", "C:\Program Files\nodejs\node.exe")) {
   if ($cand -and (Test-Path $cand)) { Write-Output "$cand => $(& $cand -v)" }
 }
 ```
 
 - **若已找到 `>= 18` 的 `node`**：记录其绝对路径为 `NODE_BIN`（以及同目录下的 `NPM_BIN`），**无需重装**，直接进入 Step 2。
 - **若未找到或版本 `< 18`**：向用户展示以下两个选项，由用户选择后再执行：
-  1. **选项 A（推荐）：由 AI 自动配置 `nvm` 并安装最新 Node LTS**
-  2. **选项 B：用户自行安装 Node LTS**（从官网或内网 `http://localhost:8790/downloads/` 安装包安装，装完后回复「继续」由 AI 复测）
+  1. **选项 A（推荐，免装 nvm、免管理员权限）**：由 AI 通过命令行直接从分发服务 `http://localhost:8790/portable-node/` 下载官方便携版 Node.js LTS 并解压到 `~/.biz-design-agent/runtime/node`（终端下载不带浏览器隔离标记，可避免 macOS Gatekeeper 拦截），同时记录路径到本地并全程使用该便携版 Node。
+  2. **选项 B**：用户自行安装官方 Node.js LTS 安装包（macOS `.pkg` / Windows `.msi`），装完后回复「继续」由 AI 复测。
 
-### 1.2 当用户选择「选项 A：自动配置 nvm 并安装 LTS」时执行
+### 1.2 当用户选择「选项 A：自动下载便携版 Node」时执行
 
-- **macOS / Linux（`nvm-sh`）**：
+- **macOS / Linux**：
   ```bash
-  export NVM_DIR="$HOME/.nvm"
-  # 若内网访问外网受限，可在此指定内网/镜像源：
-# export NVM_NODEJS_ORG_MIRROR="https://npmmirror.com/mirrors/node"
-if [ ! -s "$NVM_DIR/nvm.sh" ]; then
-    curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh" | PROFILE=/dev/null bash
-  fi
-  # 幂等写入 ~/.zshrc 与 ~/.bashrc，确保新开终端生效
-  for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
-    touch "$rc"
-    grep -q 'NVM_DIR="$HOME/.nvm"' "$rc" || printf '\nexport NVM_DIR="$HOME/.nvm"\n[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"\n' >> "$rc"
-  done
-  . "$NVM_DIR/nvm.sh"
-  nvm install --lts
-  nvm alias default 'lts/*'
-  nvm use default
-  NODE_BIN="$(nvm which current)"
-  NPM_BIN="$(dirname "$NODE_BIN")/npm"
+  RUNTIME_DIR="$HOME/.biz-design-agent/runtime"
+  NODE_DIR="$RUNTIME_DIR/node"
+  mkdir -p "$RUNTIME_DIR"
+  OS_TAG="$(uname -s | tr '[:upper:]' '[:lower:]')"
+  RAW_ARCH="$(uname -m)"
+  case "$RAW_ARCH" in
+    arm64|aarch64) ARCH_TAG="arm64" ;;
+    x86_64|amd64)  ARCH_TAG="x64" ;;
+    *) echo "不支持的架构：$RAW_ARCH" >&2; exit 1 ;;
+  esac
+  ARCHIVE="$RUNTIME_DIR/node-portable.tar.gz"
+  PORTABLE_URL="http://localhost:8790/portable-node/${OS_TAG}-${ARCH_TAG}.tar.gz"
+  FALLBACK_URL="https://nodejs.org/dist/v26.13.1/node-v26.13.1-${OS_TAG}-${ARCH_TAG}.tar.gz"
+  curl -fsSL "$PORTABLE_URL" -o "$ARCHIVE" || curl -fsSL "$FALLBACK_URL" -o "$ARCHIVE"
+  rm -rf "$NODE_DIR" && mkdir -p "$NODE_DIR"
+  tar -xzf "$ARCHIVE" -C "$NODE_DIR" --strip-components=1
+  rm -f "$ARCHIVE"
+  NODE_BIN="$NODE_DIR/bin/node"
+  NPM_BIN="$NODE_DIR/bin/npm"
+  printf '%s\n' "$NODE_BIN" > "$RUNTIME_DIR/node-path.txt"
+  echo "已就绪便携版 Node，本地路径已记录到 $RUNTIME_DIR/node-path.txt："
   echo "NODE_BIN=$NODE_BIN ($("$NODE_BIN" -v))"
   ```
 
-- **Windows（`nvm-windows`）**：
+- **Windows PowerShell**：
   ```powershell
-  if (-not (Get-Command nvm -ErrorAction SilentlyContinue)) {
-    winget install -e --id CoreyButler.NVMforWindows --accept-source-agreements --accept-package-agreements
-  }
-  nvm install lts
-  nvm use lts
+  $RuntimeDir = Join-Path $HOME ".biz-design-agent\runtime"
+  $NodeDir = Join-Path $RuntimeDir "node"
+  New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
+  $Archive = Join-Path $RuntimeDir "node-portable.zip"
+  $PortableUrl = "http://localhost:8790/portable-node/win-x64.zip"
+  $FallbackUrl = "https://nodejs.org/dist/v26.13.1/node-v26.13.1-win-x64.zip"
+  try { Invoke-WebRequest -Uri $PortableUrl -OutFile $Archive } catch { Invoke-WebRequest -Uri $FallbackUrl -OutFile $Archive }
+  $TmpExtract = Join-Path $RuntimeDir "tmp-extract"
+  if (Test-Path $TmpExtract) { Remove-Item -Recurse -Force $TmpExtract }
+  Expand-Archive -Path $Archive -DestinationPath $TmpExtract -Force
+  $InnerDir = Get-ChildItem -Path $TmpExtract -Directory | Select-Object -First 1
+  if (Test-Path $NodeDir) { Remove-Item -Recurse -Force $NodeDir }
+  Move-Item -Path $InnerDir.FullName -Destination $NodeDir
+  Remove-Item -Recurse -Force $TmpExtract, $Archive
+  $NODE_BIN = Join-Path $NodeDir "node.exe"
+  $NPM_BIN = Join-Path $NodeDir "npm.cmd"
+  Set-Content -Path (Join-Path $RuntimeDir "node-path.txt") -Value $NODE_BIN -Encoding UTF8
+  Write-Output "已就绪便携版 Node，本地路径已记录到 $RuntimeDir\node-path.txt："
+  Write-Output "NODE_BIN=$NODE_BIN ($(& $NODE_BIN -v))"
   ```
-  （若 Windows 刚装完 `nvm-windows` 需要刷新环境变量或管理员权限确认，请提示用户完成后回复「继续」，再重新执行 Step 1.1 复测直至拿到 `NODE_BIN >= 18`。）
+
+  下载完成后，请明确告知用户：*“已将便携版 Node 下载到 `~/.biz-design-agent/runtime/node` 并记录在本地，后续安装与 MCP 运行都会自动使用该便携版 Node，无需额外安装系统环境。”*
 
 ---
 
@@ -93,7 +115,7 @@ if [ ! -s "$NVM_DIR/nvm.sh" ]; then
 PATH="$(dirname "$NODE_BIN"):$PATH" "$NPM_BIN" install -g @larksuite/cli
 ```
 （若内网 registry 尚未同步 `@larksuite/cli`，可提示用户先切公共源安装或暂时跳过、后续再装。）
-3. 结合你当前运行的 AI 客户端身份，执行 `setup` 自动生成对应 Harness（Antigravity / Claude Code / Cursor / Trae / Windsurf / 通用）的原生 MCP（绑定绝对路径 `NODE_BIN`，避免 GUI 客户端丢 PATH）、工作区 Skills 与 `AGENTS.md`，同时把 Figma 插件解出到本机固定目录 `~/.biz-design-agent/plugin/`：
+3. 结合你当前运行的 AI 客户端身份，执行 `setup` 自动生成对应 Harness（Antigravity / Claude Code / Cursor / Trae / Windsurf / 通用）的原生 MCP（绑定绝对路径 `NODE_BIN`，避免 GUI 客户端丢 PATH）、工作区 Skills 与 `AGENTS.md`，同时把 Figma 插件解出到用户可见目录 `~/Documents/BizDesignAgent-FigmaPlugin/`（也可传入 `--plugin-dir <自定义目录>`）：
 ```bash
 FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/biz-design-agent"
 "$NODE_BIN" "$FIGMA_AGENT_BIN" setup --workspace "$(pwd)" --harness auto --node "$NODE_BIN"
@@ -128,8 +150,8 @@ FIGMA_AGENT_BIN="$(dirname "$NODE_BIN")/biz-design-agent"
 3. **Figma Bridge 与桌面端插件握手（检查 `bridge.reachable` 与 `bridge.pluginOnline`）**：
    - **若 `bridge.reachable` 为 false**：运行 `"$NODE_BIN" "$FIGMA_AGENT_BIN" bridge-ensure` 拉起后台共享桥后复测。
    - **若 `bridge.pluginOnline` 为 false**：
-     1. 提示用户：本地免费账号读写画布依赖 **Figma Desktop 桌面客户端**加载插件（位于 `~/.biz-design-agent/plugin/manifest.json`，全局只需导入一次）。
-     2. 自动帮用户在系统文件管理器高亮插件目录（macOS：`open -R "$HOME/.biz-design-agent/plugin/manifest.json"`；Windows：`explorer /select,"$HOME\.biz-design-agent\plugin\manifest.json"`）。
+     1. 提示用户：本地免费账号读写画布依赖 **Figma Desktop 桌面客户端**加载插件（默认位于用户可见目录 `~/Documents/BizDesignAgent-FigmaPlugin/manifest.json`，全局只需导入一次；如需放其他目录可调用 `figma_install_plugin` 指定）。
+     2. 自动帮用户在系统文件管理器高亮插件目录（macOS：`open -R "$HOME/Documents/BizDesignAgent-FigmaPlugin/manifest.json"`；Windows：`explorer /select,"%USERPROFILE%\Documents\BizDesignAgent-FigmaPlugin\manifest.json"`）。
      3. 给出 3 步指引：在 Figma Desktop 打开任意设计稿 → 顶部菜单 `Plugins → Development → Import plugin from manifest...` 选中该 `manifest.json` → 运行 `Biz Design Agent` 看到面板显示已连接。
      4. 提示用户：**“在 Figma 点开插件后回复『好了』，我立刻做真机握手验证。”**
    - 用户回复后，执行真机往返验证：

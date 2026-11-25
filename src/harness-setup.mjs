@@ -96,35 +96,26 @@ function mergeJsonMcp(filePath, serverName, serverDef) {
   return filePath;
 }
 
-const PRD_SKILL_MD = `---
-name: biz-design-agent-workflow
-description: 多角色业务开发全流程技能（业务设计 PRD & 可点击原型、美工高保真视觉、研发规格提取与提测、QA 功能验收与像素对图，所有模式均带 0 退出切换主菜单）。
+function loadCanonicalSkillMarkdown() {
+  const candidates = [
+    path.join(PKG_ROOT, 'skills', 'biz-design-agent', 'SKILL.md'),
+    path.resolve(PKG_ROOT, '..', 'skills', 'biz-design-agent', 'SKILL.md'),
+  ];
+  for (const file of candidates) {
+    if (fs.existsSync(file)) {
+      return fs.readFileSync(file, 'utf8');
+    }
+  }
+  return `---
+name: biz-design-agent
+description: 多角色业务开发全流程技能（PRD、原型、高保真视觉、研发联调、QA 验收，含 0 退出主菜单）。
 ---
 
 # biz-design-agent · 多角色全流程对话菜单
-
-## 顶层主菜单（进入工作区或从任意子模式输入 0 退出时展示）
-1. **业务设计 · 开发或更新产品 PRD**（同源输出 Figma 单页看板 + 可编辑 Word + 同步飞书文档）
-2. **业务设计 · 生成或迭代可操作预览原型图**（Figma 点击跳转预览 + 线稿细节样式 + 屏外 PRD 映射与设计理由卡）
-3. **美工 / UI 设计师 · 制作高保真视觉稿**（团队规范校验 + 本地样式/组件 + 全状态源稿 + 1x 基准图导出）
-4. **前端 / 研发人员 · 承接设计稿联调与提测**（从 Figma dump 提取精确规格/定稿文案 + 本地自查 + 提测单）
-5. **测试 & 美工走查 · 页面功能验收与设计还原对图**（隔离 Headless Chrome 功能实测 + Figma 基准像素对图 + 退回复验闭环）
-
-## 模式 1 · PRD 编写菜单（含 0 退出）
-- 1. 设定/修改需求目标 ｜ 2. 补充资料/截图/飞书文档/外部反馈/内部评审 ｜ 3. 【有目标后解锁】线上搜索与思考补细节 ｜ 4. 提供 PRD 范本 ｜ 5. 手动输入修改 ｜ 6. 预览并输出三端 PRD（Figma 单页 + Word + 调用 \`prd_sync_feishu\` 同步飞书云文档，完成后可一键衔接模式 2 生成原型图） ｜ **0. 退出当前模式返回主菜单**
-
-## 模式 2 · 可操作原型图菜单（含 0 退出）
-- 1. 从 PRD 继承同步（\`proto_from_prd\`） ｜ 2. 增改屏幕与线稿细节样式 ｜ 3. 配置 Figma 点击跳转与预览起点 ｜ 4. 补充屏外 PRD 依据与设计理由说明卡 ｜ 5. 输出到 Figma 原型页（\`proto_export_bundle\`） ｜ **0. 退出当前模式返回主菜单**
-
-## 模式 3 · 美工高保真视觉菜单（含 0 退出）
-- 1. 接入/核对团队设计规范（缺规范显式标探索草案） ｜ 2. 从原型导入全状态屏（\`visual_from_proto\`） ｜ 3. 创建/复用 Figma 本地样式与主组件 ｜ 4. 核对真实文案与防裁切自检 ｜ 5. 输出高保真源稿并导出 1x 基准图（\`visual_export_bundle\`） ｜ **0. 退出当前模式返回主菜单**
-
-## 模式 4 · 前端研发联调菜单（含 0 退出）
-- 1. 从 Figma dump + PRD 提取开发规格与定稿文案（\`dev_extract_handoff\`） ｜ 2. 对照 PRD 与 QA 退回单梳理改动 ｜ 3. 实现或修改代码 ｜ 4. 本地功能与像素自查 ｜ 5. 锁定 Build ID 生成提测单 ｜ **0. 退出当前模式返回主菜单**
-
-## 模式 5 · QA 功能验收与视觉对图菜单（含 0 退出）
-- 1. 配置测试 URL / Build ID 与设计基准屏 ｜ 2. 隔离 Chrome 功能实测（\`qa_run_audit\`，严分 通过/失败/未测） ｜ 3. Figma 基准图 vs 实测图视觉对图（\`visual_diff_png\`） ｜ 4. 生成双轨报告与退回单（可选写 Figma 走查副本页） ｜ 5. 按新 Build ID 同基准复验（保留历史轮次） ｜ **0. 退出当前模式返回主菜单**
 `;
+}
+
+const PRD_SKILL_MD = loadCanonicalSkillMarkdown();
 
 const WORKSPACE_AGENTS_SNIPPET = `# biz-design-agent 工作区协作入口
 

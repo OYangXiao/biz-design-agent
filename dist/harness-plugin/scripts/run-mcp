@@ -1,0 +1,56 @@
+#!/bin/sh
+set -e
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+AGENT_ENTRY="$SCRIPT_DIR/../runtime/bin/biz-design-agent.mjs"
+
+find_node() {
+  PORTABLE_REC=""
+  if [ -f "$HOME/.biz-design-agent/runtime/node-path.txt" ]; then
+    PORTABLE_REC=$(tr -d '\r\n' < "$HOME/.biz-design-agent/runtime/node-path.txt" 2>/dev/null || true)
+  fi
+  for cand in \
+    "$PORTABLE_REC" \
+    "$HOME/.biz-design-agent/runtime/node/bin/node" \
+    "$(command -v node 2>/dev/null || true)" \
+    /opt/homebrew/bin/node \
+    /usr/local/bin/node \
+    "$HOME/.volta/bin/node" \
+    "$HOME/.dsh/dsh-runtimes/dsh-primary-runtime/dependencies/node/bin/node" \
+    "/Applications/DeepSeek Harness.app/Contents/Resources/runtime/primary-runtime/dependencies/node/bin/node"
+  do
+    if [ -n "$cand" ] && [ -x "$cand" ]; then
+      ver=$("$cand" -p "process.versions.node.split('.')[0]" 2>/dev/null || echo 0)
+      if [ "$ver" -ge 18 ] 2>/dev/null; then
+        printf '%s\n' "$cand"
+        return 0
+      fi
+    fi
+  done
+
+  NVM_ROOT="${NVM_DIR:-$HOME/.nvm}/versions/node"
+  if [ -d "$NVM_ROOT" ]; then
+    best=""
+    best_major=0
+    for d in "$NVM_ROOT"/*; do
+      if [ -x "$d/bin/node" ]; then
+        ver=$("$d/bin/node" -p "process.versions.node.split('.')[0]" 2>/dev/null || echo 0)
+        if [ "$ver" -ge 18 ] 2>/dev/null && [ "$ver" -ge "$best_major" ]; then
+          best="$d/bin/node"
+          best_major="$ver"
+        fi
+      fi
+    done
+    if [ -n "$best" ]; then
+      printf '%s\n' "$best"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+NODE_BIN=$(find_node) || {
+  echo "biz-design-agent: 未检测到 Node.js >= 18，请先安装 Node LTS 或通过分发引导下载便携版 Node（~/.biz-design-agent/runtime/node）。" >&2
+  exit 1
+}
+
+exec "$NODE_BIN" "$AGENT_ENTRY" mcp "$@"

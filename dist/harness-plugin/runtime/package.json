@@ -1,0 +1,9 @@
+{
+  "name": "biz-design-agent",
+  "version": "1.5.1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  }
+}

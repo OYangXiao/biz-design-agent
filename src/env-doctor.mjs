@@ -9,6 +9,12 @@ import { findChromeBinary, probeBrowser } from './qa-verify.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const PKG_ROOT = path.resolve(HERE, '..');
 export const AGENT_HOME = path.join(os.homedir(), '.biz-design-agent');
+export const PORTABLE_NODE_DIR = path.join(AGENT_HOME, 'runtime', 'node');
+export const PORTABLE_NODE_RECORD = path.join(AGENT_HOME, 'runtime', 'node-path.txt');
+// Figma Desktop 插件默认放在用户可见的 Documents 目录（避免 macOS/Windows 文件选择器隐藏点目录）
+export const DEFAULT_FIGMA_PLUGIN_DIR = process.env.BIZ_DESIGN_FIGMA_PLUGIN_DIR
+  ? path.resolve(process.env.BIZ_DESIGN_FIGMA_PLUGIN_DIR)
+  : path.join(os.homedir(), 'Documents', 'BizDesignAgent-FigmaPlugin');
 export const DEFAULT_BRIDGE_URL = process.env.BRIDGE || `http://localhost:${process.env.DSH_FIGMA_PORT || 8787}`;
 
 function parseMajor(ver) {
@@ -37,6 +43,15 @@ export function discoverNodeCandidates() {
 
   if (process.execPath) candidates.add(process.execPath);
   if (process.env.NODE_BIN) candidates.add(process.env.NODE_BIN);
+
+  // 优先纳入本 Agent 自动下载并记录的便携版 Node
+  if (fs.existsSync(PORTABLE_NODE_RECORD)) {
+    try {
+      const recorded = fs.readFileSync(PORTABLE_NODE_RECORD, 'utf8').trim();
+      if (recorded) candidates.add(recorded);
+    } catch { /* ignore */ }
+  }
+  candidates.add(isWin ? path.join(PORTABLE_NODE_DIR, 'node.exe') : path.join(PORTABLE_NODE_DIR, 'bin', 'node'));
 
   // 扫描 PATH
   for (const dir of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
@@ -121,6 +136,7 @@ export function detectFeishuCli(nodeBin = null, { explicitBin = null } = {}) {
   if (explicitBin) candidates.add(explicitBin);
   if (process.env.LARK_CLI_BIN) candidates.add(process.env.LARK_CLI_BIN);
   if (binDir) candidates.add(path.join(binDir, exe));
+  candidates.add(isWin ? path.join(PORTABLE_NODE_DIR, exe) : path.join(PORTABLE_NODE_DIR, 'bin', exe));
   for (const dir of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
     candidates.add(path.join(dir, exe));
   }
@@ -226,29 +242,71 @@ export async function ensureBridgeRunning({ bridgeUrl = DEFAULT_BRIDGE_URL, node
   return { started: false, reused: false, pid: child.pid, logFile, status: { reachable: false, pluginOnline: false } };
 }
 
-export function installLocalPlugin(targetDir = path.join(AGENT_HOME, 'plugin')) {
+export function resolveFigmaPluginDir(customDir = null) {
+  if (customDir && typeof customDir === 'string' && customDir.trim()) {
+    const raw = customDir.trim();
+    if (raw.startsWith('~/') || raw === '~') {
+      return path.join(os.homedir(), raw.slice(2));
+    }
+    return path.resolve(raw);
+  }
+  return DEFAULT_FIGMA_PLUGIN_DIR;
+}
+
+export function revealInFileManager(targetPath) {
+  if (!targetPath || !fs.existsSync(targetPath)) {
+    return { ok: false, error: `目标路径不存在：${targetPath}` };
+  }
+  try {
+    if (process.platform === 'darwin') {
+      const child = spawn('open', ['-R', targetPath], { detached: true, stdio: 'ignore' });
+      child.unref();
+      return { ok: true, platform: 'darwin', path: targetPath };
+    }
+    if (process.platform === 'win32') {
+      const child = spawn('explorer.exe', [`/select,${targetPath}`], { detached: true, stdio: 'ignore' });
+      child.unref();
+      return { ok: true, platform: 'win32', path: targetPath };
+    }
+    return { ok: false, platform: process.platform, error: '当前系统不支持自动唤起图形文件管理器，请手动打开目录' };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+export function installLocalPlugin(targetDir = null) {
+  const destDir = resolveFigmaPluginDir(targetDir);
   const srcDir = path.join(PKG_ROOT, 'plugin');
-  fs.mkdirSync(targetDir, { recursive: true });
+  fs.mkdirSync(destDir, { recursive: true });
+  const copied = [];
   for (const fname of ['manifest.json', 'code.js', 'ui.html']) {
     const src = path.join(srcDir, fname);
     if (fs.existsSync(src)) {
-      fs.copyFileSync(src, path.join(targetDir, fname));
+      const dst = path.join(destDir, fname);
+      fs.copyFileSync(src, dst);
+      copied.push(dst);
     }
   }
   return {
-    pluginDir: targetDir,
-    manifestPath: path.join(targetDir, 'manifest.json'),
+    pluginDir: destDir,
+    manifestPath: path.join(destDir, 'manifest.json'),
+    files: copied,
   };
 }
 
-export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL, probeChrome = true } = {}) {
+export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL, probeChrome = true, pluginDir = null } = {}) {
   const nodes = discoverNodeCandidates();
   const bestNode = nodes.find((n) => n.ok) || nodes[0] || null;
+  const portableBin = process.platform === 'win32'
+    ? path.join(PORTABLE_NODE_DIR, 'node.exe')
+    : path.join(PORTABLE_NODE_DIR, 'bin', 'node');
+  const portableInfo = probeNodeBinary(portableBin);
   const nvm = detectNvmInstalled();
   const npmInfo = detectNpmRegistry(bestNode?.path);
   const figmaApp = detectFigmaDesktop();
   const feishu = detectFeishuCli(bestNode?.path);
-  const localManifest = path.join(AGENT_HOME, 'plugin', 'manifest.json');
+  const resolvedPluginDir = resolveFigmaPluginDir(pluginDir);
+  const localManifest = path.join(resolvedPluginDir, 'manifest.json');
   const bridge = await checkBridgeStatus(bridgeUrl);
 
   // QA 模式（模式五）依赖隔离 Headless 浏览器；这里做真实启动探测而非仅检查文件存在，
@@ -271,6 +329,13 @@ export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL, probeChrome = 
       ok: Boolean(bestNode?.ok),
       recommended: bestNode,
       allFound: nodes,
+    },
+    portableNode: {
+      dir: PORTABLE_NODE_DIR,
+      recordFile: PORTABLE_NODE_RECORD,
+      bin: portableBin,
+      installed: Boolean(portableInfo?.ok),
+      version: portableInfo?.version || null,
     },
     nvm,
     npm: npmInfo,

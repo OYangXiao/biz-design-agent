@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderBootstrapMarkdown, renderIndexHtml } from '../server/dist-server.mjs';
+import { buildAllPlugins } from './build-plugins.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -47,6 +48,12 @@ function main() {
   for (const p of [bootstrapPath, indexPath, metaPath]) {
     console.log(`  ${path.relative(ROOT, p)}  ${fs.statSync(p).size} bytes`);
   }
+
+  const pluginRes = buildAllPlugins();
+  console.log(`已同步构建多 Harness 插件产物（v${pluginRes.version}）：`);
+  console.log(`  ${path.relative(ROOT, pluginRes.harnessPluginDir)}`);
+  console.log(`  ${path.relative(ROOT, pluginRes.dshBundleDir)}`);
+  console.log(`  ${path.relative(ROOT, pluginRes.installersDir)}`);
 }
 
 main();

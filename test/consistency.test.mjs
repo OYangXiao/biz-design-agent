@@ -109,6 +109,20 @@ test('dist/ 产物与 serve-dist 动态渲染保持一致', async () => {
   );
 });
 
-test('package.json files 包含 dist/，确保打包时代入预渲染引导', () => {
+test('package.json files 包含 dist/ 与 skills/，确保打包时代入预渲染引导与技能源', () => {
   assert.ok((PKG.files || []).includes('dist/'), 'files 应包含 dist/');
+  assert.ok((PKG.files || []).includes('skills/'), 'files 应包含 skills/');
+});
+
+test('核心源码与文档不再使用已废弃的 ~/.biz-design-agent/plugin 默认路径', () => {
+  for (const rel of [
+    'src/env-doctor.mjs',
+    'bin/biz-design-agent.mjs',
+    'server/dist-server.mjs',
+    'docs/SETUP.md',
+    'README.md',
+  ]) {
+    const content = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    assert.ok(!content.includes('.biz-design-agent/plugin'), `${rel} 仍残留旧路径 .biz-design-agent/plugin`);
+  }
 });

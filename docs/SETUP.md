@@ -25,7 +25,7 @@
 
 3. **严格按该文档的 Step 1 → Step 5 执行**，每步都要真实检测；不通过时给出选项让用户选，不要自动跳过。
 
-若服务未启动，由维护者在服务器上执行：
+若服务未启动，由维护者在服务器上执行（将官方 Node LTS 便携包放入 `portable-node/` 目录即可通过 `/portable-node/` 对外提供免装 Node 下载，详见 [`portable-node/README.txt`](../portable-node/README.txt)）：
 
 ```bash
 cd <仓库目录>
@@ -42,7 +42,7 @@ cd <仓库目录>
 node -v      # 需要 >= 18
 ```
 
-若 `node` 不存在或版本过低，先让用户决策：自动装 nvm + LTS，还是自行安装。**不要擅自替用户安装系统级软件**。
+若 `node` 不存在或版本过低，先让用户决策：从分发服务通过命令行自动下载便携版 Node 到 `~/.biz-design-agent/runtime/node`（推荐，免管理员权限、免装 `nvm`），还是由用户自行安装官方 Node LTS 安装包（`.pkg` / `.msi`）。**不要擅自替用户安装系统级软件**。
 
 ### B2. 安装并自检（关键步骤，不可省略）
 
@@ -96,7 +96,7 @@ node bin/biz-design-agent.mjs setup --workspace <你的工作区目录> --harnes
 
 1. 把工作区里对应客户端的 MCP 配置写入（`biz-design-agent` 服务项，绑定 `node` 绝对路径）；
 2. 写入该客户端专属的规则/Skill（五模式主菜单的调用约定）；
-3. 把 Figma 插件解出到 `~/.biz-design-agent/plugin/`，供 Figma Desktop 导入。
+3. 把 Figma 插件解出到用户可见目录 `~/Documents/BizDesignAgent-FigmaPlugin/`（可传入 `--plugin-dir <自定义目录>`），供 Figma Desktop 导入。
 
 各 Harness 的落盘位置：
 
@@ -117,7 +117,7 @@ node bin/biz-design-agent.mjs setup --workspace <你的工作区目录> --harnes
 
 1. 打开 **Figma Desktop**（不是浏览器版），打开任意设计稿；
 2. 菜单 `Plugins → Development → Import plugin from manifest...`；
-3. 选择 `~/.biz-design-agent/plugin/manifest.json`；
+3. 选择 `~/Documents/BizDesignAgent-FigmaPlugin/manifest.json`（或你自定义保存的目录）；
 4. 运行 `Biz Design Agent`，面板显示「已连接」即成功。
 
 完成后复测：
@@ -132,7 +132,7 @@ node bin/biz-design-agent.mjs doctor
 
 MCP 配置是启动时读取的，**配置后需要让用户重启或重载 AI 客户端**，否则工具列表里看不到 `figma_*` / `prd_*` 等工具。
 
-重载后验证：询问 AI「列出你可用的 biz-design-agent 工具」，应能看到 17 项。
+重载后验证：询问 AI「列出你可用的 biz-design-agent 工具」，应能看到 18 项（含 `figma_install_plugin`）。
 
 ---
 
@@ -149,7 +149,7 @@ MCP 配置是启动时读取的，**配置后需要让用户重启或重载 AI �
 [ ] doctor: bridge.pluginOnline = true
 [ ] setup 已写入当前 Harness 的 MCP 配置
 [ ] Figma Desktop 插件面板显示「已连接」
-[ ] 客户端已重载，工具列表可见 17 项
+[ ] 客户端已重载，工具列表可见 18 项
 [ ] （可选，模式五需要）doctor: browser.ok = true
 ```
 

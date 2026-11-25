@@ -1,7 +1,7 @@
 {
   "name": "biz-design-agent",
   "version": "1.5.1",
-  "generatedAt": "2026-11-25T03:00:52.607Z",
+  "generatedAt": "2026-11-25T09:49:11.640Z",
   "sourceBaseUrl": "http://localhost:8790",
   "note": "静态预览产物，接入方式与 serve-dist 动态渲染一致"
 }

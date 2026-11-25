@@ -1,0 +1,366 @@
+// 本机 Node/NVM 环境扫描、npm 源检查、Figma 客户端与共享本地桥（:8787）状态管理
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync, spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { findChromeBinary, probeBrowser } from './qa-verify.mjs';
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+export const PKG_ROOT = path.resolve(HERE, '..');
+export const AGENT_HOME = path.join(os.homedir(), '.biz-design-agent');
+export const PORTABLE_NODE_DIR = path.join(AGENT_HOME, 'runtime', 'node');
+export const PORTABLE_NODE_RECORD = path.join(AGENT_HOME, 'runtime', 'node-path.txt');
+// Figma Desktop 插件默认放在用户可见的 Documents 目录（避免 macOS/Windows 文件选择器隐藏点目录）
+export const DEFAULT_FIGMA_PLUGIN_DIR = process.env.BIZ_DESIGN_FIGMA_PLUGIN_DIR
+  ? path.resolve(process.env.BIZ_DESIGN_FIGMA_PLUGIN_DIR)
+  : path.join(os.homedir(), 'Documents', 'BizDesignAgent-FigmaPlugin');
+export const DEFAULT_BRIDGE_URL = process.env.BRIDGE || `http://localhost:${process.env.DSH_FIGMA_PORT || 8787}`;
+
+function parseMajor(ver) {
+  const m = /v?(\d+)\.(\d+)\.(\d+)/.exec(String(ver || ''));
+  return m ? { major: Number(m[1]), minor: Number(m[2]), patch: Number(m[3]), raw: `v${m[1]}.${m[2]}.${m[3]}` } : null;
+}
+
+function probeNodeBinary(binPath) {
+  if (!binPath) return null;
+  try {
+    if (!fs.existsSync(binPath)) return null;
+    const out = execFileSync(binPath, ['-v'], { encoding: 'utf8', timeout: 3000 }).trim();
+    const parsed = parseMajor(out);
+    if (!parsed) return null;
+    return { path: binPath, version: parsed.raw, major: parsed.major, minor: parsed.minor, patch: parsed.patch, ok: parsed.major >= 18 };
+  } catch {
+    return null;
+  }
+}
+
+export function discoverNodeCandidates() {
+  const home = os.homedir();
+  const isWin = process.platform === 'win32';
+  const exe = isWin ? 'node.exe' : 'node';
+  const candidates = new Set();
+
+  if (process.execPath) candidates.add(process.execPath);
+  if (process.env.NODE_BIN) candidates.add(process.env.NODE_BIN);
+
+  // 优先纳入本 Agent 自动下载并记录的便携版 Node
+  if (fs.existsSync(PORTABLE_NODE_RECORD)) {
+    try {
+      const recorded = fs.readFileSync(PORTABLE_NODE_RECORD, 'utf8').trim();
+      if (recorded) candidates.add(recorded);
+    } catch { /* ignore */ }
+  }
+  candidates.add(isWin ? path.join(PORTABLE_NODE_DIR, 'node.exe') : path.join(PORTABLE_NODE_DIR, 'bin', 'node'));
+
+  // 扫描 PATH
+  for (const dir of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
+    candidates.add(path.join(dir, exe));
+  }
+
+  if (isWin) {
+    if (process.env.NVM_SYMLINK) candidates.add(path.join(process.env.NVM_SYMLINK, exe));
+    candidates.add('C:\\Program Files\\nodejs\\node.exe');
+    candidates.add(path.join(home, 'AppData', 'Local', 'Programs', 'nodejs', exe));
+  } else {
+    candidates.add('/opt/homebrew/bin/node');
+    candidates.add('/usr/local/bin/node');
+    candidates.add(path.join(home, '.volta', 'bin', 'node'));
+    candidates.add(path.join(home, '.dsh', 'dsh-runtimes', 'dsh-primary-runtime', 'dependencies', 'node', 'bin', 'node'));
+
+    // 扫描 ~/.nvm/versions/node/*
+    const nvmRoot = path.join(process.env.NVM_DIR || path.join(home, '.nvm'), 'versions', 'node');
+    if (fs.existsSync(nvmRoot)) {
+      for (const verDir of fs.readdirSync(nvmRoot)) {
+        candidates.add(path.join(nvmRoot, verDir, 'bin', 'node'));
+      }
+    }
+  }
+
+  const found = [];
+  for (const c of candidates) {
+    const info = probeNodeBinary(c);
+    if (info) found.push(info);
+  }
+  found.sort((a, b) => (b.major - a.major) || (b.minor - a.minor) || (b.patch - a.patch));
+  return found;
+}
+
+export function detectNvmInstalled() {
+  const home = os.homedir();
+  if (process.platform === 'win32') {
+    const nvmHome = process.env.NVM_HOME || path.join(home, 'AppData', 'Roaming', 'nvm');
+    return { installed: fs.existsSync(path.join(nvmHome, 'nvm.exe')), type: 'nvm-windows', dir: nvmHome };
+  }
+  const nvmDir = process.env.NVM_DIR || path.join(home, '.nvm');
+  return { installed: fs.existsSync(path.join(nvmDir, 'nvm.sh')), type: 'nvm-sh', dir: nvmDir };
+}
+
+export function detectNpmRegistry(nodeBin) {
+  const binDir = nodeBin ? path.dirname(nodeBin) : '';
+  const npmBin = binDir ? path.join(binDir, process.platform === 'win32' ? 'npm.cmd' : 'npm') : 'npm';
+  const env = binDir
+    ? { ...process.env, PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}` }
+    : process.env;
+  try {
+    const registry = execFileSync(npmBin, ['config', 'get', 'registry'], { encoding: 'utf8', timeout: 5000, env }).trim();
+    return { ok: true, npmBin, registry };
+  } catch (e) {
+    return { ok: false, npmBin, registry: null, error: e.message };
+  }
+}
+
+export function detectFigmaDesktop() {
+  const home = os.homedir();
+  if (process.platform === 'darwin') {
+    const paths = ['/Applications/Figma.app', path.join(home, 'Applications', 'Figma.app')];
+    const hit = paths.find((p) => fs.existsSync(p));
+    return { installed: Boolean(hit), path: hit || null };
+  }
+  if (process.platform === 'win32') {
+    const p = path.join(process.env.LOCALAPPDATA || path.join(home, 'AppData', 'Local'), 'Figma', 'Figma.exe');
+    return { installed: fs.existsSync(p), path: fs.existsSync(p) ? p : null };
+  }
+  return { installed: false, path: null };
+}
+
+export const FEISHU_DOC_URL = 'https://open.feishu.cn/document/mcp_open_tools/feishu-cli-let-ai-actually-do-your-work-in-feishu';
+
+export function detectFeishuCli(nodeBin = null, { explicitBin = null } = {}) {
+  const home = os.homedir();
+  const isWin = process.platform === 'win32';
+  const exe = isWin ? 'lark-cli.cmd' : 'lark-cli';
+  const binDir = nodeBin ? path.dirname(nodeBin) : '';
+  const candidates = new Set();
+
+  if (explicitBin) candidates.add(explicitBin);
+  if (process.env.LARK_CLI_BIN) candidates.add(process.env.LARK_CLI_BIN);
+  if (binDir) candidates.add(path.join(binDir, exe));
+  candidates.add(isWin ? path.join(PORTABLE_NODE_DIR, exe) : path.join(PORTABLE_NODE_DIR, 'bin', exe));
+  for (const dir of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
+    candidates.add(path.join(dir, exe));
+  }
+  if (!isWin) {
+    candidates.add('/opt/homebrew/bin/lark-cli');
+    candidates.add('/usr/local/bin/lark-cli');
+    candidates.add(path.join(home, '.volta', 'bin', 'lark-cli'));
+    const nvmRoot = path.join(process.env.NVM_DIR || path.join(home, '.nvm'), 'versions', 'node');
+    if (fs.existsSync(nvmRoot)) {
+      for (const verDir of fs.readdirSync(nvmRoot)) {
+        candidates.add(path.join(nvmRoot, verDir, 'bin', 'lark-cli'));
+      }
+    }
+  }
+
+  const foundBin = [...candidates].find((c) => c && fs.existsSync(c)) || null;
+  if (!foundBin) {
+    return {
+      installed: false,
+      bin: null,
+      version: null,
+      authenticated: false,
+      statusText: '未安装 @larksuite/cli（如需将 PRD 同步到飞书云文档，请先安装并登录授权）',
+      installCmd: 'npm install -g @larksuite/cli',
+      initCmd: 'lark-cli auth login',
+      fallbackConfigCmd: 'lark-cli config init --new',
+      docUrl: FEISHU_DOC_URL,
+    };
+  }
+
+  const execDir = path.dirname(foundBin);
+  const env = {
+    ...process.env,
+    PATH: [binDir, execDir, process.env.PATH || ''].filter(Boolean).join(path.delimiter),
+  };
+
+  let version = null;
+  try {
+    version = execFileSync(foundBin, ['--version'], { encoding: 'utf8', timeout: 4000, env }).trim().split(/\r?\n/)[0];
+  } catch { /* ignore */ }
+
+  let authenticated = false;
+  let statusText = '';
+  try {
+    const out = execFileSync(foundBin, ['auth', 'status'], { encoding: 'utf8', timeout: 5000, env }).trim();
+    authenticated = !/not logged in|unauthenticated|请先登录|未登录|config init/i.test(out);
+    statusText = out || '已登录飞书';
+  } catch (e) {
+    const msg = String(e.stderr || e.stdout || e.message || '').trim();
+    authenticated = false;
+    statusText = msg || '尚未登录飞书账号，请执行 lark-cli auth login';
+  }
+
+  return {
+    installed: true,
+    bin: foundBin,
+    version,
+    authenticated,
+    statusText,
+    installCmd: 'npm install -g @larksuite/cli',
+    initCmd: 'lark-cli auth login',
+    fallbackConfigCmd: 'lark-cli config init --new',
+    docUrl: FEISHU_DOC_URL,
+  };
+}
+
+export async function checkBridgeStatus(bridgeUrl = DEFAULT_BRIDGE_URL) {
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    const res = await fetch(`${bridgeUrl}/status`, { signal: ctrl.signal });
+    clearTimeout(timer);
+    const data = await res.json();
+    return { reachable: true, ...data };
+  } catch (e) {
+    return { reachable: false, pluginOnline: false, error: e.message };
+  }
+}
+
+export async function ensureBridgeRunning({ bridgeUrl = DEFAULT_BRIDGE_URL, nodeBin = process.execPath } = {}) {
+  const current = await checkBridgeStatus(bridgeUrl);
+  if (current.reachable) return { started: false, reused: true, status: current };
+
+  fs.mkdirSync(AGENT_HOME, { recursive: true });
+  const logFile = path.join(AGENT_HOME, 'bridge.log');
+  const outFd = fs.openSync(logFile, 'a');
+  const bridgeScript = path.join(PKG_ROOT, 'bridge', 'server.mjs');
+  const child = spawn(nodeBin, [bridgeScript], {
+    detached: true,
+    stdio: ['ignore', outFd, outFd],
+    env: { ...process.env },
+  });
+  child.unref();
+  fs.closeSync(outFd);
+  fs.writeFileSync(path.join(AGENT_HOME, 'bridge.pid'), `${child.pid}\n`, 'utf8');
+
+  const deadline = Date.now() + 4000;
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 200));
+    const st = await checkBridgeStatus(bridgeUrl);
+    if (st.reachable) return { started: true, reused: false, pid: child.pid, logFile, status: st };
+  }
+  return { started: false, reused: false, pid: child.pid, logFile, status: { reachable: false, pluginOnline: false } };
+}
+
+export function resolveFigmaPluginDir(customDir = null) {
+  if (customDir && typeof customDir === 'string' && customDir.trim()) {
+    const raw = customDir.trim();
+    if (raw.startsWith('~/') || raw === '~') {
+      return path.join(os.homedir(), raw.slice(2));
+    }
+    return path.resolve(raw);
+  }
+  return DEFAULT_FIGMA_PLUGIN_DIR;
+}
+
+export function revealInFileManager(targetPath) {
+  if (!targetPath || !fs.existsSync(targetPath)) {
+    return { ok: false, error: `目标路径不存在：${targetPath}` };
+  }
+  try {
+    if (process.platform === 'darwin') {
+      const child = spawn('open', ['-R', targetPath], { detached: true, stdio: 'ignore' });
+      child.unref();
+      return { ok: true, platform: 'darwin', path: targetPath };
+    }
+    if (process.platform === 'win32') {
+      const child = spawn('explorer.exe', [`/select,${targetPath}`], { detached: true, stdio: 'ignore' });
+      child.unref();
+      return { ok: true, platform: 'win32', path: targetPath };
+    }
+    return { ok: false, platform: process.platform, error: '当前系统不支持自动唤起图形文件管理器，请手动打开目录' };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+export function installLocalPlugin(targetDir = null) {
+  const destDir = resolveFigmaPluginDir(targetDir);
+  const srcDir = path.join(PKG_ROOT, 'plugin');
+  fs.mkdirSync(destDir, { recursive: true });
+  const copied = [];
+  for (const fname of ['manifest.json', 'code.js', 'ui.html']) {
+    const src = path.join(srcDir, fname);
+    if (fs.existsSync(src)) {
+      const dst = path.join(destDir, fname);
+      fs.copyFileSync(src, dst);
+      copied.push(dst);
+    }
+  }
+  return {
+    pluginDir: destDir,
+    manifestPath: path.join(destDir, 'manifest.json'),
+    files: copied,
+  };
+}
+
+export async function runDoctor({ bridgeUrl = DEFAULT_BRIDGE_URL, probeChrome = true, pluginDir = null } = {}) {
+  const nodes = discoverNodeCandidates();
+  const bestNode = nodes.find((n) => n.ok) || nodes[0] || null;
+  const portableBin = process.platform === 'win32'
+    ? path.join(PORTABLE_NODE_DIR, 'node.exe')
+    : path.join(PORTABLE_NODE_DIR, 'bin', 'node');
+  const portableInfo = probeNodeBinary(portableBin);
+  const nvm = detectNvmInstalled();
+  const npmInfo = detectNpmRegistry(bestNode?.path);
+  const figmaApp = detectFigmaDesktop();
+  const feishu = detectFeishuCli(bestNode?.path);
+  const resolvedPluginDir = resolveFigmaPluginDir(pluginDir);
+  const localManifest = path.join(resolvedPluginDir, 'manifest.json');
+  const bridge = await checkBridgeStatus(bridgeUrl);
+
+  // QA 模式（模式五）依赖隔离 Headless 浏览器；这里做真实启动探测而非仅检查文件存在，
+  // 以便提前暴露「装了浏览器但跑不起来」的环境问题，并给出可直接照做的修复指引。
+  const browser = probeChrome
+    ? await probeBrowser({ timeoutMs: 20000 }).catch((e) => ({
+        ok: false,
+        bin: findChromeBinary(),
+        reason: 'unknown',
+        detail: String(e?.message || e),
+        hint: '浏览器探测异常，请检查本机 Node 与浏览器安装状态。',
+      }))
+    : { ok: null, bin: findChromeBinary(), reason: 'skipped', detail: '已跳过浏览器探测', hint: null };
+
+  return {
+    ok: Boolean(bestNode?.ok && bridge.reachable && bridge.pluginOnline),
+    platform: process.platform,
+    arch: process.arch,
+    node: {
+      ok: Boolean(bestNode?.ok),
+      recommended: bestNode,
+      allFound: nodes,
+    },
+    portableNode: {
+      dir: PORTABLE_NODE_DIR,
+      recordFile: PORTABLE_NODE_RECORD,
+      bin: portableBin,
+      installed: Boolean(portableInfo?.ok),
+      version: portableInfo?.version || null,
+    },
+    nvm,
+    npm: npmInfo,
+    feishu,
+    figma: {
+      desktopInstalled: figmaApp.installed,
+      desktopPath: figmaApp.path,
+      localPluginInstalled: fs.existsSync(localManifest),
+      localManifestPath: localManifest,
+    },
+    bridge: {
+      url: bridgeUrl,
+      reachable: bridge.reachable,
+      pluginOnline: Boolean(bridge.pluginOnline),
+      pluginInfo: bridge.pluginInfo || null,
+    },
+    // 浏览器可用性：模式五（QA 验收与视觉对图）的必要条件
+    // ok 为 null 表示主动跳过探测（--no-browser），与「探测过但不可用」区分开
+    browser: {
+      ok: browser.ok === null ? null : Boolean(browser.ok),
+      path: browser.bin || null,
+      reason: browser.reason,
+      detail: browser.detail,
+      hint: browser.hint,
+      requiredFor: '模式五：QA 功能验收与视觉对图（隔离 Headless 浏览器实测）',
+    },
+  };
+}

@@ -3,7 +3,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_BRIDGE_URL, checkBridgeStatus, ensureBridgeRunning } from './env-doctor.mjs';
+import {
+  DEFAULT_BRIDGE_URL,
+  DEFAULT_FIGMA_PLUGIN_DIR,
+  checkBridgeStatus,
+  ensureBridgeRunning,
+  installLocalPlugin,
+  resolveFigmaPluginDir,
+  revealInFileManager,
+} from './env-doctor.mjs';
 import { computeMenuState, exportPrdBundle, inspectWordDocument, syncPrdToFeishu } from './prd.mjs';
 import { computePrototypeMenuState, derivePrototypeFromPrd, exportPrototypeBundle } from './prototype.mjs';
 import { computeVisualMenuState, deriveVisualFromPrototype, exportVisualBundle } from './visual-design.mjs';
@@ -24,6 +32,17 @@ export const MCP_TOOLS = [
       type: 'object',
       properties: {
         autoStart: { type: 'boolean', description: '桥未运行时是否自动在后台拉起（默认 true）' },
+      },
+    },
+  },
+  {
+    name: 'figma_install_plugin',
+    description: '将 Figma Desktop 本地桥接插件（manifest.json/code.js/ui.html）复制到用户指定目录（默认 ~/Documents/BizDesignAgent-FigmaPlugin，Finder/资源管理器直接可见），并可选在文件管理器中高亮选中 manifest.json 方便一次性导入。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        targetDir: { type: 'string', description: '可选：自定义目标目录路径；不传则使用默认 ~/Documents/BizDesignAgent-FigmaPlugin' },
+        reveal: { type: 'boolean', description: '可选：复制完成后是否在 Finder / 资源管理器中高亮选中 manifest.json（默认 true）' },
       },
     },
   },
@@ -243,7 +262,31 @@ export async function handleToolCall(name, args = {}) {
     const res = autoStart
       ? await ensureBridgeRunning({ bridgeUrl: DEFAULT_BRIDGE_URL })
       : { started: false, reused: false, status: await checkBridgeStatus(DEFAULT_BRIDGE_URL) };
-    return res;
+    const defaultManifest = path.join(DEFAULT_FIGMA_PLUGIN_DIR, 'manifest.json');
+    return {
+      ...res,
+      figmaPlugin: {
+        defaultDir: DEFAULT_FIGMA_PLUGIN_DIR,
+        manifestPath: defaultManifest,
+        installed: fs.existsSync(defaultManifest),
+      },
+    };
+  }
+
+  if (name === 'figma_install_plugin') {
+    const destDir = resolveFigmaPluginDir(args.targetDir || null);
+    const info = installLocalPlugin(destDir);
+    const reveal = args.reveal !== false ? revealInFileManager(info.manifestPath) : { ok: false, skipped: true };
+    return {
+      ok: true,
+      ...info,
+      reveal,
+      nextSteps: [
+        '打开 Figma Desktop（桌面客户端）并打开任意设计稿',
+        '菜单栏选择 Plugins → Development → Import plugin from manifest...',
+        `选中 ${info.manifestPath} 完成导入，然后运行 Biz Design Agent 插件`,
+      ],
+    };
   }
 
   if (name === 'figma_command') {

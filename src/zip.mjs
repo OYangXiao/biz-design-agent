@@ -118,9 +118,12 @@ export function writeZip(entries) {
     localParts.push(lfh, nameBuf, bodyBuf);
 
     // Central Directory Header (46 bytes + name)
+    // 若指定 Unix mode（如 0o755 可执行脚本），写入 versionMadeBy=Unix(3<<8|20) 与 externalFileAttributes，
+    // 确保 macOS/Linux 解压 ZIP 后自动保留 +x 权限。
+    const unixMode = typeof entry.mode === 'number' ? entry.mode : null;
     const cdh = Buffer.alloc(46);
     cdh.writeUInt32LE(0x02014b50, 0);
-    cdh.writeUInt16LE(20, 4);          // version made by
+    cdh.writeUInt16LE(unixMode !== null ? ((3 << 8) | 20) : 20, 4); // version made by
     cdh.writeUInt16LE(20, 6);          // version needed
     cdh.writeUInt16LE(0x0800, 8);      // UTF-8 flag
     cdh.writeUInt16LE(method, 10);
@@ -134,7 +137,7 @@ export function writeZip(entries) {
     cdh.writeUInt16LE(0, 32);
     cdh.writeUInt16LE(0, 34);
     cdh.writeUInt16LE(0, 36);
-    cdh.writeUInt32LE(0, 38);
+    cdh.writeUInt32LE(unixMode !== null ? (((0o100000 | (unixMode & 0o777)) << 16) >>> 0) : 0, 38);
     cdh.writeUInt32LE(offset, 42);
 
     centralParts.push(cdh, nameBuf);

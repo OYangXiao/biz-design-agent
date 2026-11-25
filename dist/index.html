@@ -1,17 +1,115 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>biz-design-agent 内网分发引导</title>
+<title>biz-design-agent 插件与内网安装中心</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f4f6fa;color:#0f172a;font:15px/1.7 system-ui,"PingFang SC",sans-serif;padding:40px 20px}
-main{max-width:760px;margin:auto;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:32px}
-h1{margin:0 0 8px;font-size:26px}p.sub{margin:0 0 24px;color:#475569}
-.box{background:#0f172a;color:#f8fafc;border-radius:10px;padding:16px 18px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;word-break:break-all}
-button{margin-top:12px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer}
-.links{margin-top:24px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px}a{color:#1d4ed8}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6fa;color:#0f172a;font:15px/1.65 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;padding:36px 20px}
+main{max-width:860px;margin:auto;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:32px;box-shadow:0 8px 28px rgba(15,23,42,.05)}
+h1{margin:0 0 6px;font-size:26px;letter-spacing:-.01em}
+.badge{display:inline-block;background:#eff6ff;color:#1d4ed8;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;vertical-align:middle;margin-left:8px}
+p.sub{margin:0 0 24px;color:#475569}
+.hero{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;border-radius:14px;padding:22px 24px;margin-bottom:24px}
+.hero h2{margin:0 0 6px;font-size:18px}
+.hero p{margin:0 0 16px;font-size:14px;opacity:.92}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-block;text-decoration:none;background:#1d4ed8;color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-white{background:#fff;color:#1d4ed8}
+.btn-ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid #e2e8f0;padding-bottom:10px;margin:22px 0 16px}
+.tab{background:#f1f5f9;color:#334155;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.tab.active{background:#0f172a;color:#fff}
+.panel{display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px}
+.panel.active{display:block}
+.box{background:#0f172a;color:#f8fafc;border-radius:9px;padding:13px 15px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;word-break:break-all;margin:10px 0}
+.card{margin-top:22px;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px;background:#fff}
+.card h3{margin:0 0 8px;font-size:16px}
+ol{margin:8px 0 0;padding-left:20px;color:#334155}
+.links{margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;gap:16px;flex-wrap:wrap;font-size:13px}
+a{color:#1d4ed8}
+.tip{font-size:13px;color:#64748b;margin-top:8px}
 </style></head><body><main>
-<h1>biz-design-agent 内网一键接入</h1>
-<p class="sub">在新机器的 AI 客户端（Antigravity / Claude Code / Cursor / Trae / Windsurf）中打开你的工作区，把下面这句话发给 AI 即可自动完成 Node/nvm 检测、内网源配置、客户端适配与 Figma 桥连通验收。</p>
-<div class="box" id="cmd">请用 curl 读取 http://localhost:8790/bootstrap.md 并按步骤帮我检测环境、配置并连接 biz-design-agent</div>
-<button onclick="navigator.clipboard.writeText(document.getElementById('cmd').textContent);this.textContent='已复制，直接粘贴给 AI 即可'">复制给 AI 的引导口令</button>
-<div class="links"><a href="/bootstrap.md">查看原始 bootstrap.md</a><a href="/api/config.json">查看服务配置 JSON</a><a href="/health">健康检查</a></div>
-</main></body></html>
+<h1>biz-design-agent 插件安装中心 <span class="badge">v1.5.1</span></h1>
+<p class="sub">面向业务设计、产品经理、UI 设计师、前端研发与 QA 的零门槛安装门户。全程无需手工改 JSON，支持 macOS（主力）与 Windows。</p>
+
+<section class="hero">
+  <h2>推荐给非程序员：下载一键安装包（Mac / Windows 通用）</h2>
+  <p>解压后双击 <strong>Install-Mac.command</strong>（macOS）或 <strong>Install-Windows.bat</strong>（Windows），自动识别并安装到本机已装 AI 客户端，并把 Figma 插件复制到可见的「文稿」目录并自动高亮。</p>
+  <div class="btn-row">
+    <a class="btn btn-white" href="/downloads/biz-design-agent-installer.zip">下载一键安装包 (.zip)</a>
+  </div>
+</section>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" onclick="showTab('dsh',this)">DeepSeek Harness（免装 Node）</button>
+  <button class="tab" onclick="showTab('agy',this)">Antigravity / Gemini App</button>
+  <button class="tab" onclick="showTab('claude',this)">Claude Code / Cowork</button>
+  <button class="tab" onclick="showTab('ai',this)">Cursor / 其它（AI 一句话装）</button>
+</div>
+
+<div id="panel-dsh" class="panel active">
+  <strong>DeepSeek Harness 图形化直装（无需安装 Node.js）</strong>
+  <ol>
+    <li>打开 <strong>DeepSeek Harness</strong> 桌面端，点击左侧 <strong>Plugins → Add plugin</strong>。</li>
+    <li>粘贴下方插件包地址并回车，安装完成后点 <strong>Enable now</strong> 即可：</li>
+  </ol>
+  <div class="box" id="dsh-url">http://localhost:8790/packages/dsh-biz-design-agent.tgz</div>
+  <button class="btn" onclick="copyText('dsh-url',this)">复制 DSH 插件包地址</button>
+</div>
+
+<div id="panel-agy" class="panel">
+  <strong>Antigravity / Gemini App 安装方式</strong>
+  <ol>
+    <li>点击上方「下载一键安装包」，解压后双击 <code>Install-Mac.command</code>（首次若提示未验证开发者，右键点「打开」即可）。</li>
+    <li>安装完成后，在 Gemini App 左侧 <strong>Customizations → Installed</strong> 中即可看到 <strong>Biz Design Agent</strong> 及其 3 个快捷启动气泡。</li>
+  </ol>
+</div>
+
+<div id="panel-claude" class="panel">
+  <strong>Claude Code / Claude Desktop Cowork 安装方式</strong>
+  <ol>
+    <li><strong>零配置全局生效</strong>：运行上方「一键安装包」自动写入 <code>~/.claude/skills/biz-design-agent/</code>，无需配置任何 Marketplace，新开会话即自动加载。</li>
+    <li><strong>Claude Desktop (Cowork)</strong>：如需单独导入，可下载 <a href="/downloads/biz-design-agent-plugin.zip">纯插件包 (.zip)</a> 直接导入。</li>
+  </ol>
+</div>
+
+<div id="panel-ai" class="panel">
+  <strong>把下面这句话粘贴给任意 AI 客户端（自动体检并接入）</strong>
+  <div class="box" id="cmd">请用 curl 读取 http://localhost:8790/bootstrap.md 并按步骤帮我检测环境、配置并连接 biz-design-agent</div>
+  <button class="btn" onclick="copyText('cmd',this)">复制给 AI 的引导口令</button>
+</div>
+
+<section class="card">
+  <h3>第二步（如需操作 Figma 画布，全局仅需导入一次）</h3>
+  <ol>
+    <li>运行安装向导（或在 AI 对话里说「帮我安装 Figma 插件」），插件会复制到你电脑的 <code>Documents/BizDesignAgent-FigmaPlugin/manifest.json</code> 并自动打开文件夹高亮。</li>
+    <li>打开 <strong>Figma Desktop 桌面版</strong> 和任意设计稿，点顶部菜单 <code>Plugins → Development → Import plugin from manifest...</code>，选中刚才高亮的 <code>manifest.json</code>。</li>
+    <li>运行 <strong>Biz Design Agent</strong>，面板显示「已连接」即可在 AI 中直接画 PRD、原型与高保真稿。</li>
+  </ol>
+  <p class="tip">注：仅生成 Word PRD、提取规格或执行 QA 浏览器验收时，不需要连接 Figma。</p>
+</section>
+
+<div class="links">
+  <a href="/bootstrap.md">查看原始 bootstrap.md</a>
+  <a href="/portable-node/index.json">便携版 Node 下载清单</a>
+  <a href="/api/config.json">查看服务配置 JSON</a>
+  <a href="/packages/dsh-biz-design-agent.tgz">下载 DSH Bundle (.tgz)</a>
+  <a href="/health">健康检查</a>
+</div>
+</main>
+<script>
+function showTab(id, btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+}
+function copyText(id, btn){
+  var txt = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(txt).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已复制，直接粘贴即可';
+    setTimeout(function(){ btn.textContent = old; }, 2200);
+  });
+}
+</script>
+</body></html>

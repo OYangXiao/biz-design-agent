@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "业务设计 Agent",
+    "description": "五模式多角色业务设计协作：PRD 双端生成、可点击原型、高保真视觉、研发规格提取与 QA 像素对图。",
+    "detail": "docs/DETAIL.md"
+  }
+}

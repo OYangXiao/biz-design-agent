@@ -1,4 +1,4 @@
-// 纯 Node 视觉对图、多 Harness 自动配置、标准 MCP Server 与内网自举分发服务（含 nvm+LTS 引导）验证
+// 纯 Node 视觉对图、多 Harness 自动配置、标准 MCP Server 与内网自举分发服务（含便携版 Node 自动下载引导）验证
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -109,13 +109,18 @@ test('多 Harness 自动检测与落盘：绝对路径绑定 NODE_BIN、写入�
   }
 });
 
-test('内网分发服务：动态生成 /bootstrap.md（含自动配置 nvm + 安装 LTS、内网 registry、Harness 识别与 Bridge 握手）', async () => {
+test('内网分发服务：动态生成 /bootstrap.md（含自动下载便携版 Node、内网 registry、Harness 识别与 Bridge 握手）并托管 /portable-node/', async () => {
+  const tmpPortable = fs.mkdtempSync(path.join(os.tmpdir(), 'biz-portable-node-'));
+  fs.writeFileSync(path.join(tmpPortable, 'node-v26.13.1-darwin-arm64.tar.gz'), 'mock-darwin-arm64');
+  fs.writeFileSync(path.join(tmpPortable, 'node-v26.13.1-win-x64.zip'), 'mock-win-x64');
+
   const { server, port } = await startDistServer({
     port: 0,
     host: '127.0.0.1',
     npmRegistry: 'http://npm.intranet.local:4873',
     npmScope: '@team',
     nodeMirror: 'http://mirror.intranet.local/node',
+    portableNodeDir: tmpPortable,
   });
   try {
     const base = `http://127.0.0.1:${port}`;
@@ -127,11 +132,25 @@ test('内网分发服务：动态生成 /bootstrap.md（含自动配置 nvm + �
     assert.equal(cfg.npmRegistry, 'http://npm.intranet.local:4873');
     assert.equal(cfg.npmScope, '@team');
     assert.equal(cfg.nodeMirror, 'http://mirror.intranet.local/node');
+    assert.equal(cfg.portableNodeFiles.length, 2);
+
+    const portableIdx = await (await fetch(`${base}/portable-node/index.json`)).json();
+    assert.equal(portableIdx.ok, true);
+    assert.equal(portableIdx.files.length, 2);
+
+    const darwinResp = await fetch(`${base}/portable-node/darwin-arm64.tar.gz`);
+    assert.equal(darwinResp.status, 200);
+    assert.equal(await darwinResp.text(), 'mock-darwin-arm64');
+
+    const winResp = await fetch(`${base}/portable-node/win-x64.zip`);
+    assert.equal(winResp.status, 200);
+    assert.equal(await winResp.text(), 'mock-win-x64');
 
     const md = await (await fetch(`${base}/bootstrap.md`)).text();
-    assert.match(md, /自动配置 `nvm` 并安装最新 Node LTS/);
-    assert.match(md, /nvm install --lts/);
-    assert.match(md, /CoreyButler\.NVMforWindows/);
+    assert.match(md, /自动下载便携版 Node/);
+    assert.match(md, /\/portable-node\/\$\{OS_TAG\}-\$\{ARCH_TAG\}\.tar\.gz/);
+    assert.match(md, /\/portable-node\/win-x64\.zip/);
+    assert.match(md, /node-path\.txt/);
     assert.match(md, /http:\/\/mirror\.intranet\.local\/node/);
     assert.match(md, /@team:registry.*http:\/\/npm\.intranet\.local:4873/);
     assert.match(md, /setup --workspace/);
@@ -144,8 +163,10 @@ test('内网分发服务：动态生成 /bootstrap.md（含自动配置 nvm + �
 
     const html = await (await fetch(`${base}/`)).text();
     assert.match(html, /bootstrap\.md/);
+    assert.match(html, /portable-node\/index\.json/);
   } finally {
     await new Promise((r) => server.close(r));
+    fs.rmSync(tmpPortable, { recursive: true, force: true });
   }
 });
 

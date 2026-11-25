@@ -28,7 +28,7 @@ node bin/biz-design-agent.mjs doctor
 node bin/biz-design-agent.mjs setup --workspace <你的工作区目录>
 
 # 3. 在 Figma Desktop 里：Plugins → Development → Import plugin from manifest...
-#    选择 ~/.biz-design-agent/plugin/manifest.json，运行 "Biz Design Agent"
+#    选择 ~/Documents/BizDesignAgent-FigmaPlugin/manifest.json，运行 "Biz Design Agent"
 
 # 4. 复测，确认 bridge.pluginOnline = true
 node bin/biz-design-agent.mjs doctor
@@ -44,11 +44,13 @@ node bin/biz-design-agent.mjs doctor
 - `dist/index.html` — 引导首页（复制口令给 AI）
 - `dist/meta.json` — 版本与生成时间
 
-启动真实分发服务（内容与静态版一致，但可动态注入内网 npm 源）：
+启动真实分发服务（内容与静态版一致，可动态注入内网 npm 源，并自动托管 `portable-node/` 下的便携版 Node 压缩包）：
 
 ```bash
 ./fimg serve-dist --port 8790 --registry <内网npm源>
 ```
+
+> 部署到内网服务器时，请将官方 Node LTS 便携包放入服务器 `portable-node/` 目录（详见 [`portable-node/README.txt`](portable-node/README.txt)，大体积压缩包已由 `.gitignore` 忽略、不随 Git 提交）。
 
 ---
 
@@ -88,9 +90,9 @@ node bin/biz-design-agent.mjs mcp
 ## 四、开发与验证
 
 ```bash
-npm test              # 契约 + 全角色 + 浏览器降级 + 一致性，共 34 项
+npm test              # 全量单测（契约 + 全角色 + 浏览器降级 + 分发 + 多 Harness 插件 + 一致性）
 npm run test:plugin   # 需真实 Figma 环境
-npm run build:dist    # 重新生成 dist/ 预打包引导
+npm run build:dist    # 重新生成 dist/ 预打包引导与多 Harness 插件产物
 ```
 
 `npm test` 会同时校验：版本号与品牌标识全仓一致、`dist/` 产物与代码同步、文档内部链接有效。

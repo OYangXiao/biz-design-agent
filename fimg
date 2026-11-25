@@ -13,8 +13,8 @@
 #   ./fimg rm    --name "旧卡片" --dry
 #   ./fimg render | export | clear
 #
-#   ./fimg spec | check | preview      从零生成模式的本地三步
-#   ./fimg dev [--figma]               完整开发回路
+#   ./fimg prd | proto | visual | dev-handoff | qa | visual-diff
+#   ./fimg setup | mcp | serve-dist | check | fake-plugin
 #
 # 为什么不用 npm：本环境里 npm 可能不存在（node 是内置运行时）。
 # 这个入口自己解析运行时，所以任何机器上都能用。

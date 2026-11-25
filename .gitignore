@@ -16,6 +16,14 @@ node_modules/
 npm-debug.log*
 .npm
 
+# ---- 便携版 Node 压缩包（体积较大不提交到 Git，仅保留 portable-node/README.txt）----
+portable-node/*.tar.gz
+portable-node/*.tar.xz
+portable-node/*.zip
+portable-node/*.7z
+portable-node/*.pkg
+portable-node/*.msi
+
 # ---- macOS / 系统 ----
 .DS_Store
 .AppleDouble

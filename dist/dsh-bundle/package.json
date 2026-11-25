@@ -1,0 +1,26 @@
+{
+  "name": "@biz-design/dsh-plugin",
+  "version": "1.5.1",
+  "private": true,
+  "type": "module",
+  "description": "业务设计 Agent（PRD 双端同源、可点击原型、高保真视觉、研发联调与 QA 验收对图）",
+  "exports": {
+    ".": "./index.mjs",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.mjs",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale/*.json",
+    "docs",
+    "skills",
+    "runtime"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

@@ -8,6 +8,7 @@
   },
   "files": [
     "dist/",
+    "skills/",
     "bin/",
     "src/",
     "bridge/",
@@ -42,7 +43,8 @@
     "mcp": "node bin/biz-design-agent.mjs mcp",
     "serve-dist": "node bin/biz-design-agent.mjs serve-dist",
     "build:dist": "node scripts/build-dist.mjs",
-    "test": "node --test test/design-contract.test.mjs test/prd-workflow.test.mjs test/distribution.test.mjs test/all-roles.test.mjs test/browser-fallback.test.mjs test/consistency.test.mjs",
+    "build:plugins": "node scripts/build-plugins.mjs",
+    "test": "node --test test/design-contract.test.mjs test/prd-workflow.test.mjs test/distribution.test.mjs test/all-roles.test.mjs test/browser-fallback.test.mjs test/consistency.test.mjs test/harness-plugins.test.mjs",
     "test:plugin": "node test/plugin.test.mjs",
     "check": "node specs/validate-spec.mjs",
     "status": "node tools/figma.mjs status",

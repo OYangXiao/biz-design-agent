@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "biz-design-agent": {
+      "command": "./scripts/run-mcp",
+      "args": [],
+      "cwd": "."
+    }
+  }
+}

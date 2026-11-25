@@ -1,0 +1,16 @@
+{
+  "name": "biz-design-agent",
+  "displayName": "Biz Design Agent",
+  "version": "1.5.1",
+  "description": "纯 Node 多角色业务设计协作插件：涵盖 PRD 双端同源生成、可点击原型图、高保真视觉稿、研发规格提取与隔离浏览器 QA 验收对图。",
+  "author": {
+    "name": "Biz Design Team"
+  },
+  "license": "MIT",
+  "mcpServers": {
+    "biz-design-agent": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/scripts/run-mcp",
+      "args": []
+    }
+  }
+}

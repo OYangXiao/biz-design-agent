@@ -1,0 +1,17 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "biz-design-agent",
+  "displayName": "Biz Design Agent",
+  "version": "1.5.1",
+  "description": "纯 Node 多角色业务设计协作插件：涵盖 PRD 双端同源生成、可点击原型图、高保真视觉稿、研发规格提取与隔离浏览器 QA 验收对图。",
+  "logo": "assets/logo.svg",
+  "author": {
+    "name": "Biz Design Team"
+  },
+  "license": "MIT",
+  "suggestedPrompts": [
+    "打开 biz-design-agent 主菜单，查看五种工作模式",
+    "进入模式 1，帮我编写或更新一份产品 PRD",
+    "运行环境自检并检查 Figma 桌面插件连通状态"
+  ]
+}
