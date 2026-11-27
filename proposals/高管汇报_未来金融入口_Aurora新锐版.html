@@ -283,14 +283,20 @@ svg.wires { position: absolute; inset: 0; overflow: visible; pointer-events: non
 /* =====================================================================
    P04 双手机对比
    ===================================================================== */
-.s4-stage { position: relative; display: grid; grid-template-columns: 1fr 1fr; margin-top: 30px; height: 720px; }
+.s4-stage { position: relative; display: grid; grid-template-columns: 1fr 1fr; margin-top: 18px; height: 716px; }
 .phone-col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .phone-cap { width: 470px; display: flex; align-items: center; justify-content: space-between; font-size: 17px; color: var(--fg2); }
 .phone { position: relative; width: 470px; height: 664px; border-radius: 66px; padding: 10px; background: linear-gradient(145deg, #3A3B42 0%, #15161B 40%, #2B2C33 70%, #0D0E12 100%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), inset 0 2px 1px rgba(255,255,255,.18), 0 50px 100px -20px rgba(0,0,0,.8); }
 .phone.glow { box-shadow: inset 0 0 0 1px rgba(255,190,120,.25), inset 0 2px 1px rgba(255,255,255,.2), 0 50px 120px -20px rgba(255,120,60,.35), 0 0 0 1px rgba(255,181,71,.12); }
 .screen { position: relative; width: 100%; height: 100%; border-radius: 56px; overflow: hidden; background: #0A0B0F; }
-.island { position: absolute; top: 14px; left: 50%; width: 118px; height: 32px; margin-left: -59px; border-radius: 999px; background: #000; z-index: 5; }
-.scr { position: absolute; left: 12px; right: 12px; top: 58px; bottom: 14px; }
+.island { position: absolute; top: 12px; left: 50%; width: 118px; height: 30px; margin-left: -59px; border-radius: 999px; background: #000; z-index: 5; }
+/* 状态栏：把刘海两侧原本空着的黑带用起来，避免屏幕顶部大面积留白 */
+.statusbar { position: absolute; left: 0; right: 0; top: 0; height: 42px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; font-family: var(--mono); font-size: 12px; letter-spacing: .04em; color: var(--fg3); z-index: 4; }
+.statusbar .sb-r { display: flex; align-items: flex-end; gap: 3px; height: 12px; }
+.statusbar .sb-r i { display: block; width: 3px; border-radius: 1px; background: var(--fg4); }
+.statusbar .sb-batt { position: relative; width: 22px; height: 11px; margin-left: 5px; border-radius: 3px; border: 1px solid var(--fg4); }
+.statusbar .sb-batt::after { content: ''; position: absolute; inset: 1.5px; right: 5px; border-radius: 1px; background: var(--fg3); }
+.scr { position: absolute; left: 12px; right: 12px; top: 44px; bottom: 12px; }
 .scr > .abs { position: absolute; left: 0; right: 0; }
 .hint { height: 36px; border-radius: 12px; display: flex; align-items: center; padding: 0 14px; font-size: 13px; font-weight: 500; }
 .ubbl { position: absolute; right: 0; padding: 14px 18px; border-radius: 20px 20px 6px 20px; background: #F5F5F7; color: #111; font-size: 15px; font-weight: 500; }
@@ -299,8 +305,18 @@ svg.wires { position: absolute; inset: 0; overflow: visible; pointer-events: non
 .shot .sb { transform: translateY(calc(var(--p, 0) * 245px)); }
 .shot img { display: block; width: 100%; }
 .shot::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); border-radius: inherit; }
+/* 截图上下缘柔化：滚动裁切时不会把原图里的按钮/标题硬切一刀 */
+.shot::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(to bottom, rgba(255,255,255,.94) 0%, rgba(255,255,255,0) 9%, rgba(255,255,255,0) 74%, rgba(255,255,255,.55) 92%, rgba(255,255,255,1) 100%); }
 .mini h6 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
 .mini p { font-size: 14px; color: var(--fg2); line-height: 1.6; }
+/* P04 存量页面样本清单：把"这只是其中一个例子"讲实 */
+.legacy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.legacy-grid > span { height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 12.5px; color: var(--fg3); background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+.legacy-strip { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 12px; border-radius: 13px; background: rgba(255,255,255,.03); border: 1px dashed rgba(255,255,255,.13); }
+.legacy-strip .ls-label { flex-shrink: 0; font-size: 11.5px; line-height: 1.35; color: var(--fg3); }
+.legacy-strip .ls-chips { display: flex; gap: 5px; overflow: hidden; }
+.legacy-strip .ls-chips span { flex-shrink: 0; height: 22px; padding: 0 8px; display: flex; align-items: center; border-radius: 7px; font-size: 11px; color: var(--fg3); background: rgba(255,255,255,.05); }
 .vs { position: absolute; left: 50%; top: 40px; bottom: 0; width: 1px; background: linear-gradient(180deg, transparent, rgba(255,255,255,.18) 30%, rgba(255,255,255,.18) 70%, transparent); }
 .vs .knot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 12px 16px; border-radius: 999px; font-family: var(--mono); font-size: 14px; letter-spacing: .12em; color: var(--amber); white-space: nowrap; }
 .chart { position: relative; margin-top: 12px; padding: 12px 14px 8px; border-radius: 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--line); }
@@ -317,11 +333,29 @@ svg.wires { position: absolute; inset: 0; overflow: visible; pointer-events: non
 .panel { position: relative; padding: 34px 38px; border-radius: 30px; }
 .panel .head { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 600; color: var(--fg3); margin-bottom: 28px; }
 .bubble-u { margin-left: auto; width: max-content; max-width: 90%; padding: 15px 20px; border-radius: 20px 20px 6px 20px; background: rgba(255,255,255,0.9); color: #111; font-size: 16.5px; font-weight: 500; }
-.bubble-a { margin-top: 18px; padding: 20px 24px; border-radius: 20px 20px 20px 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); font-size: 16.5px; line-height: 1.6; color: var(--fg2); }
-.ad { margin-top: 18px; padding: 22px 24px; border-radius: 18px; border: 1.5px dashed rgba(255,91,79,.5); background: rgba(255,91,79,.06); }
-.ad b { display: block; font-size: 17px; color: var(--red); margin-bottom: 10px; }
-.ad p { font-size: 15.5px; line-height: 1.65; color: var(--fg2); }
-.panel .foot { position: absolute; left: 38px; right: 38px; bottom: 32px; font-size: 16px; color: var(--fg3); line-height: 1.6; }
+.bubble-a { margin-top: 16px; padding: 20px 24px; border-radius: 20px 20px 20px 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); font-size: 16.5px; line-height: 1.6; color: var(--fg2); }
+/* P05 反面例证：弹窗 / Banner 打断式推广的视觉示意 */
+.mock-screen { position: relative; margin-top: 2px; height: 240px; border-radius: 22px; overflow: hidden; background: #0B0C11; border: 1px solid var(--line); box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+.mock-banner { position: relative; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 14px; font-size: 13px; color: #FFD9B0; background: linear-gradient(90deg, rgba(255,122,69,.28), rgba(255,91,79,.16)); border-bottom: 1px solid rgba(255,91,79,.28); }
+.mock-banner .mb-tag { flex-shrink: 0; padding: 2px 7px; border-radius: 5px; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: #FFB199; background: rgba(255,91,79,.22); border: 1px solid rgba(255,91,79,.4); }
+.mock-banner .mb-x { margin-left: auto; color: var(--fg4); font-size: 12px; }
+.mock-body { position: absolute; left: 0; right: 0; top: 52px; bottom: 0; padding: 14px 16px; opacity: .5; }
+.mock-line { height: 9px; border-radius: 5px; background: rgba(255,255,255,.10); margin-bottom: 8px; }
+.mock-line.w1 { width: 62%; } .mock-line.w2 { width: 86%; } .mock-line.w3 { width: 74%; }
+.mock-txt { margin-top: 10px; font-size: 12px; color: var(--fg3); }
+.mock-pop { position: absolute; left: 50%; bottom: 9px; width: 300px; padding: 12px 15px 12px; border-radius: 18px; transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(46,26,26,.96), rgba(28,18,20,.98)); border: 1px solid rgba(255,91,79,.42);
+  box-shadow: 0 26px 60px -14px rgba(0,0,0,.85), 0 0 0 1px rgba(255,91,79,.14); }
+.mock-pop .mp-x { position: absolute; right: 12px; top: 10px; color: var(--fg4); font-size: 13px; }
+.mock-pop .mp-k { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: rgba(255,140,120,.85); margin-bottom: 6px; }
+.mock-pop .mp-h { font-size: 14.5px; font-weight: 600; color: #FFE8DC; line-height: 1.4; }
+.mock-pop .mp-p { margin-top: 5px; font-size: 11.5px; color: rgba(255,220,210,.6); }
+.mock-pop .mp-btn { margin-top: 9px; height: 30px; border-radius: 10px; display: grid; place-items: center; font-size: 13.5px; font-weight: 700; color: #2A0E06; background: linear-gradient(100deg, #FFB199, #FF7A45); }
+.mock-pop .mp-close { margin-top: 6px; text-align: center; font-size: 10.5px; color: var(--fg4); }
+.ad { margin-top: 14px; padding: 17px 20px; border-radius: 18px; border: 1.5px dashed rgba(255,91,79,.5); background: rgba(255,91,79,.06); }
+.ad b { display: block; font-size: 16px; color: var(--red); margin-bottom: 8px; }
+.ad p { font-size: 14.5px; line-height: 1.6; color: var(--fg2); }
+.panel .foot { margin-top: 16px; font-size: 16px; color: var(--fg3); line-height: 1.6; }
 .step-done { display: flex; gap: 16px; align-items: flex-start; padding: 20px 24px; border-radius: 18px; background: rgba(255,255,255,0.035); border: 1px solid var(--line); }
 .step-done .ck { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgba(61,220,151,.14); color: var(--mint); font-weight: 700; font-size: 15px; }
 .step-done b { display: block; font-size: 16px; color: var(--mint); margin-bottom: 6px; }
@@ -633,31 +667,41 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
     <!-- ============================ P04 千人千面 ============================ -->
     <section class="slide" data-title="千人千面" data-aurora="900,-200,.75|-200,300,.5|500,500,.55">
       <div class="eyebrow fx" data-t="0"><span class="num">04</span><span class="dash"></span><span class="zh">攻克“90% 非核心与运营功能来不及 AI 化”的困局</span></div>
-      <h2 class="h h-md" data-t="0.1"><span class="ln"><span>把《智投实盘赛》与长尾业务，真正做成<span class="g">“千人千面”</span>。</span></span></h2>
+      <h2 class="h h-md" data-t="0.1"><span class="ln"><span>存量页面远不止《智投实盘赛》一处，让它们统统<span class="g">“千人千面”</span>。</span></span></h2>
 
       <div class="s4-stage">
         <div class="vs fx" data-t="0.6"><div class="knot glass">GEN-UI →</div></div>
 
         <!-- 左：现状 -->
         <div class="phone-col fx" data-t="0.4">
-          <div class="phone-cap"><span>现状实拍 · 点进交易大赛仍是千人一面老页面</span><span class="pill red">传统静态页面</span></div>
+          <div class="phone-cap"><span>现状实拍 · 存量页面仍是千人一面的老形态</span><span class="pill red">传统静态页面</span></div>
           <div class="phone"><div class="screen"><div class="island"></div>
+            <div class="statusbar"><span>9:41</span><span class="sb-r"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i><span class="sb-batt"></span></span></div>
             <div class="scr">
               <div class="abs out-on-in" data-t="3.0" style="top:0;bottom:0;">
-                <div class="hint" style="background:rgba(255,255,255,.06);color:var(--fg2);">核心行情/条件单虽有卡片，但一进活动页…</div>
-                <div class="ubbl fx" data-t="0.9" style="top:56px;">“我想看看最近的智投实盘大赛，顺便报个名”</div>
-                <div class="mini glass flat fx" data-t="1.6" style="position:absolute;left:0;right:0;top:136px;padding:22px 22px;">
-                  <h6>智投实盘系列赛（未经过 AI 化重构）</h6>
-                  <p>存量活动与非高频功能太多，研发根本没时间逐一改写</p>
-                  <div style="margin-top:16px;height:48px;border-radius:14px;background:rgba(255,255,255,.08);display:grid;place-items:center;font-size:15px;font-weight:500;">点击跳转传统 H5 静态活动页 →</div>
+                <div class="hint" style="background:rgba(255,255,255,.06);color:var(--fg2);">核心行情/条件单已有卡片，但一进存量页面…</div>
+                <div class="ubbl fx" data-t="0.9" style="top:52px;">“我想看看最近的智投实盘大赛，顺便报个名”</div>
+                <div class="mini glass flat fx" data-t="1.6" style="position:absolute;left:0;right:0;top:130px;height:430px;padding:22px;display:flex;flex-direction:column;">
+                  <h6>智投实盘系列赛 —— 只是其中一个样本</h6>
+                  <p>同类存量页面还有几百个，全都没做过 AI 化重构，研发根本没时间逐一改写。</p>
+                  <div class="legacy-grid" style="margin-top:16px;">
+                    <span>运营活动长尾页</span><span>开户与权限开通</span>
+                    <span>定投与资产诊断</span><span>对账单与报表</span>
+                    <span>低频工具与查询</span><span>新品与权益介绍</span>
+                  </div>
+                  <div style="margin-top:auto;height:48px;border-radius:14px;background:rgba(255,255,255,.08);display:grid;place-items:center;font-size:15px;font-weight:500;">点击跳转传统 H5 静态活动页 →</div>
                 </div>
               </div>
               <div class="abs fx r" data-t="3.0" style="top:0;bottom:0;">
-                <div class="hint" style="background:rgba(255,91,79,.12);color:var(--red);font-weight:600;">实拍现状：所有人看同一套固定页面 · 需手点选赛区</div>
-                <div class="shot"><div class="sa" data-p="3.9,2.0"><div class="sb" data-p="6.1,1.3"><img src="./assets/trading_contest_real.jpg" alt="智投实盘赛现状截图"/></div></div></div>
-                <div class="mini glass redish fx" data-t="5.4" style="position:absolute;left:0;right:0;top:428px;padding:18px 20px;text-align:center;">
-                  <h6 style="color:var(--red);font-size:17px;">✕ 千人一面 · 未关注活动的高手根本不会点</h6>
-                  <p>周度赛/季度价投赛/大师赛全靠自己翻，对话框在此完全失灵；几百个非核心业务靠人工排期永远改不完</p>
+                <div class="hint" style="background:rgba(255,91,79,.12);color:var(--red);font-weight:600;">实拍现状：同一套固定页面 · 赛区全靠手点</div>
+                <div class="shot"><div class="sa" data-p="3.9,2.0"><div class="sb" data-p="6.1,1.3"><img src="./assets/trading_contest_real.jpg" alt="智投实盘赛现状截图（存量页面样本）"/></div></div></div>
+                <div class="mini glass redish fx" data-t="5.4" style="position:absolute;left:0;right:0;top:416px;padding:15px 18px;text-align:center;">
+                  <h6 style="color:var(--red);font-size:16.5px;margin-bottom:3px;">✕ 千人一面 · 未关注活动的高手根本不会点</h6>
+                  <p>对话框在这些老页面里完全失灵；几百个存量页面靠人工排期永远改不完</p>
+                </div>
+                <div class="legacy-strip fx" data-t="6.0" style="top:530px;">
+                  <span class="ls-label">同类存量页面</span>
+                  <span class="ls-chips"><span>运营活动</span><span>开户与权限</span><span>定投诊断</span><span>对账单</span></span>
                 </div>
               </div>
             </div>
@@ -666,10 +710,11 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
 
         <!-- 右：新形态 -->
         <div class="phone-col fx" data-t="0.55">
-          <div class="phone-cap"><span style="color:var(--amber);font-weight:600;">新形态 · 主动识人＋自动生成专属参赛卡</span><span class="pill mint">真·千人千面</span></div>
+          <div class="phone-cap"><span style="color:var(--amber);font-weight:600;">新形态 · 主动识人＋自动生成专属卡片</span><span class="pill mint">真·千人千面</span></div>
           <div class="phone glow"><div class="screen"><div class="island"></div>
+            <div class="statusbar"><span>9:41</span><span class="sb-r"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i><span class="sb-batt"></span></span></div>
             <div class="scr">
-              <div class="abs out-on-in" data-t="6.8" style="top:200px;text-align:center;">
+              <div class="abs out-on-in" data-t="6.8" style="top:184px;text-align:center;">
                 <div style="font-size:15px;color:var(--fg3);">请先看左屏传统活动页痛点</div>
                 <div style="margin-top:10px;font-size:14px;color:var(--amber);">随后演示：新形态如何对未报名高手主动出卡…</div>
                 <div style="margin:26px auto 0;width:64px;height:64px;position:relative;"><div class="orb" style="--size:64px;left:0;top:0;"><i class="o-glow"></i><i class="o-ring"></i><i class="o-core"></i><i class="o-swirl"></i></div></div>
@@ -680,33 +725,38 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
                 <p style="color:var(--fg);font-size:14.5px;">“您本季收益达 <b class="mono" style="color:var(--red)">+26.4%</b>，在《智投实盘赛·季度价投赛》已达前 3% 获奖水平！报名即可角逐 30g 金牛与 MacBook Pro。”</p>
               </div>
 
-              <div class="abs glass beam fx" data-t="8.4" style="top:134px;padding:18px 18px 16px;border-radius:24px;">
-                <div style="font-size:12.5px;color:var(--amber);font-weight:600;">✦ 依托用户端算力动态生成 · 专属参赛卡</div>
-                <div style="margin-top:8px;font-size:18.5px;font-weight:600;">已为您匹配【季度价投赛】· 稳居前 3% 冲奖圈</div>
+              <div class="abs glass beam fx" data-t="8.4" style="top:134px;padding:16px 18px 14px;border-radius:24px;">
+                <div style="font-size:12.5px;color:var(--amber);font-weight:600;">✦ 依托用户端算力动态生成 · 专属卡片</div>
+                <div style="margin-top:7px;font-size:18.5px;font-weight:600;">已为您匹配【季度价投赛】· 稳居前 3% 冲奖圈</div>
                 <div class="chart">
                   <div class="top"><span>您的本季收益曲线 vs 赛区获奖线</span><b>我 +26.4%</b></div>
-                  <svg width="374" height="66" viewBox="0 0 374 66" style="display:block;margin-top:6px;overflow:visible">
-                    <defs><linearGradient id="s4a" x1="0" y1="0" x2="0" y2="66" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="rgba(255,91,79,.35)"/><stop offset="1" stop-color="rgba(255,91,79,0)"/></linearGradient></defs>
-                    <path d="M0 52 L95 46 L190 49 L285 40 L374 36" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.6"/>
-                    <path d="M0 28 L374 28" fill="none" stroke="#FFB547" stroke-width="1.4" stroke-dasharray="4 4"/>
-                    <path class="fx" data-t="10.2" d="M0 56 L92 38 L184 30 L280 12 L374 4 L374 66 L0 66 Z" fill="url(#s4a)"/>
-                    <path class="w-on" pathLength="1" data-p="8.9,1.4" d="M0 56 L92 38 L184 30 L280 12 L374 4" stroke="#FF5B4F" stroke-width="3"/>
+                  <svg width="374" height="46" viewBox="0 0 374 46" style="display:block;margin-top:5px;overflow:visible">
+                    <defs><linearGradient id="s4a" x1="0" y1="0" x2="0" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="rgba(255,91,79,.35)"/><stop offset="1" stop-color="rgba(255,91,79,0)"/></linearGradient></defs>
+                    <path d="M0 36 L95 32 L190 34 L285 28 L374 24" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.6"/>
+                    <path d="M0 19 L374 19" fill="none" stroke="#FFB547" stroke-width="1.4" stroke-dasharray="4 4"/>
+                    <path class="fx" data-t="10.2" d="M0 40 L92 26 L184 20 L280 8 L374 2 L374 46 L0 46 Z" fill="url(#s4a)"/>
+                    <path class="w-on" pathLength="1" data-p="8.9,1.4" d="M0 40 L92 26 L184 20 L280 8 L374 2" stroke="#FF5B4F" stroke-width="3"/>
                   </svg>
                   <div class="leg"><span style="color:var(--amber)">--- 获奖晋级线 +18.0%</span>　　— 沪深300 +6.8%</div>
                 </div>
                 <div class="kv"><span>AI 自动选组</span><b>季度价投赛（识别中长线风格 · 免手选）</b></div>
                 <div class="kv"><span>可角逐奖品</span><b>30g 金牛 · 华为智慧屏 · MacBook Pro</b></div>
-                <div class="swipe" data-p="10.6,1.3" style="--h:46px;--knob:120px;--track:390px;--fs:14px;margin-top:12px;">
+                <div class="swipe" data-p="10.6,1.3" style="--h:46px;--knob:120px;--track:390px;--fs:14px;margin-top:9px;">
                   <div class="swipe-fill"></div>
                   <div class="swipe-hint">右滑一键报名【季度价投赛】→</div>
                   <div class="swipe-knob">立即参赛</div>
                   <div class="swipe-done fx s" data-t="12.0">✓ 报名成功 · 实盘冲击 30g 金牛</div>
                 </div>
+                <div style="margin-top:9px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--fg3);">
+                  <span style="color:var(--violet);font-weight:600;">同一套能力可复用到全部存量页面</span>
+                  <span style="color:var(--fg4);">·</span>
+                  <span>开户 · 权限 · 定投 · 对账</span>
+                </div>
               </div>
 
-              <div class="abs mini glass mint fx" data-t="12.5" style="top:494px;padding:14px 16px;text-align:center;">
-                <h6 style="color:var(--mint);font-size:16px;margin-bottom:4px;">✓ 对达标高手主动出卡 · 对浮亏客户零打扰</h6>
-                <p style="font-size:13px;">免排期重做老网页，真正实现领导期望的“千人千面”</p>
+              <div class="abs mini glass mint fx" data-t="12.5" style="top:506px;padding:12px 16px;text-align:center;">
+                <h6 style="color:var(--mint);font-size:16px;margin-bottom:3px;">✓ 对达标高手主动出卡 · 对浮亏客户零打扰</h6>
+                <p style="font-size:12.5px;">免排期重做老网页，真正实现领导期望的“千人千面”</p>
               </div>
             </div>
           </div></div>
@@ -717,18 +767,33 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
     <!-- ============================ P05 寒暄 vs 硬广 ============================ -->
     <section class="slide" data-title="推广方式蜕变" data-aurora="1000,100,.8|300,-500,.5|-300,400,.5">
       <div class="eyebrow fx" data-t="0"><span class="num">05</span><span class="dash"></span><span class="zh">业务推广方式的本质蜕变</span></div>
-      <h2 class="h h-md" data-t="0.1"><span class="ln"><span>不在回答末尾硬塞广告，而像<span class="g">线下营业部投顾</span>自然寒暄。</span></span></h2>
+      <h2 class="h h-md" data-t="0.1"><span class="ln"><span>不靠弹窗与 Banner 打断，而像<span class="g">线下营业部投顾</span>自然寒暄。</span></span></h2>
 
       <div class="s5-stage">
         <div class="panel glass flat dim-on-in" data-t="3.4">
-          <div class="head"><span class="pill">BEFORE</span>现有 AI 炒股 App · 强诉求问答后生硬塞卡片</div>
+          <div class="head"><span class="pill">BEFORE</span>现有 App · 靠弹窗与 Banner 无差别打断</div>
           <div class="bubble-u fx" data-t="0.4">客户带着急事来：“帮我看下今日半导体板块资金流”</div>
           <div class="bubble-a fx" data-t="0.8">AI 回答：今日半导体主力净流入 <b class="mono" style="color:var(--fg)">32.4</b> 亿元，前排龙头……<br/><span style="color:var(--fg3);font-size:15px;">（客户看完答案就准备关掉软件了）</span></div>
-          <div class="ad fx" data-t="1.5">
-            <b>✕ 回答末尾硬塞营销卡：“快来开通两融享优惠礼包！”</b>
-            <p>客户正急着办正事，强挂推广关联度弱、生硬违和，给人的感觉依然是“机器人在插播广告”。</p>
+          <div class="mock-screen fx" data-t="1.5">
+            <div class="mock-banner"><span class="mb-tag">BANNER</span>开户有礼 · 两融利率限时 5.8% 起<span class="mb-x">✕</span></div>
+            <div class="mock-body">
+              <div class="mock-line w2"></div><div class="mock-line w1"></div><div class="mock-line w3"></div><div class="mock-line w2"></div>
+              <div class="mock-txt">客户正在看的行情页被一条与当下需求无关的推广横条压在顶上……</div>
+            </div>
+            <div class="mock-pop">
+              <span class="mp-x">✕</span>
+              <div class="mp-k">POP-UP · 开屏弹窗</div>
+              <div class="mp-h">恭喜获得「尊享理财礼包」<br/>立即领取，今日仅剩 3 个名额</div>
+              <div class="mp-p">强制遮挡画面 · 必须点击关闭</div>
+              <div class="mp-btn">立即领取</div>
+              <div class="mp-close">暂不需要 · 跳过</div>
+            </div>
           </div>
-          <div class="foot fx" data-t="2.2">结果：工具属性太强，缺乏人与人交流的松弛感与信任铺垫。</div>
+          <div class="ad fx" data-t="2.4">
+            <b>✕ 无差别推送：“总有一条会撞上目标客户”</b>
+            <p>弹窗遮挡操作、Banner 挤压版面、Push 打断日程——非目标客户被反复骚扰，目标客户也常常绕过；转化靠碰运气，还将长期损害信任。</p>
+          </div>
+          <div class="foot fx" data-t="2.9">结果：工具属性太强，缺乏人与人交流的松弛感与信任铺垫。</div>
         </div>
 
         <div class="panel glass warm fx" data-t="2.8">
@@ -828,7 +893,7 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
         <div class="leap glass fx" data-t="0.75" style="height:470px;">
           <div><div class="idx"><span>02</span><span>LONG-TAIL</span></div>
             <div class="bigw">千人<br/>千面</div></div>
-          <div><h4>激活 90% 活动与长尾功能</h4><p>不止看盘与条件单——实盘大赛与低频业务也能按画像自动生成专属卡。</p></div>
+          <div><h4>激活 90% 活动与长尾功能</h4><p>不止看盘与条件单——运营活动、权限开通、低频查询等存量页面，同样的能力都能按画像自动生成专属卡。</p></div>
         </div>
         <div class="leap glass warm beam fx" data-t="1.0" style="height:540px;">
           <div class="shine"></div>
@@ -868,7 +933,7 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
         <div class="newflow glass warm fx r" data-t="2.4">
           <div class="head">针对“涨乐 Agent”的全新工作流 · 将华泰专业服务合理触达用户侧</div>
           <div class="topic fx" data-t="2.9"><span class="pill red">课题 01 · 克制编排</span><b>绝不把海量服务一股脑堆过去（严防耗算力 · 占上下文 · 响应慢）</b><span>分级意图路由与渐进式加载，每次只按需挂载最薄、最准的华泰服务。</span></div>
-          <div class="topic fx" data-t="3.6"><span class="pill amber">课题 02 · 场景挖掘</span><b>从“挂 Banner 等人点”到“懂语境送方案”</b><span>围绕实盘收益、持仓异动与对话脉络设计触发规则（如向未报名高收益客推实盘大赛）。</span></div>
+          <div class="topic fx" data-t="3.6"><span class="pill amber">课题 02 · 场景挖掘</span><b>从“挂 Banner 等人点”到“懂语境送方案”</b><span>围绕持仓异动、活动进度与对话脉络设计触发规则，为每个存量页面配置“该对谁、在何时、说什么”。</span></div>
           <div class="topic fx" data-t="4.3"><span class="pill mint">课题 03 · 顺畅闭环</span><b>保障存量业务经 Agent 调用 100% 顺畅完结</b><span>语义中间层适配与状态兜底，消除老业务表单断点，调用底层柜台丝滑到底。</span></div>
         </div>
       </div>
@@ -952,7 +1017,7 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
             <div class="phase glass fx" data-t="1.5">
               <div class="when">MONTH 1 · 新工作流破冰</div>
               <h4>跑通“克制编排＋场景触达”</h4>
-              <p>拿《智投实盘赛》试水：验证按需上下文裁剪、存量业务顺畅调用，以及未报名高手千人千面动态出卡。</p>
+              <p>用《智投实盘赛》做首个样本（同机制可复制到其余存量页面）：验证按需上下文裁剪、存量业务顺畅调用，以及未报名高手千人千面动态出卡。</p>
             </div>
             <div class="phase glass warm beam fx" data-t="2.4">
               <div class="when">MONTH 2–3 · 人机投顾双打</div>
