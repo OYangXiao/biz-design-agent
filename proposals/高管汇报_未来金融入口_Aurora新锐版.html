@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>走出独立 App，成为用户的随身真人投顾 — 未来 3–10 年战略前瞻汇报</title>
+<style>
+/* =====================================================================
+   AURORA NOIR — 设计系统
+   深空底 · 极光光晕 · 液态玻璃 · 渐变光束描边 · 动态排版
+   ===================================================================== */
+@property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
+:root {
+  --bg: #05060A;
+  --fg: #F5F5F7;
+  --fg2: rgba(235, 237, 245, 0.70);
+  --fg3: rgba(235, 237, 245, 0.44);
+  --fg4: rgba(235, 237, 245, 0.22);
+  --line: rgba(255, 255, 255, 0.08);
+  --line2: rgba(255, 255, 255, 0.14);
+  --amber: #FFB547;
+  --coral: #FF7A45;
+  --rose: #FF4D8D;
+  --violet: #9B7BFF;
+  --cyan: #5AC8FA;
+  --mint: #3DDC97;
+  --red: #FF5B4F;
+  --grad: linear-gradient(100deg, #FFD08A 0%, #FF9A4D 30%, #FF5C8A 64%, #A688FF 100%);
+  --grad-warm: linear-gradient(100deg, #FFE1A8 0%, #FFB547 45%, #FF7A45 100%);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --sans: 'SF Pro Display', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+  --mono: 'SF Mono', 'JetBrains Mono', 'Menlo', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: #000; color: var(--fg); font-family: var(--sans);
+  -webkit-font-smoothing: antialiased; user-select: none;
+}
+body.idle, body.idle * { cursor: none !important; }
+
+#viewport { position: fixed; inset: 0; background: #000; overflow: hidden; cursor: pointer; }
+#stage {
+  position: absolute; left: 50%; top: 50%;
+  width: 1920px; height: 1080px; transform-origin: center center;
+  background: var(--bg); overflow: hidden;
+}
+
+/* ---------- 环境层：极光 / 网格 / 颗粒 / 暗角 / 光标聚光 ---------- */
+#aurora { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.blob { position: absolute; left: 0; top: 0; width: 1200px; height: 1200px; transition: transform 2.6s var(--ease), opacity 2.2s ease; }
+.blob i { position: absolute; inset: 0; border-radius: 50%; }
+.b1 { transform: translate(var(--x1), var(--y1)); opacity: var(--o1, .9); }
+.b2 { transform: translate(var(--x2), var(--y2)); opacity: var(--o2, .8); }
+.b3 { transform: translate(var(--x3), var(--y3)); opacity: var(--o3, .8); }
+.b1 i { background: radial-gradient(circle, rgba(255, 150, 60, 0.42) 0%, rgba(255, 120, 50, 0.10) 38%, transparent 64%); animation: drift1 22s ease-in-out infinite alternate; }
+.b2 i { background: radial-gradient(circle, rgba(255, 70, 140, 0.30) 0%, rgba(255, 60, 130, 0.07) 40%, transparent 64%); animation: drift2 26s ease-in-out infinite alternate; }
+.b3 i { background: radial-gradient(circle, rgba(120, 100, 255, 0.34) 0%, rgba(100, 90, 255, 0.08) 40%, transparent 64%); animation: drift3 30s ease-in-out infinite alternate; }
+@keyframes drift1 { to { transform: translate(120px, 80px) scale(1.12); } }
+@keyframes drift2 { to { transform: translate(-140px, 60px) scale(0.92); } }
+@keyframes drift3 { to { transform: translate(90px, -110px) scale(1.08); } }
+
+.grid {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.032) 1px, transparent 1px);
+  background-size: 96px 96px; background-position: -1px -1px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 42%, #000 20%, transparent 80%);
+          mask-image: radial-gradient(ellipse 75% 70% at 50% 42%, #000 20%, transparent 80%);
+}
+.grain {
+  position: absolute; inset: 0; pointer-events: none; z-index: 50; opacity: 0.09; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.vignette { position: absolute; inset: 0; pointer-events: none; z-index: 49; background: radial-gradient(ellipse 120% 95% at 50% 45%, transparent 55%, rgba(0,0,0,0.55) 100%); }
+.spot {
+  position: absolute; inset: 0; pointer-events: none; z-index: 48; opacity: 0; transition: opacity .6s;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 190, 120, 0.07), transparent 65%);
+}
+#viewport:hover .spot { opacity: 1; }
+
+/* ---------- 舞台外框 Chrome ---------- */
+.chrome { position: absolute; left: 120px; right: 120px; z-index: 40; display: flex; align-items: center; justify-content: space-between; pointer-events: none; font-family: var(--mono); font-size: 14px; letter-spacing: 0.14em; color: var(--fg3); }
+.chrome.top { top: 50px; }
+.chrome.bot { bottom: 40px; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--fg2); }
+.brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--grad); box-shadow: 0 0 14px rgba(255, 140, 80, .8); }
+.brand em { font-style: normal; color: var(--fg4); }
+.pager { display: flex; align-items: center; gap: 14px; }
+.pager b { color: var(--fg); font-weight: 600; }
+.pager .bar { width: 44px; height: 1px; background: var(--line2); }
+.segs { display: flex; gap: 6px; }
+.segs i { width: 26px; height: 3px; border-radius: 3px; background: rgba(255,255,255,0.12); transition: background .6s, width .6s var(--ease); }
+.segs i.on { background: rgba(255,255,255,0.45); }
+.segs i.cur { width: 52px; background: var(--grad); box-shadow: 0 0 12px rgba(255,140,80,.6); }
+
+/* ---------- 幻灯片 & 转场 ---------- */
+.slide {
+  position: absolute; inset: 0; z-index: 10; padding: 140px 120px 100px;
+  opacity: 0; visibility: hidden; transform: scale(1.03); filter: blur(18px);
+  transition: opacity .7s var(--ease), transform 1s var(--ease), filter .7s var(--ease), visibility 0s linear .7s;
+}
+.slide.active {
+  opacity: 1; visibility: visible; transform: none; filter: blur(0);
+  transition: opacity .9s var(--ease) .12s, transform 1.2s var(--ease) .12s, filter .9s var(--ease) .12s, visibility 0s;
+}
+.slide.no-tr, .slide.no-tr * { transition: none !important; }
+body.export-mode .slide, body.export-mode .slide * { transition: none !important; }
+
+/* ---------- 构建动效（由时间轴驱动 data-t → .in） ---------- */
+.fx { opacity: 0; transform: translateY(26px); filter: blur(10px); transition: opacity .9s var(--ease), transform 1.1s var(--ease), filter .9s var(--ease); }
+.fx.l { transform: translateX(-34px); }
+.fx.r { transform: translateX(34px); }
+.fx.s { transform: scale(0.9); }
+.fx.in { opacity: 1; transform: none; filter: blur(0); }
+.out-on-in { transition: opacity .6s var(--ease), filter .6s var(--ease), transform .8s var(--ease); }
+.out-on-in.in { opacity: 0; filter: blur(8px); transform: scale(0.97); pointer-events: none; }
+.dim-on-in { transition: opacity 1s var(--ease), filter 1s var(--ease); }
+.dim-on-in.in { opacity: 0.38; filter: saturate(0.3); }
+
+/* 标题：逐行遮罩升起 */
+.h { font-weight: 600; color: var(--fg); letter-spacing: -0.035em; }
+.h .ln { display: block; overflow: hidden; padding: 0.04em 0 0.1em; margin: -0.04em 0 -0.1em; }
+.h .ln > span { display: inline-block; transform: translateY(110%); transition: transform 1.2s var(--ease); }
+.h.in .ln > span { transform: none; }
+.h .ln:nth-child(2) > span { transition-delay: .09s; }
+.h .ln:nth-child(3) > span { transition-delay: .18s; }
+.h .ln:nth-child(4) > span { transition-delay: .27s; }
+.h-xl { font-size: 108px; line-height: 1.06; }
+.h-lg { font-size: 64px; line-height: 1.12; }
+.h-md { font-size: 52px; line-height: 1.16; }
+.g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.gw { background: var(--grad-warm); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.eyebrow { display: flex; align-items: center; gap: 14px; font-family: var(--mono); font-size: 15px; letter-spacing: 0.2em; color: var(--fg3); text-transform: uppercase; margin-bottom: 26px; }
+.eyebrow .num { color: var(--amber); }
+.eyebrow .dash { width: 36px; height: 1px; background: linear-gradient(90deg, var(--amber), transparent); }
+.eyebrow .zh { letter-spacing: 0.12em; color: var(--fg2); text-transform: none; font-family: var(--sans); font-weight: 500; }
+.lead { font-size: 23px; line-height: 1.7; color: var(--fg2); font-weight: 400; }
+.lead strong { color: var(--fg); font-weight: 600; }
+
+/* ---------- 玻璃卡片 / 光束描边 ---------- */
+.glass {
+  position: relative; border-radius: 26px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.025) 100%);
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 30px 80px -20px rgba(0,0,0,0.55);
+  -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
+}
+.glass.warm { background: linear-gradient(180deg, rgba(255,181,71,0.11) 0%, rgba(255,122,69,0.03) 100%); border-color: rgba(255,181,71,0.22); }
+.glass.mint { background: linear-gradient(180deg, rgba(61,220,151,0.10) 0%, rgba(61,220,151,0.02) 100%); border-color: rgba(61,220,151,0.24); }
+.glass.redish { background: linear-gradient(180deg, rgba(255,91,79,0.10) 0%, rgba(255,91,79,0.02) 100%); border-color: rgba(255,91,79,0.26); }
+.glass.flat { background: rgba(255,255,255,0.035); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+.beam::before {
+  content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: conic-gradient(from var(--ang), transparent 0%, transparent 52%, rgba(255,208,138,.95) 66%, #FF5C8A 78%, #A688FF 88%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: spin 5.5s linear infinite;
+}
+.beam::after {
+  content: ''; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none; z-index: -1;
+  box-shadow: 0 0 60px -10px rgba(255, 140, 80, 0.35);
+}
+@keyframes spin { to { --ang: 360deg; } }
+
+.pill { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 14px; border-radius: 999px; font-size: 13.5px; font-weight: 600; letter-spacing: .02em; white-space: nowrap; border: 1px solid var(--line2); color: var(--fg2); background: rgba(255,255,255,0.04); }
+.pill.amber { color: var(--amber); border-color: rgba(255,181,71,0.35); background: rgba(255,181,71,0.08); }
+.pill.mint { color: var(--mint); border-color: rgba(61,220,151,0.35); background: rgba(61,220,151,0.08); }
+.pill.red { color: var(--red); border-color: rgba(255,91,79,0.38); background: rgba(255,91,79,0.08); }
+.pill.violet { color: #BFAEFF; border-color: rgba(155,123,255,0.4); background: rgba(155,123,255,0.1); }
+.mono { font-family: var(--mono); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; display: inline-block; flex-shrink: 0; }
+.dot.pulse { animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; transform: scale(.75); } }
+
+/* ---------- Agent 光球（Apple Intelligence 式） ---------- */
+.orb { position: absolute; width: var(--size); height: var(--size); border-radius: 50%; animation: breathe 5s ease-in-out infinite; }
+.orb > i { position: absolute; border-radius: 50%; }
+.orb .o-glow { inset: -22%; background: conic-gradient(from 0deg, #FFB547, #FF7A45, #FF4D8D, #9B7BFF, #5AC8FA, #FFB547); filter: blur(calc(var(--size) * 0.14)); opacity: .55; animation: spin2 9s linear infinite; }
+.orb .o-ring { inset: 0; background: conic-gradient(from 0deg, #FFD08A, #FF7A45, #FF4D8D, #A688FF, #5AC8FA, #FFD08A); animation: spin2 6s linear infinite reverse; }
+.orb .o-core { inset: 3.2%; background: radial-gradient(circle at 34% 28%, rgba(255,255,255,0.22) 0%, rgba(30,26,40,0.92) 38%, #07070C 72%); box-shadow: inset 0 0 calc(var(--size) * .18) rgba(255,150,80,.28), inset 0 2px 2px rgba(255,255,255,.25); }
+.orb .o-swirl { inset: 16%; background: conic-gradient(from 90deg, transparent, rgba(255,140,80,.55), transparent 40%, rgba(160,130,255,.5), transparent 75%); filter: blur(calc(var(--size) * 0.06)); mix-blend-mode: screen; animation: spin2 4.5s linear infinite; }
+.orb .o-spec { inset: 9% 30% 62% 18%; background: radial-gradient(ellipse, rgba(255,255,255,.35), transparent 70%); transform: rotate(-24deg); }
+.orb .o-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 2; }
+.orb .o-label b { font-size: calc(var(--size) * .105); font-weight: 600; letter-spacing: .02em; color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.5); }
+.orb .o-label small { margin-top: 6px; font-family: var(--mono); font-size: calc(var(--size) * .058); letter-spacing: .14em; color: rgba(255,225,190,.8); }
+@keyframes spin2 { to { transform: rotate(360deg); } }
+@keyframes breathe { 50% { transform: scale(1.035); } }
+
+/* ---------- SVG 连线 ---------- */
+svg.wires { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.w-base { fill: none; stroke: rgba(255,255,255,0.09); stroke-width: 1.5; }
+.w-on { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--p, 0)); }
+.w-flow { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 0.035 0.965; opacity: 0; transition: opacity .6s; animation: flow 2.2s linear infinite; }
+.w-flow.in { opacity: .95; }
+@keyframes flow { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* ---------- 滑动确认组件 ---------- */
+.swipe { position: relative; height: var(--h, 62px); border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,181,71,0.25); overflow: hidden; }
+.swipe-fill { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--knob) + 8px + var(--p, 0) * (100% - var(--knob) - 8px)); background: linear-gradient(90deg, rgba(255,181,71,.0), rgba(255,181,71,.28)); border-radius: inherit; }
+.swipe-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding-left: calc(var(--knob) + 10px); font-size: var(--fs, 17px); font-weight: 500; color: rgba(255,220,170,.8); opacity: calc(1 - var(--p, 0) * 1.6); }
+.swipe-hint::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.18) 50%, transparent 70%); background-size: 220% 100%; animation: shine 2.4s linear infinite; mix-blend-mode: overlay; }
+@keyframes shine { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+.swipe-knob { position: absolute; left: 4px; top: 4px; bottom: 4px; width: var(--knob); border-radius: 999px; display: flex; align-items: center; justify-content: center; background: var(--grad-warm); color: #2A1500; font-weight: 700; font-size: calc(var(--fs, 17px) - 1px); box-shadow: 0 6px 24px rgba(255,140,60,.45); transform: translateX(calc(var(--p, 0) * (var(--track) - var(--knob) - 8px))); }
+.swipe-done { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: inherit; background: linear-gradient(90deg, #12B57A, #3DDC97); color: #04170E; font-weight: 700; font-size: var(--fs, 17px); }
+
+/* =====================================================================
+   P01 封面
+   ===================================================================== */
+.s1-copy { position: absolute; left: 120px; top: 0; bottom: 0; width: 1000px; display: flex; flex-direction: column; justify-content: center; z-index: 3; }
+.s1-copy .lead { margin-top: 38px; max-width: 880px; font-size: 24px; }
+.s1-meta { display: flex; gap: 0; margin-top: 56px; border-top: 1px solid var(--line); width: 900px; }
+.s1-meta > div { flex: 1; padding: 22px 28px 0 0; }
+.s1-meta > div + div { padding-left: 28px; border-left: 1px solid var(--line); }
+.s1-meta b { display: block; font-family: var(--mono); font-size: 30px; font-weight: 500; letter-spacing: -0.01em; color: var(--fg); }
+.s1-meta span { display: block; margin-top: 8px; font-size: 16px; color: var(--fg3); }
+.s1-visual { position: absolute; right: 30px; top: 120px; width: 820px; height: 820px; z-index: 2; }
+.s1-visual .orb { left: 50%; top: 50%; margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2); }
+.s1-rings { position: absolute; inset: 0; }
+.s1-rings .rot { transform-origin: 410px 410px; animation: spin2 60s linear infinite; }
+.s1-rings .rot.rev { animation-duration: 90s; animation-direction: reverse; }
+.chip { position: absolute; display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 16px; font-size: 16px; font-weight: 500; color: var(--fg); white-space: nowrap; }
+.chip .dot { color: var(--amber); }
+.chip small { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; color: var(--fg3); margin-left: 4px; }
+.float { animation: floaty 6s ease-in-out infinite; }
+.float.d2 { animation-delay: -2s; } .float.d3 { animation-delay: -4s; } .float.d4 { animation-delay: -1s; } .float.d5 { animation-delay: -3s; }
+@keyframes floaty { 50% { transform: translateY(-14px); } }
+
+/* =====================================================================
+   P02 借脑 + 注魂
+   ===================================================================== */
+.s2 { display: grid; grid-template-columns: 600px 1040px; gap: 40px; align-items: center; }
+.s2 .lead { margin-top: 32px; font-size: 21px; }
+.s2-dia { position: relative; width: 1040px; height: 840px; }
+.s2-dia > .card { position: absolute; padding: 26px 30px; }
+.card .lbl { font-family: var(--mono); font-size: 13px; letter-spacing: .12em; color: var(--fg3); margin-bottom: 12px; }
+.card .lbl.amber { color: var(--amber); }
+.card h4 { font-size: 24px; font-weight: 600; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 8px; }
+.card p { font-size: 16.5px; line-height: 1.6; color: var(--fg2); }
+.leg h4 { font-size: 22px; }
+.leg .status { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 15.5px; font-weight: 500; color: var(--mint); }
+.leg .status.amber { color: var(--amber); }
+
+/* =====================================================================
+   P03 住进工作流
+   ===================================================================== */
+.win { position: relative; margin-top: 40px; height: 604px; border-radius: 30px; overflow: hidden; }
+.win-bar { height: 54px; display: flex; align-items: center; padding: 0 24px; gap: 10px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.03); }
+.win-bar i { width: 13px; height: 13px; border-radius: 50%; }
+.win-bar .t { flex: 1; text-align: center; font-size: 15px; color: var(--fg3); margin-right: 60px; }
+.win-bar .t b { color: var(--fg2); font-weight: 600; }
+.win-body { display: grid; grid-template-columns: 860px 1fr; gap: 28px; padding: 26px 28px; height: calc(100% - 54px); }
+.doc { border-radius: 20px; padding: 28px 34px; background: rgba(255,255,255,0.025); border: 1px solid var(--line); }
+.doc .ask { display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 12px; font-size: 15px; color: var(--amber); background: rgba(255,181,71,.07); border: 1px solid rgba(255,181,71,.22); }
+.doc h3 { margin-top: 34px; font-size: 32px; font-weight: 600; letter-spacing: -0.01em; }
+.doc .sub { margin-top: 10px; font-size: 16px; color: var(--fg3); }
+.doc .row { margin-top: 30px; font-size: 18.5px; color: var(--fg2); }
+.doc .sk { margin-top: 12px; height: 9px; border-radius: 9px; background: rgba(255,255,255,0.06); }
+.caret { display: inline-block; width: 2px; height: 22px; background: var(--amber); vertical-align: -4px; margin-left: 4px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.feed { display: flex; flex-direction: column; gap: 18px; }
+.news { padding: 22px 26px; }
+.news h5 { font-size: 20px; font-weight: 600; line-height: 1.45; margin: 14px 0 10px; }
+.news p { font-size: 15.5px; color: var(--amber); }
+.voice { align-self: flex-end; display: flex; align-items: center; gap: 14px; padding: 18px 24px; border-radius: 22px 22px 6px 22px; background: #F5F5F7; color: #111; font-size: 18px; font-weight: 500; box-shadow: 0 20px 50px -10px rgba(0,0,0,.6); }
+.wave { display: flex; align-items: center; gap: 3px; height: 24px; }
+.wave i { width: 3px; border-radius: 3px; background: #FF7A45; animation: wave 1s ease-in-out infinite; }
+.wave i:nth-child(1) { height: 10px; animation-delay: -.2s; } .wave i:nth-child(2) { height: 20px; animation-delay: -.5s; }
+.wave i:nth-child(3) { height: 14px; animation-delay: -.1s; } .wave i:nth-child(4) { height: 22px; animation-delay: -.7s; }
+.wave i:nth-child(5) { height: 12px; animation-delay: -.3s; }
+@keyframes wave { 50% { transform: scaleY(.35); } }
+.order { padding: 24px 28px; }
+.order .lbl { font-size: 14px; color: var(--amber); font-weight: 600; }
+.order h5 { margin-top: 14px; font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+.order h5 .mono { font-size: 22px; color: var(--fg2); }
+.order p { margin: 8px 0 20px; font-size: 16.5px; color: var(--fg2); }
+.caption { margin: 26px auto 0; width: max-content; display: flex; align-items: center; gap: 14px; padding: 14px 28px; border-radius: 999px; font-size: 18px; color: var(--fg); }
+
+/* =====================================================================
+   P04 双手机对比
+   ===================================================================== */
+.s4-stage { position: relative; display: grid; grid-template-columns: 1fr 1fr; margin-top: 30px; height: 720px; }
+.phone-col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.phone-cap { width: 470px; display: flex; align-items: center; justify-content: space-between; font-size: 17px; color: var(--fg2); }
+.phone { position: relative; width: 470px; height: 664px; border-radius: 66px; padding: 10px; background: linear-gradient(145deg, #3A3B42 0%, #15161B 40%, #2B2C33 70%, #0D0E12 100%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), inset 0 2px 1px rgba(255,255,255,.18), 0 50px 100px -20px rgba(0,0,0,.8); }
+.phone.glow { box-shadow: inset 0 0 0 1px rgba(255,190,120,.25), inset 0 2px 1px rgba(255,255,255,.2), 0 50px 120px -20px rgba(255,120,60,.35), 0 0 0 1px rgba(255,181,71,.12); }
+.screen { position: relative; width: 100%; height: 100%; border-radius: 56px; overflow: hidden; background: #0A0B0F; }
+.island { position: absolute; top: 14px; left: 50%; width: 118px; height: 32px; margin-left: -59px; border-radius: 999px; background: #000; z-index: 5; }
+.scr { position: absolute; left: 12px; right: 12px; top: 58px; bottom: 14px; }
+.scr > .abs { position: absolute; left: 0; right: 0; }
+.hint { height: 36px; border-radius: 12px; display: flex; align-items: center; padding: 0 14px; font-size: 13px; font-weight: 500; }
+.ubbl { position: absolute; right: 0; padding: 14px 18px; border-radius: 20px 20px 6px 20px; background: #F5F5F7; color: #111; font-size: 15px; font-weight: 500; }
+.shot { position: absolute; left: 0; right: 0; top: 46px; height: 368px; border-radius: 20px; overflow: hidden; background: #fff; }
+.shot .sa { transform: translateY(calc(-40px - var(--p, 0) * 410px)); }
+.shot .sb { transform: translateY(calc(var(--p, 0) * 245px)); }
+.shot img { display: block; width: 100%; }
+.shot::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); border-radius: inherit; }
+.mini h6 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.mini p { font-size: 14px; color: var(--fg2); line-height: 1.6; }
+.vs { position: absolute; left: 50%; top: 40px; bottom: 0; width: 1px; background: linear-gradient(180deg, transparent, rgba(255,255,255,.18) 30%, rgba(255,255,255,.18) 70%, transparent); }
+.vs .knot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 12px 16px; border-radius: 999px; font-family: var(--mono); font-size: 14px; letter-spacing: .12em; color: var(--amber); white-space: nowrap; }
+.chart { position: relative; margin-top: 12px; padding: 12px 14px 8px; border-radius: 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--line); }
+.chart .top { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--fg3); }
+.chart .top b { font-family: var(--mono); font-size: 14px; color: var(--red); }
+.chart .leg { margin-top: 4px; font-size: 11.5px; color: var(--fg3); }
+.kv { display: flex; justify-content: space-between; align-items: center; height: 34px; padding: 0 14px; margin-top: 8px; border-radius: 10px; background: rgba(255,255,255,0.04); font-size: 13px; }
+.kv span { color: var(--fg3); } .kv b { font-weight: 500; color: var(--fg); }
+
+/* =====================================================================
+   P05 寒暄 vs 硬广
+   ===================================================================== */
+.s5-stage { display: grid; grid-template-columns: 620px 1fr; gap: 30px; margin-top: 40px; height: 690px; }
+.panel { position: relative; padding: 34px 38px; border-radius: 30px; }
+.panel .head { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 600; color: var(--fg3); margin-bottom: 28px; }
+.bubble-u { margin-left: auto; width: max-content; max-width: 90%; padding: 15px 20px; border-radius: 20px 20px 6px 20px; background: rgba(255,255,255,0.9); color: #111; font-size: 16.5px; font-weight: 500; }
+.bubble-a { margin-top: 18px; padding: 20px 24px; border-radius: 20px 20px 20px 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); font-size: 16.5px; line-height: 1.6; color: var(--fg2); }
+.ad { margin-top: 18px; padding: 22px 24px; border-radius: 18px; border: 1.5px dashed rgba(255,91,79,.5); background: rgba(255,91,79,.06); }
+.ad b { display: block; font-size: 17px; color: var(--red); margin-bottom: 10px; }
+.ad p { font-size: 15.5px; line-height: 1.65; color: var(--fg2); }
+.panel .foot { position: absolute; left: 38px; right: 38px; bottom: 32px; font-size: 16px; color: var(--fg3); line-height: 1.6; }
+.step-done { display: flex; gap: 16px; align-items: flex-start; padding: 20px 24px; border-radius: 18px; background: rgba(255,255,255,0.035); border: 1px solid var(--line); }
+.step-done .ck { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgba(61,220,151,.14); color: var(--mint); font-weight: 700; font-size: 15px; }
+.step-done b { display: block; font-size: 16px; color: var(--mint); margin-bottom: 6px; }
+.step-done p { font-size: 17px; line-height: 1.55; color: var(--fg2); }
+.greet { position: relative; margin-top: 20px; padding: 28px 32px 28px 130px; border-radius: 26px; }
+.greet .orb { left: 34px; top: 30px; }
+.greet .who { font-size: 15px; font-weight: 600; color: var(--amber); margin-bottom: 14px; }
+.greet q { display: block; quotes: none; font-size: 23px; line-height: 1.68; color: var(--fg); font-weight: 450; letter-spacing: .005em; }
+.reply { display: inline-flex; align-items: center; gap: 10px; margin-top: 20px; padding: 12px 22px; border-radius: 999px; background: linear-gradient(90deg, #12B57A, #3DDC97); color: #04170E; font-size: 16px; font-weight: 700; }
+.verdict { margin-top: 20px; padding: 22px 28px; border-radius: 20px; }
+.verdict b { display: block; font-size: 20px; font-weight: 600; color: var(--fg); margin-bottom: 8px; }
+.verdict p { font-size: 16.5px; color: var(--fg2); }
+
+/* =====================================================================
+   P06 人机协同
+   ===================================================================== */
+.s6-stage { position: relative; margin-top: 40px; height: 690px; }
+.s6-left { position: absolute; left: 0; top: 0; width: 500px; height: 690px; display: flex; flex-direction: column; gap: 14px; }
+.s6-left .card { padding: 20px 24px; border-radius: 22px; }
+.avatar { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; font-weight: 600; color: #2A1500; background: var(--grad-warm); box-shadow: 0 0 0 4px rgba(255,181,71,.15); flex-shrink: 0; }
+.big-ratio { font-family: var(--mono); font-size: 52px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
+.syn { position: absolute; left: 680px; width: 1000px; padding: 24px 30px; border-radius: 26px; }
+.syn .top { display: flex; justify-content: space-between; align-items: center; }
+.syn .tag { font-family: var(--mono); font-size: 13px; letter-spacing: .1em; color: var(--fg3); }
+.syn h4 { margin: 16px 0 14px; font-size: 22px; font-weight: 600; letter-spacing: -0.005em; }
+.syn .q { padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.035); border-left: 2px solid var(--c, var(--amber)); font-size: 16px; line-height: 1.7; color: var(--fg2); }
+
+/* =====================================================================
+   P07 四大跃迁（Bento 阶梯）
+   ===================================================================== */
+.bento { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; align-items: end; margin-top: 50px; height: 620px; }
+.leap { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 34px 32px 34px; border-radius: 30px; overflow: hidden; }
+.leap .idx { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 14px; letter-spacing: .14em; color: var(--fg3); }
+.leap .bign { margin-top: 18px; font-size: 92px; font-weight: 600; letter-spacing: -0.05em; line-height: 1; }
+.leap .bign small { font-size: 34px; letter-spacing: -0.01em; margin-left: 6px; font-weight: 500; }
+.leap .bigw { margin-top: 22px; font-size: 64px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
+.leap h4 { font-size: 25px; font-weight: 600; margin-bottom: 12px; }
+.leap p { font-size: 17.5px; line-height: 1.6; color: var(--fg2); }
+.leap .shine { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.07) 50%, transparent 65%); background-size: 250% 100%; animation: shine 6s ease-in-out infinite; }
+
+/* =====================================================================
+   P08 部门影响
+   ===================================================================== */
+.banner { display: flex; align-items: center; gap: 24px; padding: 24px 34px; border-radius: 24px; }
+.banner h4 { font-size: 22px; font-weight: 600; }
+.banner p { margin-top: 6px; font-size: 16.5px; color: var(--fg2); }
+.s8-mid { position: relative; display: grid; grid-template-columns: 520px 1fr; gap: 110px; margin-top: 20px; height: 420px; }
+.oldflow { padding: 28px 32px; border-radius: 26px; }
+.oldflow .head, .newflow .head { font-size: 16px; font-weight: 600; color: var(--fg3); margin-bottom: 20px; }
+.ostep { position: relative; display: flex; align-items: center; gap: 18px; height: 56px; padding: 0 20px; margin-bottom: 12px; border-radius: 14px; background: rgba(255,255,255,0.035); border: 1px solid var(--line); font-size: 17.5px; color: var(--fg2); }
+.ostep .mono { color: var(--fg4); font-size: 14px; }
+.oldflow .note { margin-top: 18px; font-size: 15px; color: var(--fg3); }
+.newflow { padding: 28px 32px; border-radius: 26px; }
+.newflow .head { color: var(--amber); }
+.topic { display: grid; grid-template-columns: 170px 1fr; gap: 6px 22px; align-items: center; padding: 16px 22px; margin-bottom: 12px; border-radius: 16px; background: rgba(255,255,255,0.035); border: 1px solid var(--line); }
+.topic .pill { grid-row: span 2; justify-content: center; }
+.topic b { font-size: 18px; font-weight: 600; color: var(--fg); }
+.topic span { font-size: 15.5px; color: var(--fg2); }
+.arrowchip { position: absolute; left: 520px; top: 50%; width: 110px; display: flex; justify-content: center; transform: translateY(-50%); }
+.arrowchip > div { padding: 12px 18px; border-radius: 999px; font-size: 15px; font-weight: 600; color: var(--amber); }
+
+/* =====================================================================
+   P09 安全信任
+   ===================================================================== */
+.s9 { display: grid; grid-template-columns: 860px 1fr; gap: 40px; align-items: center; height: 100%; }
+.trust { margin-top: 48px; display: flex; flex-direction: column; gap: 30px; }
+.trust-item { display: flex; gap: 24px; }
+.trust-item .n { flex-shrink: 0; width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-family: var(--mono); font-size: 16px; color: var(--amber); }
+.trust-item h3 { font-size: 25px; font-weight: 600; margin-bottom: 8px; }
+.trust-item p { font-size: 18.5px; line-height: 1.6; color: var(--fg2); }
+.rings { position: relative; width: 780px; height: 780px; }
+.rings svg { position: absolute; inset: 0; overflow: visible; }
+.rings .rot { transform-origin: 390px 390px; animation: spin2 var(--d, 30s) linear infinite; }
+.rings .rot.rev { animation-direction: reverse; }
+.rings .orb { left: 50%; top: 50%; margin: -105px 0 0 -105px; }
+
+/* =====================================================================
+   P10 收束 · 路线图
+   ===================================================================== */
+.s10-orb { position: absolute; right: -260px; top: -300px; opacity: .55; }
+.s10-orb .orb { position: relative; }
+.road { position: relative; margin-top: 64px; }
+.track { position: relative; height: 2px; margin: 0 0 30px; background: rgba(255,255,255,0.1); }
+.track .fill { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--p, 0) * 100%); background: var(--grad); box-shadow: 0 0 16px rgba(255,140,80,.8); }
+.track .node { position: absolute; top: -7px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 2px solid rgba(255,255,255,.3); transition: all .6s var(--ease); }
+.track .node.in { border-color: var(--amber); background: var(--amber); box-shadow: 0 0 0 6px rgba(255,181,71,.15), 0 0 20px rgba(255,181,71,.8); }
+.phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.phase { padding: 30px 34px; border-radius: 26px; }
+.phase .when { font-family: var(--mono); font-size: 14px; letter-spacing: .12em; color: var(--amber); margin-bottom: 14px; }
+.phase h4 { font-size: 26px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.01em; }
+.phase p { font-size: 17.5px; line-height: 1.65; color: var(--fg2); }
+
+/* =====================================================================
+   HUD（舞台外，演示控制）
+   ===================================================================== */
+#hud {
+  position: fixed; left: 50%; bottom: 22px; z-index: 100; transform: translate(-50%, 0);
+  display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 999px;
+  background: rgba(20, 21, 28, 0.72); border: 1px solid rgba(255,255,255,0.1);
+  -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5); color: var(--fg2); font-size: 13px;
+  transition: opacity .4s, transform .5s var(--ease);
+}
+body.hud-hide #hud { opacity: 0; transform: translate(-50%, 16px); pointer-events: none; }
+#hud button { height: 32px; min-width: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--fg); font: 600 13px var(--sans); cursor: pointer; transition: background .2s; }
+#hud button:hover { background: rgba(255,255,255,0.1); }
+#hud button:disabled { opacity: .3; cursor: default; background: transparent; }
+#hud .sep { width: 1px; height: 18px; background: rgba(255,255,255,0.12); margin: 0 4px; }
+#hud-counter { font-family: var(--mono); padding: 0 6px; color: var(--fg); }
+#hud-status { font-family: var(--mono); font-size: 12px; min-width: 120px; text-align: center; color: var(--fg3); }
+#hud-tip { position: fixed; left: 50%; bottom: 72px; transform: translateX(-50%); z-index: 100; font-size: 12px; color: rgba(255,255,255,.4); font-family: var(--mono); letter-spacing: .06em; transition: opacity .4s; white-space: nowrap; }
+body.hud-hide #hud-tip { opacity: 0; }
+body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="viewport">
+  <div id="stage">
+    <!-- 环境层 -->
+    <div id="aurora">
+      <div class="blob b1"><i></i></div>
+      <div class="blob b2"><i></i></div>
+      <div class="blob b3"><i></i></div>
+    </div>
+    <div class="grid"></div>
+
+    <div class="chrome top">
+      <div class="brand"><span class="brand-dot"></span>HUATAI · 涨乐 AGENT <em>/ STRATEGIC FORESIGHT 2026–2036</em></div>
+      <div class="pager"><span id="chapter">封面</span><span class="bar"></span><span><b id="pg-cur">01</b> / <span id="pg-tot">10</span></span></div>
+    </div>
+    <div class="chrome bot">
+      <div>用户增长与平台运营部</div>
+      <div class="segs" id="segs"></div>
+      <div>CONFIDENTIAL · 内部战略讨论</div>
+    </div>
+
+    <!-- ============================ P01 封面 ============================ -->
+    <section class="slide" data-title="封面" data-aurora="1000,-180,.95|1180,420,.85|380,420,.7">
+      <div class="s1-visual">
+        <svg class="s1-rings" viewBox="0 0 820 820" width="820" height="820">
+          <defs>
+            <linearGradient id="s1g" x1="0" y1="0" x2="820" y2="820" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#FFD08A"/><stop offset=".5" stop-color="#FF5C8A"/><stop offset="1" stop-color="#A688FF"/>
+            </linearGradient>
+          </defs>
+          <circle cx="410" cy="410" r="400" fill="none" stroke="rgba(255,255,255,.05)"/>
+          <circle cx="410" cy="410" r="330" fill="none" stroke="rgba(255,255,255,.07)" stroke-dasharray="2 8"/>
+          <circle cx="410" cy="410" r="262" fill="none" stroke="rgba(255,255,255,.08)"/>
+          <g class="rot"><circle cx="410" cy="410" r="330" fill="none" stroke="url(#s1g)" stroke-width="1.6" stroke-dasharray="220 1854" stroke-linecap="round"/><circle cx="740" cy="410" r="5" fill="#FFD08A"/></g>
+          <g class="rot rev"><circle cx="410" cy="410" r="400" fill="none" stroke="url(#s1g)" stroke-width="1.2" stroke-dasharray="140 2373" stroke-linecap="round" opacity=".8"/><circle cx="410" cy="10" r="4" fill="#A688FF"/></g>
+        </svg>
+        <div class="fx s" data-t="0.2" style="position:absolute;inset:0;">
+          <div class="orb" style="--size:400px"><i class="o-glow"></i><i class="o-ring"></i><i class="o-core"></i><i class="o-swirl"></i><i class="o-spec"></i>
+            <div class="o-label"><b>涨乐随身投顾</b><small>ALWAYS-ON ADVISOR</small></div>
+          </div>
+        </div>
+        <div class="fx" data-t="1.0" style="position:absolute;left:30px;top:150px;"><div class="chip glass float"><span class="dot"></span>盯持仓异动<small>PORTFOLIO</small></div></div>
+        <div class="fx" data-t="1.15" style="position:absolute;right:0;top:110px;"><div class="chip glass float d2"><span class="dot" style="color:var(--violet)"></span>盯宏观与大宗<small>MACRO</small></div></div>
+        <div class="fx" data-t="1.3" style="position:absolute;right:-30px;top:470px;"><div class="chip glass float d3"><span class="dot" style="color:var(--rose)"></span>盯突发舆情<small>NEWS</small></div></div>
+        <div class="fx" data-t="1.45" style="position:absolute;left:0;top:560px;"><div class="chip glass float d4"><span class="dot" style="color:var(--mint)"></span>一句话原地委托<small>INLINE TRADE</small></div></div>
+        <div class="fx" data-t="1.6" style="position:absolute;left:300px;bottom:30px;"><div class="chip glass float d5"><span class="dot" style="color:var(--cyan)"></span>千人千面实时生成卡片<small>GEN-UI</small></div></div>
+      </div>
+
+      <div class="s1-copy">
+        <div class="eyebrow fx" data-t="0.05"><span class="num">●</span><span>未来三到十年最重要的业务变革</span><span class="dash"></span><span class="zh">站在变革前夕</span></div>
+        <h1 class="h h-xl" data-t="0.2">
+          <span class="ln"><span>走出独立 App，</span></span>
+          <span class="ln"><span>成为用户的</span></span>
+          <span class="ln"><span class="g">随身真人投顾</span></span>
+        </h1>
+        <p class="lead fx" data-t="0.9">传统客户端不会一夜淘汰，但下一代个人 AI 底座（Harness）正在重塑入口。早一步让涨乐的专业灵魂住进用户日常工作流，才能在未来三到十年掌握主动权。</p>
+        <div class="s1-meta fx" data-t="1.25">
+          <div><b>3–10 <span style="font-size:18px;color:var(--fg3);display:inline">YRS</span></b><span>范式变革窗口期</span></div>
+          <div><b class="gw">Harness</b><span>客户自有 AI 底座 · 新入口</span></div>
+          <div><b>90 <span style="font-size:18px;color:var(--fg3);display:inline">DAYS</span></b><span>轻骑兵跑通样板</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ P02 借脑 + 注魂 ============================ -->
+    <section class="slide" data-title="物种本质" data-aurora="1100,-300,.7|900,300,.5|-300,200,.6">
+      <div class="s2">
+        <div>
+          <div class="eyebrow fx" data-t="0"><span class="num">02</span><span class="dash"></span><span class="zh">物种本质的区别</span></div>
+          <h2 class="h h-md" data-t="0.1">
+            <span class="ln"><span>不是加了对话框的软件，</span></span>
+            <span class="ln"><span>而是跟在身边的</span></span>
+            <span class="ln"><span class="g">华泰随身投顾。</span></span>
+          </h2>
+          <p class="lead fx" data-t="0.6">为什么现有 AI 炒股软件仍像在“点预置菜单”？因为中心化算力撑不起为百万人实时生成界面，只能预先开发固定模块。</p>
+          <p class="lead fx" data-t="0.8" style="margin-top:18px;">而在 Harness 中，<strong>客户自有的 AI 算力天然成为实时动态生成专属卡片的底座</strong>，让华泰专业能力像真人顾问一样随问随画。</p>
+        </div>
+
+        <div class="s2-dia">
+          <svg class="wires" width="1040" height="840" viewBox="0 0 1040 840">
+            <defs>
+              <linearGradient id="s2g" x1="0" y1="0" x2="1040" y2="840" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFD08A"/><stop offset=".55" stop-color="#FF7A45"/><stop offset="1" stop-color="#A688FF"/></linearGradient>
+            </defs>
+            <path class="w-base" d="M240 150 C240 240 520 190 520 232"/>
+            <path class="w-base" d="M800 150 C800 240 520 190 520 232"/>
+            <path class="w-on" pathLength="1" data-p="1.1,1.0" stroke="url(#s2g)" d="M240 150 C240 240 520 190 520 232"/>
+            <path class="w-on" pathLength="1" data-p="1.1,1.0" stroke="url(#s2g)" d="M800 150 C800 240 520 190 520 232"/>
+            <path class="w-flow" pathLength="1" data-t="2.2" d="M240 150 C240 240 520 190 520 232"/>
+            <path class="w-flow" pathLength="1" data-t="2.2" d="M800 150 C800 240 520 190 520 232" style="animation-delay:-1.1s"/>
+            <g>
+              <path class="w-base" d="M520 428 C520 480 160 470 160 522"/>
+              <path class="w-base" d="M520 428 L520 522"/>
+              <path class="w-base" d="M520 428 C520 480 880 470 880 522"/>
+              <path class="w-on" pathLength="1" data-p="2.6,0.8" stroke="url(#s2g)" d="M520 428 C520 480 160 470 160 522"/>
+              <path class="w-on" pathLength="1" data-p="3.2,0.8" stroke="url(#s2g)" d="M520 428 L520 522"/>
+              <path class="w-on" pathLength="1" data-p="3.8,0.8" stroke="url(#s2g)" d="M520 428 C520 480 880 470 880 522"/>
+              <path class="w-flow" pathLength="1" data-t="4.8" d="M520 428 C520 480 160 470 160 522"/>
+              <path class="w-flow" pathLength="1" data-t="4.8" d="M520 428 L520 522" style="animation-delay:-.7s"/>
+              <path class="w-flow" pathLength="1" data-t="4.8" d="M520 428 C520 480 880 470 880 522" style="animation-delay:-1.4s"/>
+            </g>
+          </svg>
+
+          <div class="card glass fx" data-t="0.3" style="left:0;top:10px;width:480px;height:140px;">
+            <div class="lbl">COMPUTE · 客户自有底座（Harness）算力</div>
+            <h4>为“实时动态生成卡片”提供基础</h4>
+            <p>破解集中算力与速度瓶颈 · 告别预开发静态模块</p>
+          </div>
+          <div class="card glass warm fx" data-t="0.5" style="left:560px;top:10px;width:480px;height:140px;">
+            <div class="lbl amber">SOUL · 专业灵魂 · 华泰核心壁垒</div>
+            <h4>注入华泰投研知识与全业务专权</h4>
+            <p>研究所框架 · 实时账户持仓 · 免表单交易通道</p>
+          </div>
+
+          <div class="fx s" data-t="1.7" style="position:absolute;left:422px;top:232px;">
+            <div class="orb" style="--size:196px"><i class="o-glow"></i><i class="o-ring"></i><i class="o-core"></i><i class="o-swirl"></i><i class="o-spec"></i>
+              <div class="o-label"><b>涨乐随身投顾</b><small>真人感 · 懂业务</small></div>
+            </div>
+          </div>
+
+          <div class="card glass warm leg fx" data-t="3.0" style="left:0;top:522px;width:320px;">
+            <h4>盯股市与持仓</h4><p>实时扫描持仓异动与估值</p>
+            <div class="status amber fx" data-t="3.6"><span class="dot pulse"></span>持仓敞口全天候守护中</div>
+          </div>
+          <div class="card glass leg fx" data-t="3.6" style="left:360px;top:522px;width:320px;">
+            <h4>盯大宗商品与宏观</h4><p>黄金 · 原油 · 伦铜跨市场联动</p>
+            <div class="status fx" data-t="4.2"><span class="dot pulse"></span>捕捉有色期货突发异动</div>
+          </div>
+          <div class="card glass leg fx" data-t="4.2" style="left:720px;top:522px;width:320px;">
+            <h4>盯突发新闻与讲话</h4><p>WSJ · 财联社 · X 实时舆情</p>
+            <div class="status fx" data-t="4.8"><span class="dot pulse"></span>自动关联持仓标的利好</div>
+          </div>
+
+          <div class="card glass beam fx" data-t="5.4" style="left:0;top:720px;width:1040px;height:120px;display:flex;align-items:center;gap:28px;">
+            <span class="pill amber">与独立 App 的核心差异</span>
+            <div>
+              <h4 style="margin-bottom:6px;font-size:23px;">无需预先开发静态卡片 · 按客户问题当场生成专属交互</h4>
+              <p>依托客户自有 AI 算力突破实时生成瓶颈，让懂华泰业务的“随身投顾”随问随画、全天伴随。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ P03 住进工作流 ============================ -->
+    <section class="slide" data-title="住进工作流" data-aurora="1100,200,.8|200,500,.45|-200,-400,.6">
+      <div class="eyebrow fx" data-t="0"><span class="num">03</span><span class="dash"></span><span class="zh">打破独立炒股 App 的驻留孤岛</span></div>
+      <h2 class="h h-md" data-t="0.1"><span class="ln"><span>没人会全天泡在炒股 App 里，但我们能<span class="g">住进他的日常工作流</span>。</span></span></h2>
+
+      <div class="win glass fx" data-t="0.4">
+        <div class="win-bar">
+          <i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i>
+          <div class="t"><b>个人日常工作底座（Harness）</b> · 当前正在撰写公司业务方案（未打开任何炒股软件）</div>
+        </div>
+        <div class="win-body">
+          <div class="doc dim-on-in" data-t="2.0">
+            <div class="ask"><span class="dot pulse"></span>早间已交代 Harness：“顺便帮我盯今日股市、大宗商品与突发新闻”</div>
+            <h3>2026 季度供应链与采购预算方案</h3>
+            <div class="sub">日常本职工作中（与股票完全无关）……</div>
+            <div class="row">一、本季度核心原材料交付周期评估与备货策略</div><div class="sk" style="width:92%"></div>
+            <div class="row">二、华东与华南仓储物流成本结构优化目标（预计下降 8.5%）</div><div class="sk" style="width:84%"></div>
+            <div class="row">三、年度供应商战略合作框架协议续签时间表</div><div class="sk" style="width:70%"></div>
+            <div class="row">四、跨部门数字化协同排期与里程碑考核节点<span class="caret"></span></div>
+          </div>
+
+          <div class="feed">
+            <div class="news glass redish fx r" data-t="1.6">
+              <span class="pill red">⚡ 外部资讯 Agent · 突发推送</span>
+              <h5>突发讲话：海外关键矿产出口政策收紧，伦铜期货直线拉升 4%</h5>
+              <p>涨乐随身投顾自动提示：与您关注的【有色金属 / 紫金矿业】强相关</p>
+            </div>
+            <div class="voice fx r" data-t="3.4">
+              <div class="wave"><i></i><i></i><i></i><i></i><i></i></div>
+              “不用切软件了，直接按现价帮我买两成仓位紫金矿业！”
+            </div>
+            <div class="order glass warm beam fx r" data-t="4.8">
+              <div class="lbl">✦ 涨乐随身投顾 · 原地即时生成委托视图（无需打开 AI 涨乐）</div>
+              <h5>买入 紫金矿业 <span class="mono">601899 · ¥17.82</span></h5>
+              <p>自动折算可用资金 20%：<b class="mono" style="color:var(--fg)">2,200</b> 股（约 <b class="mono" style="color:var(--fg)">¥39,204</b>）</p>
+              <div class="swipe" data-p="6.0,1.5" style="--knob:176px;--track:660px;">
+                <div class="swipe-fill"></div>
+                <div class="swipe-hint">右滑完成原地委托 · 下一秒继续写方案 →</div>
+                <div class="swipe-knob">本人滑动确认</div>
+                <div class="swipe-done fx s" data-t="7.6">✓ 委托已成交 · 全程零应用切换，工作流毫发无损</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="caption glass fx" data-t="8.2"><span class="dot" style="color:var(--amber)"></span>体验本质差异：不是等客户想起来去打开“AI 涨乐”，而是在他全天工作的每一个瞬间随时响应交易机会</div>
+    </section>
+
+    <!-- ============================ P04 千人千面 ============================ -->
+    <section class="slide" data-title="千人千面" data-aurora="900,-200,.75|-200,300,.5|500,500,.55">
+      <div class="eyebrow fx" data-t="0"><span class="num">04</span><span class="dash"></span><span class="zh">攻克“90% 非核心与运营功能来不及 AI 化”的困局</span></div>
+      <h2 class="h h-md" data-t="0.1"><span class="ln"><span>把《智投实盘赛》与长尾业务，真正做成<span class="g">“千人千面”</span>。</span></span></h2>
+
+      <div class="s4-stage">
+        <div class="vs fx" data-t="0.6"><div class="knot glass">GEN-UI →</div></div>
+
+        <!-- 左：现状 -->
+        <div class="phone-col fx" data-t="0.4">
+          <div class="phone-cap"><span>现状实拍 · 点进交易大赛仍是千人一面老页面</span><span class="pill red">传统静态页面</span></div>
+          <div class="phone"><div class="screen"><div class="island"></div>
+            <div class="scr">
+              <div class="abs out-on-in" data-t="3.0" style="top:0;bottom:0;">
+                <div class="hint" style="background:rgba(255,255,255,.06);color:var(--fg2);">核心行情/条件单虽有卡片，但一进活动页…</div>
+                <div class="ubbl fx" data-t="0.9" style="top:56px;">“我想看看最近的智投实盘大赛，顺便报个名”</div>
+                <div class="mini glass flat fx" data-t="1.6" style="position:absolute;left:0;right:0;top:136px;padding:22px 22px;">
+                  <h6>智投实盘系列赛（未经过 AI 化重构）</h6>
+                  <p>存量活动与非高频功能太多，研发根本没时间逐一改写</p>
+                  <div style="margin-top:16px;height:48px;border-radius:14px;background:rgba(255,255,255,.08);display:grid;place-items:center;font-size:15px;font-weight:500;">点击跳转传统 H5 静态活动页 →</div>
+                </div>
+              </div>
+              <div class="abs fx r" data-t="3.0" style="top:0;bottom:0;">
+                <div class="hint" style="background:rgba(255,91,79,.12);color:var(--red);font-weight:600;">实拍现状：所有人看同一套固定页面 · 需手点选赛区</div>
+                <div class="shot"><div class="sa" data-p="3.9,2.0"><div class="sb" data-p="6.1,1.3"><img src="./assets/trading_contest_real.jpg" alt="智投实盘赛现状截图"/></div></div></div>
+                <div class="mini glass redish fx" data-t="5.4" style="position:absolute;left:0;right:0;top:428px;padding:18px 20px;text-align:center;">
+                  <h6 style="color:var(--red);font-size:17px;">✕ 千人一面 · 未关注活动的高手根本不会点</h6>
+                  <p>周度赛/季度价投赛/大师赛全靠自己翻，对话框在此完全失灵；几百个非核心业务靠人工排期永远改不完</p>
+                </div>
+              </div>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- 右：新形态 -->
+        <div class="phone-col fx" data-t="0.55">
+          <div class="phone-cap"><span style="color:var(--amber);font-weight:600;">新形态 · 主动识人＋自动生成专属参赛卡</span><span class="pill mint">真·千人千面</span></div>
+          <div class="phone glow"><div class="screen"><div class="island"></div>
+            <div class="scr">
+              <div class="abs out-on-in" data-t="6.8" style="top:200px;text-align:center;">
+                <div style="font-size:15px;color:var(--fg3);">请先看左屏传统活动页痛点</div>
+                <div style="margin-top:10px;font-size:14px;color:var(--amber);">随后演示：新形态如何对未报名高手主动出卡…</div>
+                <div style="margin:26px auto 0;width:64px;height:64px;position:relative;"><div class="orb" style="--size:64px;left:0;top:0;"><i class="o-glow"></i><i class="o-ring"></i><i class="o-core"></i><i class="o-swirl"></i></div></div>
+              </div>
+
+              <div class="abs mini glass warm fx" data-t="7.0" style="top:0;padding:16px 18px;">
+                <div style="font-size:12.5px;color:var(--amber);font-weight:600;margin-bottom:8px;">● 客户原本未报名 · 随身投顾发现其收益达标后主动报喜</div>
+                <p style="color:var(--fg);font-size:14.5px;">“您本季收益达 <b class="mono" style="color:var(--red)">+26.4%</b>，在《智投实盘赛·季度价投赛》已达前 3% 获奖水平！报名即可角逐 30g 金牛与 MacBook Pro。”</p>
+              </div>
+
+              <div class="abs glass beam fx" data-t="8.4" style="top:134px;padding:18px 18px 16px;border-radius:24px;">
+                <div style="font-size:12.5px;color:var(--amber);font-weight:600;">✦ 依托用户端算力动态生成 · 专属参赛卡</div>
+                <div style="margin-top:8px;font-size:18.5px;font-weight:600;">已为您匹配【季度价投赛】· 稳居前 3% 冲奖圈</div>
+                <div class="chart">
+                  <div class="top"><span>您的本季收益曲线 vs 赛区获奖线</span><b>我 +26.4%</b></div>
+                  <svg width="374" height="66" viewBox="0 0 374 66" style="display:block;margin-top:6px;overflow:visible">
+                    <defs><linearGradient id="s4a" x1="0" y1="0" x2="0" y2="66" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="rgba(255,91,79,.35)"/><stop offset="1" stop-color="rgba(255,91,79,0)"/></linearGradient></defs>
+                    <path d="M0 52 L95 46 L190 49 L285 40 L374 36" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.6"/>
+                    <path d="M0 28 L374 28" fill="none" stroke="#FFB547" stroke-width="1.4" stroke-dasharray="4 4"/>
+                    <path class="fx" data-t="10.2" d="M0 56 L92 38 L184 30 L280 12 L374 4 L374 66 L0 66 Z" fill="url(#s4a)"/>
+                    <path class="w-on" pathLength="1" data-p="8.9,1.4" d="M0 56 L92 38 L184 30 L280 12 L374 4" stroke="#FF5B4F" stroke-width="3"/>
+                  </svg>
+                  <div class="leg"><span style="color:var(--amber)">--- 获奖晋级线 +18.0%</span>　　— 沪深300 +6.8%</div>
+                </div>
+                <div class="kv"><span>AI 自动选组</span><b>季度价投赛（识别中长线风格 · 免手选）</b></div>
+                <div class="kv"><span>可角逐奖品</span><b>30g 金牛 · 华为智慧屏 · MacBook Pro</b></div>
+                <div class="swipe" data-p="10.6,1.3" style="--h:46px;--knob:120px;--track:390px;--fs:14px;margin-top:12px;">
+                  <div class="swipe-fill"></div>
+                  <div class="swipe-hint">右滑一键报名【季度价投赛】→</div>
+                  <div class="swipe-knob">立即参赛</div>
+                  <div class="swipe-done fx s" data-t="12.0">✓ 报名成功 · 实盘冲击 30g 金牛</div>
+                </div>
+              </div>
+
+              <div class="abs mini glass mint fx" data-t="12.5" style="top:494px;padding:14px 16px;text-align:center;">
+                <h6 style="color:var(--mint);font-size:16px;margin-bottom:4px;">✓ 对达标高手主动出卡 · 对浮亏客户零打扰</h6>
+                <p style="font-size:13px;">免排期重做老网页，真正实现领导期望的“千人千面”</p>
+              </div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ P05 寒暄 vs 硬广 ============================ -->
+    <section class="slide" data-title="推广方式蜕变" data-aurora="1000,100,.8|300,-500,.5|-300,400,.5">
+      <div class="eyebrow fx" data-t="0"><span class="num">05</span><span class="dash"></span><span class="zh">业务推广方式的本质蜕变</span></div>
+      <h2 class="h h-md" data-t="0.1"><span class="ln"><span>不在回答末尾硬塞广告，而像<span class="g">线下营业部投顾</span>自然寒暄。</span></span></h2>
+
+      <div class="s5-stage">
+        <div class="panel glass flat dim-on-in" data-t="3.4">
+          <div class="head"><span class="pill">BEFORE</span>现有 AI 炒股 App · 强诉求问答后生硬塞卡片</div>
+          <div class="bubble-u fx" data-t="0.4">客户带着急事来：“帮我看下今日半导体板块资金流”</div>
+          <div class="bubble-a fx" data-t="0.8">AI 回答：今日半导体主力净流入 <b class="mono" style="color:var(--fg)">32.4</b> 亿元，前排龙头……<br/><span style="color:var(--fg3);font-size:15px;">（客户看完答案就准备关掉软件了）</span></div>
+          <div class="ad fx" data-t="1.5">
+            <b>✕ 回答末尾硬塞营销卡：“快来开通两融享优惠礼包！”</b>
+            <p>客户正急着办正事，强挂推广关联度弱、生硬违和，给人的感觉依然是“机器人在插播广告”。</p>
+          </div>
+          <div class="foot fx" data-t="2.2">结果：工具属性太强，缺乏人与人交流的松弛感与信任铺垫。</div>
+        </div>
+
+        <div class="panel glass warm fx" data-t="2.8">
+          <div class="head" style="color:var(--amber)"><span class="pill amber">AFTER</span>Harness 涨乐随身投顾 · 像在营业厅跟熟悉的专属投顾当面聊天</div>
+          <div class="step-done fx" data-t="3.6">
+            <div class="ck">✓</div>
+            <div><b>第一步：先把客户交代的正事利落办妥（绝不中途插播打断）</b><p>刚帮客户办完调仓委托，客户仍停留在日常 Harness 的轻松上下文中，并授予了适度推荐权限。</p></div>
+          </div>
+          <div class="greet glass beam fx" data-t="5.0">
+            <div class="orb" style="--size:72px"><i class="o-glow"></i><i class="o-ring"></i><i class="o-core"></i><i class="o-swirl"></i><div class="o-label"><b style="font-size:15px">涨乐</b></div></div>
+            <div class="who">下午空闲时刻 · 涨乐随身投顾主动温和打招呼</div>
+            <q>“嗨，刚那笔调仓已经办妥啦。看你最近几次波段节奏踩得特别稳，刚好我们华泰新出了一套很契合你目前持仓结构的信用融券锁定与大宗对冲方案，这会儿不忙的话，要不要我给你简单聊两句？”</q>
+            <div class="reply fx" data-t="7.2">客户自然回应：“行啊，拿出来我看看” →</div>
+          </div>
+          <div class="verdict glass mint fx" data-t="8.0">
+            <b>这才是金融服务最理想的模样：懂业务、知冷暖、有分寸的“数字私人银行家”</b>
+            <p>把线下营业部金牌投顾对高净值客户的服务温度，零边际成本复刻给每一位客户。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ P06 人机协同 ============================ -->
+    <section class="slide" data-title="人机协同" data-aurora="200,-200,.7|1100,300,.55|500,600,.5">
+      <div class="eyebrow fx" data-t="0"><span class="num">06</span><span class="dash"></span><span class="zh">虚拟随身投顾 × 华泰真人投顾（三分投、七分顾）</span></div>
+      <h2 class="h h-md" data-t="0.1"><span class="ln"><span>不是替代真人投顾，而是把专家服务半径<span class="g">放大十倍</span>。</span></span></h2>
+
+      <div class="s6-stage">
+        <svg class="wires" width="1680" height="690" viewBox="0 0 1680 690">
+          <defs><linearGradient id="s6g" x1="500" y1="0" x2="700" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFD08A"/><stop offset="1" stop-color="#FF5C8A"/></linearGradient></defs>
+          <path class="w-base" d="M500 345 L522 345"/>
+          <path class="w-on" pathLength="1" data-p="1.4,0.6" stroke="url(#s6g)" d="M500 345 L522 345"/>
+          <path class="w-base" d="M652 345 C670 345 660 107 680 107"/>
+          <path class="w-base" d="M652 345 L680 345"/>
+          <path class="w-base" d="M652 345 C670 345 660 580 680 580"/>
+          <path class="w-on" pathLength="1" data-p="2.0,0.5" stroke="url(#s6g)" d="M652 345 C670 345 660 107 680 107"/>
+          <path class="w-on" pathLength="1" data-p="3.8,0.5" stroke="url(#s6g)" d="M652 345 L680 345"/>
+          <path class="w-on" pathLength="1" data-p="5.6,0.5" stroke="url(#s6g)" d="M652 345 C670 345 660 580 680 580"/>
+        </svg>
+
+        <div class="s6-left">
+          <div class="card glass warm fx l" data-t="0.3" style="display:flex;align-items:center;gap:18px;">
+            <div class="avatar">张</div>
+            <div><h4 style="font-size:20px;margin:0 0 4px;">签约专属真人投顾 · 张顾问</h4><p style="font-size:14.5px;">专注主线研判 · 模拟组合调仓 · 高净值复杂配置</p></div>
+          </div>
+          <div class="card glass fx l" data-t="0.5">
+            <div class="lbl" style="color:var(--mint)">● 今早 08:45 · 真人投顾发布最新投资方向</div>
+            <p style="font-size:17px;color:var(--fg);line-height:1.6;">“建议逢高兑现部分高估值算力仓位，将组合向低波红利央企与高股息资源品适度倾斜。”</p>
+            <p style="font-size:14px;color:var(--fg3);margin-top:8px;">传统痛点：客户上班忙常漏看，或不知如何对应自己持仓</p>
+          </div>
+          <div class="card glass redish fx l" data-t="0.7" style="display:flex;gap:22px;align-items:center;">
+            <div class="big-ratio" style="color:var(--red)">1<span style="color:var(--fg4)">:</span>500</div>
+            <div><div class="lbl" style="color:var(--red);margin-bottom:6px;">盘中急跌 · 服务瓶颈</div><p style="font-size:15px;">大跌时客户集体恐慌，真人分身乏术；日常跟调组合又苦于手点繁琐跟丢。</p></div>
+          </div>
+          <div class="card glass flat fx l" data-t="0.9" style="flex:1;">
+            <h4 style="font-size:18px;">人机黄金分工</h4>
+            <p style="font-size:15.5px;"><b style="color:var(--amber)">真人投顾</b>　定策略方向 · 给信任温度 · 1v1 攻坚大客</p>
+            <p style="font-size:15.5px;margin-top:6px;"><b style="color:#BFAEFF">随身 Agent</b>　盯投顾观点 · 对表实盘持仓 · 秒级触达</p>
+          </div>
+        </div>
+
+        <div class="fx s" data-t="1.2" style="position:absolute;left:522px;top:280px;">
+          <div class="orb" style="--size:130px"><i class="o-glow"></i><i class="o-ring"></i><i class="o-core"></i><i class="o-swirl"></i><i class="o-spec"></i>
+            <div class="o-label"><b>涨乐 Agent</b><small>人机协同桥</small></div>
+          </div>
+        </div>
+
+        <div class="syn glass beam fx r" data-t="2.3" style="top:0;--c:var(--amber);">
+          <div class="top"><span class="pill amber">协同 01 · 主动观察真人投顾方向并与实盘“对表”</span><span class="tag">防漏看 · 免手算一键跟调</span></div>
+          <h4>自动订阅签约投顾最新观点，发现持仓背离时主动提醒并拟定跟调卡</h4>
+          <div class="q">“观察到您签约的张顾问今早建议下调高估值算力，而您当前账户算力仓位仍占 <b class="mono" style="color:var(--fg)">46%</b> 偏高；已按张顾问方向为您生成一笔 10% 仓位平衡预案（转向红利央企 ETF），是否滑动查看？”</div>
+        </div>
+        <div class="syn glass mint fx r" data-t="4.1" style="top:234px;--c:var(--mint);">
+          <div class="top"><span class="pill mint">协同 02 · 震荡行情秒级“心理按摩”与高危情绪转接</span><span class="tag">把真人精力花在刀刃上</span></div>
+          <h4>急跌时秒级向数百客户同步专属投顾定心解读，精准筛出高危客呼叫真人 1v1</h4>
+          <div class="q">盘中大跌时结合每位客户的持仓回撤，即时传递张顾问刚录制的安抚复盘，防止恐慌割肉；一旦识别重仓焦虑或两融逼近警戒线，立即附带《持仓与情绪简报》无缝转接张顾问本人。</div>
+        </div>
+        <div class="syn glass fx r" data-t="5.9" style="top:468px;--c:var(--violet);">
+          <div class="top"><span class="pill violet">协同 03 · 普惠潜客孵化与高净值“带画像签约导流”</span><span class="tag">投顾业务超级增长漏斗</span></div>
+          <h4>日常陪伴识别复杂财富配置诉求，精准引荐风格契合的华泰真人投顾</h4>
+          <div class="q">海量普通客户先由零边际成本的随身投顾陪伴；捕捉到大额入金或跨品种配置需求时，自动匹配最契合的持牌真人投顾促成付费签约，让单名投顾有效服务半径放大 10 倍。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ P07 四大跃迁 ============================ -->
+    <section class="slide" data-title="增量价值" data-aurora="700,-500,.8|1200,200,.6|-200,300,.55">
+      <div class="eyebrow fx" data-t="0"><span class="num">07</span><span class="dash"></span><span class="zh">商业与资源增量价值</span></div>
+      <h2 class="h h-md" data-t="0.1"><span class="ln"><span>释放十倍外部触达，让华泰人力聚焦<span class="g">真正有价值的投资产品</span>。</span></span></h2>
+
+      <div class="bento">
+        <div class="leap glass fx" data-t="0.5" style="height:400px;">
+          <div><div class="idx"><span>01</span><span>ATTENTION</span></div>
+            <div class="bign"><span data-t="0.6" data-to="8" data-dur="1.2">8</span><small>小时</small></div></div>
+          <div><h4>占领工作流注意力</h4><p>突破“只有看盘时才打开 App”的局限，把全天突发信息实时转化为委托与活跃。</p></div>
+        </div>
+        <div class="leap glass fx" data-t="0.75" style="height:470px;">
+          <div><div class="idx"><span>02</span><span>LONG-TAIL</span></div>
+            <div class="bigw">千人<br/>千面</div></div>
+          <div><h4>激活 90% 活动与长尾功能</h4><p>不止看盘与条件单——实盘大赛与低频业务也能按画像自动生成专属卡。</p></div>
+        </div>
+        <div class="leap glass warm beam fx" data-t="1.0" style="height:540px;">
+          <div class="shine"></div>
+          <div><div class="idx"><span style="color:var(--amber)">03</span><span>FOCUS</span></div>
+            <div class="bigw g">释放<br/>人力</div></div>
+          <div><h4>回归打磨优质投资产品</h4><p>依托用户端算力告别重复画静态页面，把研发营销资源投向高价值产品。</p></div>
+        </div>
+        <div class="leap glass fx" data-t="1.25" style="height:610px;">
+          <div><div class="idx"><span>04</span><span>SYNERGY</span></div>
+            <div class="bign gw"><span data-t="1.35" data-to="10" data-dur="1.4">10</span>×</div></div>
+          <div><h4>放大华泰真人投顾势能</h4><p>实时对表签约投顾方向、秒级震荡陪伴、精准引荐，双升满意度与转化。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ P08 部门影响 ============================ -->
+    <section class="slide" data-title="对部门的影响" data-aurora="-200,-300,.6|1100,-200,.6|700,600,.6">
+      <div class="eyebrow fx" data-t="0"><span class="num">08</span><span class="dash"></span><span class="zh">对【用户增长与平台运营部】的影响 · 机遇与挑战并存</span></div>
+      <h2 class="h h-md" data-t="0.1" style="font-size:50px;"><span class="ln"><span>稳守传统 App 基本盘，将 Agent 工作从“画页面”转向<span class="g">智能服务编排</span>。</span></span></h2>
+
+      <div class="banner glass fx" data-t="0.4" style="margin-top:34px;">
+        <span class="pill">清醒前提 · 双轨长期并进</span>
+        <div><h4>传统 App 绝不会立刻淘汰 —— 服务存量基本盘的传统工作必须稳扎稳打继续做</h4>
+        <p>绝大多数用户短期内还不会转向纯 AI 助手工作方式，也不是人人都有充足个人算力；客户端运营仍是压舱石。</p></div>
+      </div>
+
+      <div class="s8-mid">
+        <div class="oldflow glass flat fx l" data-t="1.1">
+          <div class="head">过去熟悉的工作流 · 围绕“静态页面”交付</div>
+          <div class="ostep"><span class="mono">01</span>接各业务条线需求</div>
+          <div class="ostep"><span class="mono">02</span>设计固定静态页面与点击流</div>
+          <div class="ostep"><span class="mono">03</span>拉通前后端排期逐页开发</div>
+          <div class="ostep"><span class="mono">04</span>客户端发版交付与挂位推广</div>
+          <div class="note">局限：功能越多排期越堵，大量精力内耗在重复画页面上</div>
+        </div>
+        <div class="arrowchip fx s" data-t="2.0"><div class="glass warm">转型 →</div></div>
+        <div class="newflow glass warm fx r" data-t="2.4">
+          <div class="head">针对“涨乐 Agent”的全新工作流 · 将华泰专业服务合理触达用户侧</div>
+          <div class="topic fx" data-t="2.9"><span class="pill red">课题 01 · 克制编排</span><b>绝不把海量服务一股脑堆过去（严防耗算力 · 占上下文 · 响应慢）</b><span>分级意图路由与渐进式加载，每次只按需挂载最薄、最准的华泰服务。</span></div>
+          <div class="topic fx" data-t="3.6"><span class="pill amber">课题 02 · 场景挖掘</span><b>从“挂 Banner 等人点”到“懂语境送方案”</b><span>围绕实盘收益、持仓异动与对话脉络设计触发规则（如向未报名高收益客推实盘大赛）。</span></div>
+          <div class="topic fx" data-t="4.3"><span class="pill mint">课题 03 · 顺畅闭环</span><b>保障存量业务经 Agent 调用 100% 顺畅完结</b><span>语义中间层适配与状态兜底，消除老业务表单断点，调用底层柜台丝滑到底。</span></div>
+        </div>
+      </div>
+
+      <div class="banner glass mint beam fx" data-t="5.2" style="margin-top:20px;">
+        <span class="pill mint">机遇与挑战并存 · 战略红利</span>
+        <div><h4>解放华泰人员力量，更多投入到“生产真正有价值的投资产品”上</h4>
+        <p>告别低水平重复画页面，聚焦打磨优质策略与金融产品 —— 全面拉升【客户满意度】与【开发营销资源利用率】。</p></div>
+      </div>
+    </section>
+
+    <!-- ============================ P09 安全信任 ============================ -->
+    <section class="slide" data-title="稳健可控" data-aurora="1000,0,.75|1300,500,.4|-400,-200,.5">
+      <div class="s9">
+        <div>
+          <div class="eyebrow fx" data-t="0"><span class="num">09</span><span class="dash"></span><span class="zh">稳健可控 · 尊重既有投入</span></div>
+          <h2 class="h h-lg" data-t="0.1">
+            <span class="ln"><span>把繁琐手点全部清零，</span></span>
+            <span class="ln"><span>把<span class="g">最终确认权</span>永远留给客户。</span></span>
+          </h2>
+          <div class="trust">
+            <div class="trust-item fx l" data-t="0.7"><div class="n glass">01</div><div><h3>100% 复用主站与 AI 涨乐底座</h3><p>不是推翻重来，而是把前期已打通的投研数据与交易接口变成可外派的“随身投顾”。</p></div></div>
+            <div class="trust-item fx l" data-t="1.0"><div class="n glass">02</div><div><h3>过程全免手点，唯独拍板必经人手</h3><p>取消一切繁琐输入框与勾选框，但最后一笔资金与交易确认必须由客户本人滑动签字。</p></div></div>
+            <div class="trust-item fx l" data-t="1.3"><div class="n glass">03</div><div><h3>持牌投研与真人投顾构筑排他壁垒</h3><p>内置适当性规范、研究所框架与持牌投顾体系，让任何外部野生金融插件都无法替代。</p></div></div>
+          </div>
+        </div>
+
+        <div class="rings">
+          <svg viewBox="0 0 780 780" width="780" height="780">
+            <defs>
+              <linearGradient id="s9g" x1="0" y1="0" x2="780" y2="780" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFD08A"/><stop offset=".5" stop-color="#FF5C8A"/><stop offset="1" stop-color="#A688FF"/></linearGradient>
+              <path id="arc1" d="M 70 390 A 320 320 0 0 1 710 390"/>
+              <path id="arc2" d="M 160 390 A 230 230 0 0 1 620 390"/>
+              <path id="arc3" d="M 238 390 A 152 152 0 0 1 542 390"/>
+            </defs>
+            <circle cx="390" cy="390" r="345" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="44"/>
+            <circle cx="390" cy="390" r="255" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="40"/>
+            <circle cx="390" cy="390" r="177" fill="none" stroke="rgba(255,255,255,.045)" stroke-width="36"/>
+            <circle class="w-on" pathLength="1" data-p="0.5,1.6" cx="390" cy="390" r="367" stroke="url(#s9g)" stroke-width="1.2" transform="rotate(-90 390 390)"/>
+            <circle class="w-on" pathLength="1" data-p="0.9,1.4" cx="390" cy="390" r="275" stroke="url(#s9g)" stroke-width="1.2" transform="rotate(-90 390 390)"/>
+            <circle class="w-on" pathLength="1" data-p="1.3,1.2" cx="390" cy="390" r="195" stroke="url(#s9g)" stroke-width="1.2" transform="rotate(-90 390 390)"/>
+            <g class="rot" style="--d:28s"><circle cx="390" cy="390" r="345" fill="none" stroke="url(#s9g)" stroke-width="3" stroke-dasharray="160 2008" stroke-linecap="round"/><circle cx="735" cy="390" r="6" fill="#FFD08A"/></g>
+            <g class="rot rev" style="--d:22s"><circle cx="390" cy="390" r="255" fill="none" stroke="url(#s9g)" stroke-width="3" stroke-dasharray="120 1482" stroke-linecap="round"/><circle cx="390" cy="645" r="5" fill="#FF5C8A"/></g>
+            <g class="rot" style="--d:16s"><circle cx="390" cy="390" r="177" fill="none" stroke="url(#s9g)" stroke-width="3" stroke-dasharray="90 1022" stroke-linecap="round"/><circle cx="213" cy="390" r="4.5" fill="#A688FF"/></g>
+            <g font-family="PingFang SC, sans-serif" font-size="16" font-weight="500" letter-spacing="3" fill="rgba(235,237,245,.78)">
+              <text class="fx" data-t="1.4"><textPath href="#arc1" startOffset="50%" text-anchor="middle">外环 · 华泰持牌适当性与投研护栏</textPath></text>
+              <text class="fx" data-t="1.7"><textPath href="#arc2" startOffset="50%" text-anchor="middle">中环 · 客户本人最终滑动签字确认</textPath></text>
+              <text class="fx" data-t="2.0" font-size="14.5"><textPath href="#arc3" startOffset="50%" text-anchor="middle">内环 · 复用成熟账户与风控底座</textPath></text>
+            </g>
+          </svg>
+          <div class="fx s" data-t="0.4" style="position:absolute;inset:0;">
+            <div class="orb" style="--size:210px"><i class="o-glow"></i><i class="o-ring"></i><i class="o-core"></i><i class="o-swirl"></i><i class="o-spec"></i>
+              <div class="o-label"><b>客户资产安全</b><small>CLIENT FIRST</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ P10 收束 ============================ -->
+    <section class="slide" data-title="早做准备" data-aurora="1100,-400,.95|1300,200,.7|200,500,.55">
+      <div class="s10-orb fx s" data-t="0.2">
+        <div class="orb" style="--size:900px"><i class="o-glow"></i><i class="o-ring"></i><i class="o-core"></i><i class="o-swirl"></i><i class="o-spec"></i></div>
+      </div>
+      <div style="position:relative;z-index:2;">
+        <div class="eyebrow fx" data-t="0"><span class="num">10</span><span class="dash"></span><span class="zh">未来三年到十年最重要的业务变化 · 变革前夕的主动布局</span></div>
+        <h2 class="h h-xl" data-t="0.1" style="font-size:96px;">
+          <span class="ln"><span>身处变革前夕，</span></span>
+          <span class="ln"><span><span class="g">早做准备</span>才不会在未来陷入被动。</span></span>
+        </h2>
+        <p class="lead fx" data-t="0.8" style="margin-top:34px;max-width:1180px;">传统 App 仍将长期服务广大存量客群，但等新一代 AI 底座格局定型再追赶就会失去先机。由<strong>用户增长与平台运营部</strong>双轨并进：稳住当下基本盘，今天就用 90 天轻骑兵跑通涨乐 Agent 样板。</p>
+
+        <div class="road">
+          <div class="track fx" data-t="1.1" data-p="1.3,2.4">
+            <div class="fill"></div>
+            <div class="node" data-t="1.4" style="left:0"></div>
+            <div class="node" data-t="2.3" style="left:calc(33.33% + 9px)"></div>
+            <div class="node" data-t="3.2" style="left:calc(66.66% + 18px)"></div>
+          </div>
+          <div class="phases">
+            <div class="phase glass fx" data-t="1.5">
+              <div class="when">MONTH 1 · 新工作流破冰</div>
+              <h4>跑通“克制编排＋场景触达”</h4>
+              <p>拿《智投实盘赛》试水：验证按需上下文裁剪、存量业务顺畅调用，以及未报名高手千人千面动态出卡。</p>
+            </div>
+            <div class="phase glass warm beam fx" data-t="2.4">
+              <div class="when">MONTH 2–3 · 人机投顾双打</div>
+              <h4>联动 10–20 位华泰真人投顾</h4>
+              <p>打通“签约投顾方向自动对表持仓＋震荡行情秒级定心解读与 1v1 转接”，将专家服务半径放大数倍。</p>
+            </div>
+            <div class="phase glass fx" data-t="3.3">
+              <div class="when">YEAR 3–10 · 主动卡位</div>
+              <h4>入驻主流 Harness 与释放产能</h4>
+              <p>在外部智能体生态占据首选投顾身位，同时把解放出的研发营销力量持续聚焦打磨真正有价值的华泰投资产品。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="spot"></div>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+  </div>
+</div>
+
+<div id="hud-tip">单击 / → 下一页　·　右键 / ← 上一页　·　P 暂停　·　R 重播　·　F 全屏</div>
+<div id="hud">
+  <button id="btn-prev" title="上一页 (←)">‹</button>
+  <span id="hud-counter">1 / 10</span>
+  <button id="btn-next" title="下一页 (→ / 单击)">›</button>
+  <span class="sep"></span>
+  <span id="hud-status">—</span>
+  <button id="btn-pause" title="暂停 / 继续 (P)">⏸</button>
+  <button id="btn-replay" title="重播本页动画 (R)">↻</button>
+  <span class="sep"></span>
+  <button id="btn-fs" title="全屏 (F)">⛶</button>
+</div>
+
+<script>
+(() => {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const N = slides.length;
+  const stage = document.getElementById('stage');
+  const viewport = document.getElementById('viewport');
+  const aurora = document.getElementById('aurora');
+  const $ = (id) => document.getElementById(id);
+
+  const params = new URLSearchParams(location.search);
+  const isExport = params.get('export') === '1';
+  if (isExport) document.body.classList.add('export-mode');
+
+  /* ---------- 16:9 等比缩放 ---------- */
+  let scale = 1;
+  function resize() {
+    scale = Math.min(innerWidth / 1920, innerHeight / 1080);
+    stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+  addEventListener('resize', resize); resize();
+
+  /* ---------- 时间轴引擎 ----------
+     data-t="秒"        → 到点添加 .in（CSS 过渡负责动效）
+     data-p="起点,时长" → 每帧写入 --p ∈ [0,1]（缓动后，用于连线/滑块/滚动）
+     data-to="数值"     → 数字滚动计数                                        */
+  const clamp01 = (x) => Math.max(0, Math.min(1, x));
+  const easeIO = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+
+  slides.forEach((s) => {
+    s._t = Array.from(s.querySelectorAll('[data-t]')).map((el) => ({ el, t: parseFloat(el.dataset.t), on: false }));
+    s._p = Array.from(s.querySelectorAll('[data-p]')).map((el) => {
+      const [a, d] = el.dataset.p.split(',').map(Number);
+      return { el, a, d, v: -1 };
+    });
+    s._c = Array.from(s.querySelectorAll('[data-to]')).map((el) => ({
+      el, t: parseFloat(el.dataset.t || 0), to: parseFloat(el.dataset.to), dur: parseFloat(el.dataset.dur || 1.4), v: null
+    }));
+    const ends = [0, ...s._t.map((i) => i.t + 0.9), ...s._p.map((i) => i.a + i.d), ...s._c.map((i) => i.t + i.dur)];
+    s._end = Math.max(...ends);
+    s._animated = s._end > 4;
+    const a = (s.dataset.aurora || '').split('|').map((x) => x.split(',').map(Number));
+    s._aur = a.length === 3 ? a : null;
+  });
+
+  function apply(s, t) {
+    for (const i of s._t) { const on = t >= i.t; if (on !== i.on) { i.on = on; i.el.classList.toggle('in', on); } }
+    for (const i of s._p) {
+      const v = Math.round(easeIO(clamp01((t - i.a) / i.d)) * 1000) / 1000;
+      if (v !== i.v) { i.v = v; i.el.style.setProperty('--p', v); }
+    }
+    for (const i of s._c) {
+      const v = String(Math.round(i.to * easeOut(clamp01((t - i.t) / i.dur))));
+      if (v !== i.v) { i.v = v; i.el.textContent = v; }
+    }
+  }
+
+  function hardSet(s, t) {          // 无过渡地跳到某一时刻
+    s.classList.add('no-tr');
+    apply(s, t);
+    void s.offsetHeight;
+    s.classList.remove('no-tr');
+  }
+
+  /* ---------- 状态 ---------- */
+  let current = Math.max(0, Math.min(N - 1, (parseInt(params.get('slide') || '1', 10) || 1) - 1));
+  let startAt = performance.now();
+  let paused = false, pausedT = 0;
+  let deterministic = isExport;
+  const resetTimers = new Map();
+
+  // 章节分段条
+  const segs = $('segs');
+  for (let i = 0; i < N; i++) segs.appendChild(document.createElement('i'));
+  $('pg-tot').textContent = String(N).padStart(2, '0');
+
+  function setAurora(s) {
+    if (!s._aur) return;
+    s._aur.forEach(([x, y, o], k) => {
+      aurora.style.setProperty(`--x${k + 1}`, x + 'px');
+      aurora.style.setProperty(`--y${k + 1}`, y + 'px');
+      aurora.style.setProperty(`--o${k + 1}`, o);
+    });
+  }
+
+  function curT() {
+    return paused ? pausedT : (performance.now() - startAt) / 1000;
+  }
+
+  function show(idx, { built = false } = {}) {
+    idx = Math.max(0, Math.min(N - 1, idx));
+    const prev = slides[current];
+    const next = slides[idx];
+    if (resetTimers.has(next)) { clearTimeout(resetTimers.get(next)); resetTimers.delete(next); }
+
+    if (prev !== next) {
+      prev.classList.remove('active');
+      // 离场动画结束后复位，保证再次进入能重新演绎
+      resetTimers.set(prev, setTimeout(() => { hardSet(prev, -1); resetTimers.delete(prev); }, 950));
+    }
+    current = idx;
+    hardSet(next, built ? next._end + 1 : -1);
+    next.classList.add('active');
+    paused = false;
+    startAt = performance.now() - (built ? (next._end + 1) * 1000 : 0);
+
+    setAurora(next);
+    $('pg-cur').textContent = String(idx + 1).padStart(2, '0');
+    $('chapter').textContent = next.dataset.title || '';
+    $('hud-counter').textContent = `${idx + 1} / ${N}`;
+    Array.from(segs.children).forEach((el, i) => { el.classList.toggle('on', i < idx); el.classList.toggle('cur', i === idx); });
+    $('btn-prev').disabled = idx === 0;
+    $('btn-next').disabled = idx === N - 1;
+    $('btn-pause').disabled = $('btn-replay').disabled = !next._animated;
+    updatePause();
+  }
+
+  const next = () => { if (current < N - 1) show(current + 1); };
+  const prev = () => { if (current > 0) show(current - 1, { built: true }); };   // 回看时直接给完整画面
+
+  function togglePause() {
+    if (!slides[current]._animated) return;
+    if (!paused) { pausedT = curT(); paused = true; }
+    else { startAt = performance.now() - pausedT * 1000; paused = false; }
+    updatePause();
+  }
+  function replay() {
+    const s = slides[current];
+    hardSet(s, -1); paused = false; startAt = performance.now(); updatePause();
+  }
+  function updatePause() { $('btn-pause').textContent = paused ? '▶' : '⏸'; }
+
+  function tick() {
+    if (!deterministic) {
+      const s = slides[current];
+      const t = curT();
+      apply(s, t);
+      const st = $('hud-status');
+      if (!s._animated) st.textContent = '静态页';
+      else if (paused) st.textContent = '已暂停';
+      else if (t < s._end) st.textContent = `演绎中 ${Math.min(99, Math.floor((t / s._end) * 100))}%`;
+      else st.textContent = '完整画面 · R 重播';
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ---------- 导出 / 截图钩子（兼容旧版脚本） ---------- */
+  window.__setAnimTime = (n, t) => { deterministic = true; show(n - 1); hardSet(slides[n - 1], t); };
+  window.__setDeterministicState = (n) => { deterministic = true; show(n - 1, { built: true }); hardSet(slides[n - 1], slides[n - 1]._end + 1); };
+  window.togglePauseAnim = togglePause;
+  window.restartSlideAnim = replay;
+
+  /* ---------- 交互：点击 / 右键 / 键盘 / HUD ---------- */
+  viewport.addEventListener('click', (e) => {
+    if (e.target.closest('button, a, [data-nonav]')) return;
+    if (window.getSelection && String(window.getSelection())) return;
+    next();
+  });
+  viewport.addEventListener('contextmenu', (e) => { e.preventDefault(); prev(); });
+
+  $('btn-prev').addEventListener('click', prev);
+  $('btn-next').addEventListener('click', next);
+  $('btn-pause').addEventListener('click', togglePause);
+  $('btn-replay').addEventListener('click', replay);
+  const toggleFs = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
+  $('btn-fs').addEventListener('click', toggleFs);
+
+  addEventListener('keydown', (e) => {
+    const k = e.key;
+    if (['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'Enter'].includes(k)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); prev(); }
+    else if (k === 'Home') show(0);
+    else if (k === 'End') show(N - 1, { built: true });
+    else if (k === 'p' || k === 'P') togglePause();
+    else if (k === 'r' || k === 'R') replay();
+    else if (k === 'f' || k === 'F') toggleFs();
+    else if (/^[0-9]$/.test(k)) show(k === '0' ? 9 : parseInt(k, 10) - 1);
+  });
+
+  /* ---------- 光标聚光 & HUD 自动隐藏 ---------- */
+  let idleTimer = null;
+  function wake() {
+    document.body.classList.remove('hud-hide', 'idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => document.body.classList.add('hud-hide', 'idle'), 2400);
+  }
+  addEventListener('mousemove', (e) => {
+    const r = stage.getBoundingClientRect();
+    stage.style.setProperty('--mx', ((e.clientX - r.left) / scale) + 'px');
+    stage.style.setProperty('--my', ((e.clientY - r.top) / scale) + 'px');
+    wake();
+  });
+  wake();
+
+  show(current);
+  if (isExport) window.__setDeterministicState(current + 1);
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
