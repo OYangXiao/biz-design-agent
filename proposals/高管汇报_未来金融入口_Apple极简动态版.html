@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>走出独立 App，成为用户的随身真人投顾 — 未来 3–10 年战略前瞻汇报</title>
+<style>
+  :root {
+    --studio-white: #F5F5F7;
+    --studio-pure: #FFFFFF;
+    --ink: #1D1D1F;
+    --ink-sub: #515154;
+    --ink-whisper: #86868B;
+    --amber: #B47B2B;
+    --amber-bright: #D4943A;
+    --amber-soft: rgba(180, 123, 43, 0.12);
+    --forest-ok: #1F6F54;
+    --stock-up: #C93B2B;
+    --sans: 'SF Pro Display', 'PingFang SC', 'Hiragino Sans GB', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'SF Mono', 'Menlo', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #DCDCE2;
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+  }
+
+  /* Strict 16:9 Aspect-Ratio Lock (Zero Flexbox Squishing!) */
+  #viewport {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background: #D8D8DF;
+    overflow: hidden;
+  }
+
+  #stage {
+    width: 1920px;
+    height: 1080px;
+    flex-shrink: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform-origin: center center;
+    background: radial-gradient(ellipse 1300px 900px at 68% 42%, #FFFFFF 0%, #F4F4F6 60%, #EAEAEF 100%);
+    overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.18);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 84px 112px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.992);
+    transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0.52s;
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+  }
+
+  body.export-mode .slide {
+    transition: none !important;
+  }
+
+  .whisper {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    color: var(--ink-whisper);
+    margin-bottom: 18px;
+  }
+
+  .headline-xl {
+    font-size: 86px;
+    font-weight: 700;
+    line-height: 1.14;
+    letter-spacing: -2px;
+    color: var(--ink);
+  }
+
+  .headline-lg {
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -1.1px;
+    color: var(--ink);
+  }
+
+  .headline-xl span, .headline-lg span {
+    color: var(--amber);
+  }
+
+  .subcopy {
+    margin-top: 24px;
+    font-size: 23px;
+    line-height: 1.62;
+    color: var(--ink-sub);
+    font-weight: 400;
+  }
+
+  .frosted {
+    background: rgba(255, 255, 255, 0.84);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 28px;
+    box-shadow:
+      0 26px 65px rgba(20, 22, 30, 0.07),
+      0 6px 18px rgba(20, 22, 30, 0.035),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+
+  .anim-controls {
+    position: absolute;
+    right: 112px;
+    top: 84px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px 6px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  }
+  .anim-status {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-whisper);
+    margin-right: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .ctrl-btn {
+    padding: 6px 13px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.045);
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-sub);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ctrl-btn:hover {
+    background: var(--amber-soft);
+    color: var(--amber);
+  }
+  body.export-mode .anim-controls { display: none !important; }
+
+  /* ==================== P01: COVER ==================== */
+  .s1-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('./assets/apple_titanium_orb.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+  }
+
+  @keyframes subtleBreathe {
+    0%, 100% { opacity: 0.12; transform: scale(1); }
+    50% { opacity: 0.28; transform: scale(1.06); }
+  }
+
+  .s1-glow {
+    position: absolute;
+    right: 260px;
+    top: 250px;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(235, 175, 82, 0.45) 0%, transparent 70%);
+    pointer-events: none;
+    animation: subtleBreathe 5s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .s1-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 920px;
+  }
+
+  .s1-foot {
+    position: absolute;
+    left: 112px;
+    bottom: 68px;
+    z-index: 2;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink-whisper);
+    letter-spacing: 1.5px;
+  }
+
+  /* ==================== P02: ADVISOR SOUL + HOST BRAIN ==================== */
+  .s2-layout {
+    display: grid;
+    grid-template-columns: 0.72fr 1.28fr;
+    gap: 44px;
+    height: 100%;
+    align-items: center;
+  }
+  .s2-stage { position: relative; height: 860px; }
+
+  /* ==================== P03: WORKFLOW ACCOMPANY ==================== */
+  .s3-stage { position: relative; flex: 1; margin-top: 14px; }
+
+  /* ==================== P04: 1.5 APP vs 2.0 EPHEMERAL UI ==================== */
+  .s4-stage {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 68px;
+    align-items: center;
+    padding: 14px 36px 0 36px;
+  }
+
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .race-timer-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 536px;
+    padding: 0 6px;
+  }
+
+  .race-label {
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink-sub);
+  }
+
+  .race-badge {
+    font-size: 15px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 999px;
+  }
+
+  .iphone {
+    width: 536px;
+    height: 684px;
+    border-radius: 52px;
+    padding: 13px;
+    background: linear-gradient(145deg, #E2E2E7 0%, #B8B8BF 48%, #DFDFE4 100%);
+    box-shadow:
+      0 42px 90px rgba(20, 22, 32, 0.12),
+      0 12px 28px rgba(20, 22, 32, 0.06),
+      inset 0 2px 2px rgba(255, 255, 255, 0.9);
+    position: relative;
+  }
+
+  .iphone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 40px;
+    background: #F9F9FB;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dynamic-island {
+    width: 108px;
+    height: 26px;
+    border-radius: 999px;
+    background: #141416;
+    margin: 13px auto 8px auto;
+    flex-shrink: 0;
+  }
+
+  /* ==================== P05, P06, P08 CANVAS CONTAINERS ==================== */
+  .s5-grid {
+    flex: 1;
+    margin-top: 16px;
+  }
+
+  /* ==================== P07: 4 STRATEGIC LEAPS ==================== */
+  .s7-pillars-layout {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .pillars-stage {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 34px;
+    align-items: end;
+    height: 590px;
+    padding-bottom: 16px;
+  }
+
+  .pillar-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+  }
+
+  .pillar-glass {
+    border-radius: 32px;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(244,244,248,0.72) 100%);
+    border: 1px solid rgba(255,255,255,0.98);
+    box-shadow:
+      0 32px 70px rgba(18, 20, 28, 0.075),
+      0 8px 20px rgba(18, 20, 28, 0.03),
+      inset 0 2px 0 #FFFFFF;
+  }
+
+  .pillar-glass.gold-featured {
+    background: linear-gradient(180deg, #FFFFFF 0%, #FBF6EE 100%);
+    border: 1.5px solid rgba(180, 123, 43, 0.35);
+    box-shadow:
+      0 38px 85px rgba(180, 123, 43, 0.15),
+      0 10px 26px rgba(18, 20, 28, 0.05),
+      inset 0 2px 0 #FFFFFF;
+  }
+
+  .p-big {
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+
+  .gold-featured .p-big { color: var(--amber); }
+
+  .p-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+
+  .p-desc {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--ink-sub);
+  }
+
+  /* ==================== P09: OPTICAL TRUST RINGS ==================== */
+  .s9-layout {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 0.96fr 1.04fr;
+    gap: 52px;
+    align-items: center;
+  }
+
+  .trust-items {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-top: 40px;
+  }
+
+  .trust-item {
+    display: flex;
+    gap: 22px;
+    align-items: flex-start;
+  }
+
+  .trust-dot {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #FFFFFF, #E6E6EB);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.07), inset 0 1px 0 #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--amber);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .trust-item h3 {
+    font-size: 25px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .trust-item p {
+    font-size: 19.5px;
+    line-height: 1.55;
+    color: var(--ink-sub);
+  }
+
+  /* ==================== P10: 3-10 YEAR HORIZON & 90-DAY PILOT ==================== */
+  .s10-bg-echo {
+    position: absolute;
+    right: -180px;
+    top: -60px;
+    width: 1200px;
+    height: 1200px;
+    background-image: url('./assets/apple_titanium_orb.jpg');
+    background-size: cover;
+    background-position: right center;
+    opacity: 0.34;
+    mask-image: radial-gradient(circle at 72% 48%, rgba(0,0,0,1) 15%, transparent 68%);
+    -webkit-mask-image: radial-gradient(circle at 72% 48%, rgba(0,0,0,1) 15%, transparent 68%);
+    pointer-events: none;
+  }
+
+  .s10-content {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .pilot-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .pilot-card { padding: 36px 38px; }
+
+  .pilot-when {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--amber);
+    margin-bottom: 14px;
+  }
+
+  .pilot-card h4 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .pilot-card p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink-sub);
+  }
+
+  /* ==================== HUD ==================== */
+  #hud {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+    opacity: 0.25;
+    transition: opacity 0.25s;
+  }
+  #hud:hover { opacity: 1; }
+  #hud button {
+    background: transparent;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  #hud button:hover { background: rgba(0,0,0,0.06); }
+  #hud-counter { font-family: var(--mono); font-size: 13px; color: var(--ink-whisper); padding: 0 8px; }
+
+  #progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--amber);
+    z-index: 101;
+    transition: width 0.35s ease;
+  }
+
+  body.export-mode #hud,
+  body.export-mode #progress-bar { display: none !important; }
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+
+<div id="viewport">
+  <div id="stage">
+
+    <!-- ==================== SLIDE 1: HERO COVER ==================== -->
+    <section class="slide active" data-slide="1">
+      <div class="s1-bg"></div>
+      <div class="s1-glow"></div>
+      <div class="s1-content">
+        <div class="whisper">未来三年到十年最重要的业务变革 · 站在变革前夕</div>
+        <h1 class="headline-xl" style="font-size:76px;">走出独立 App，<br/>成为用户的<span>随身真人投顾</span></h1>
+        <p class="subcopy" style="max-width:860px;">
+          传统客户端不会一夜淘汰，但下一代个人 AI 底座（Harness）正在重塑入口。<br/>
+          早一步让涨乐专业灵魂住进用户日常工作流，才能在未来三到十年掌握主动权。
+        </p>
+      </div>
+      <div class="s1-foot">用户增长与平台运营部</div>
+    </section>
+
+    <!-- ==================== SLIDE 2: ANIMATED SCENE 1 (BORROWED BRAIN + HUATAI SOUL) ==================== -->
+    <section class="slide" data-slide="2">
+      <div class="anim-controls">
+        <span class="anim-status" id="status-2">演示中</span>
+        <button class="ctrl-btn pause-btn" onclick="togglePauseAnim()">⏸ 暂停</button>
+        <button class="ctrl-btn" onclick="restartSlideAnim(2)">↻ 重播</button>
+      </div>
+      <div class="s2-layout">
+        <div>
+          <div class="whisper">物种本质的区别</div>
+          <h2 class="headline-lg" style="font-size:48px;">不是加了对话框的软件，<br/>而是跟在身边的<br/><span>华泰随身投顾</span>。</h2>
+          <p class="subcopy">
+            为什么现有 AI 炒股软件仍像在“点预置菜单”？因为中心化算力撑不起为百万人实时生成界面，只能预先开发固定模块。<br/><br/>
+            而在 Harness 中，<strong>客户自有的 AI 算力天然成为实时动态生成专属卡片的底座</strong>，让华泰专业能力像真人顾问一样随问随画。
+          </p>
+        </div>
+
+        <div class="s2-stage">
+          <canvas id="s2-canvas" width="1080" height="860" style="width:1080px;height:860px;"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 3: ANIMATED SCENE 2 (DAILY WORKFLOW ACCOMPANY & INLINE TRADE) ==================== -->
+    <section class="slide" data-slide="3">
+      <div class="anim-controls">
+        <span class="anim-status" id="status-3">演示中</span>
+        <button class="ctrl-btn pause-btn" onclick="togglePauseAnim()">⏸ 暂停</button>
+        <button class="ctrl-btn" onclick="restartSlideAnim(3)">↻ 重播</button>
+      </div>
+      <div>
+        <div class="whisper">打破独立炒股 App 的驻留孤岛</div>
+        <h2 class="headline-lg">没人会全天泡在炒股 App 里，但我们能<span>住进他的日常工作流</span>。</h2>
+      </div>
+      <div class="s3-stage">
+        <canvas id="s3-canvas" width="1696" height="756" style="width:1696px;height:756px;"></canvas>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 4: ANIMATED SCENE 3 (90% LONG-TAIL & TRADING CONTEST -> TRUE PERSONALIZATION) ==================== -->
+    <section class="slide" data-slide="4">
+      <div class="anim-controls">
+        <span class="anim-status" id="status-4">演示中</span>
+        <button class="ctrl-btn pause-btn" onclick="togglePauseAnim()">⏸ 暂停</button>
+        <button class="ctrl-btn" onclick="restartSlideAnim(4)">↻ 重播</button>
+      </div>
+      <div>
+        <div class="whisper">攻克“90% 非核心与运营功能来不及 AI 化”的困局</div>
+        <h2 class="headline-lg">把《智投实盘赛》与长尾业务，真正做成<span>“千人千面”</span>。</h2>
+      </div>
+
+      <div class="s4-stage">
+        <div class="phone-col">
+          <div class="race-timer-row">
+            <span class="race-label">现状实拍 · 点进交易大赛仍是千人一面老页面</span>
+            <span class="race-badge" id="s4-badge-left" style="background:rgba(201,59,43,0.1);color:var(--stock-up);">传统静态页面</span>
+          </div>
+          <div class="iphone">
+            <div class="iphone-screen">
+              <div class="dynamic-island"></div>
+              <canvas id="s4-left-canvas" width="510" height="608" style="width:510px;height:608px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-col">
+          <div class="race-timer-row">
+            <span class="race-label" style="color:var(--amber);font-weight:700;">新形态 · 主动识人＋自动生成专属参赛卡</span>
+            <span class="race-badge" id="s4-badge-right" style="background:rgba(31,111,84,0.12);color:var(--forest-ok);">真·千人千面</span>
+          </div>
+          <div class="iphone" style="box-shadow: 0 42px 95px rgba(180, 123, 43, 0.16), 0 12px 28px rgba(20, 22, 32, 0.06), inset 0 2px 2px #FFF;">
+            <div class="iphone-screen">
+              <div class="dynamic-island"></div>
+              <canvas id="s4-right-canvas" width="510" height="608" style="width:510px;height:608px;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 5: ANIMATED SCENE 4 (OFFLINE BRANCH ADVISOR GREETING) ==================== -->
+    <section class="slide" data-slide="5">
+      <div class="anim-controls">
+        <span class="anim-status" id="status-5">演示中</span>
+        <button class="ctrl-btn pause-btn" onclick="togglePauseAnim()">⏸ 暂停</button>
+        <button class="ctrl-btn" onclick="restartSlideAnim(5)">↻ 重播</button>
+      </div>
+      <div>
+        <div class="whisper">业务推广方式的本质蜕变</div>
+        <h2 class="headline-lg">不在回答末尾硬塞广告，而像<span>线下营业部投顾</span>自然寒暄。</h2>
+      </div>
+
+      <div class="s5-grid">
+        <canvas id="s5-canvas" width="1696" height="746" style="width:1696px;height:746px;"></canvas>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 6: NEW! VIRTUAL AGENT × HUMAN ADVISOR CO-PILOT ==================== -->
+    <section class="slide" data-slide="6">
+      <div class="anim-controls">
+        <span class="anim-status" id="status-6">演示中</span>
+        <button class="ctrl-btn pause-btn" onclick="togglePauseAnim()">⏸ 暂停</button>
+        <button class="ctrl-btn" onclick="restartSlideAnim(6)">↻ 重播</button>
+      </div>
+      <div>
+        <div class="whisper">虚拟随身投顾 × 华泰真人投顾（三分投、七分顾）</div>
+        <h2 class="headline-lg">不是替代真人投顾，而是把专家服务半径<span>放大十倍</span>。</h2>
+      </div>
+
+      <div class="s5-grid">
+        <canvas id="s6-canvas" width="1696" height="746" style="width:1696px;height:746px;"></canvas>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 7: 4 STRATEGIC LEAPS ==================== -->
+    <section class="slide" data-slide="7">
+      <div class="s7-pillars-layout">
+        <div>
+          <div class="whisper">商业与资源增量价值</div>
+          <h2 class="headline-lg">释放十倍外部触达，让华泰人力聚焦<span>真正有价值的投资产品</span>。</h2>
+        </div>
+
+        <div class="pillars-stage">
+          <div class="pillar-wrap">
+            <div class="pillar-glass" style="height:375px;">
+              <div class="p-big">8 小时</div>
+              <div>
+                <div class="p-title">占领工作流注意力</div>
+                <p class="p-desc">突破“只有看盘时才打开 App”的局限，把全天突发信息实时转化为委托与活跃。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-wrap">
+            <div class="pillar-glass" style="height:440px;">
+              <div class="p-big" style="font-size:56px;">千人千面</div>
+              <div>
+                <div class="p-title">激活 90% 活动与长尾功能</div>
+                <p class="p-desc">不止看盘与条件单——实盘大赛与低频业务也能按画像自动生成专属卡。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-wrap">
+            <div class="pillar-glass gold-featured" style="height:505px;">
+              <div class="p-big">释放人力</div>
+              <div>
+                <div class="p-title">回归打磨优质投资产品</div>
+                <p class="p-desc">依托用户端算力告别重复画静态页面，把研发营销资源投向高价值产品。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-wrap">
+            <div class="pillar-glass" style="height:565px;">
+              <div class="p-big">10× 协同</div>
+              <div>
+                <div class="p-title">放大华泰真人投顾势能</div>
+                <p class="p-desc">实时对表签约投顾方向、秒级震荡陪伴、精准引荐，双升满意度与转化。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 8: NEW! IMPACT ON USER GROWTH & PLATFORM OPS DEPT ==================== -->
+    <section class="slide" data-slide="8">
+      <div class="anim-controls">
+        <span class="anim-status" id="status-8">演示中</span>
+        <button class="ctrl-btn pause-btn" onclick="togglePauseAnim()">⏸ 暂停</button>
+        <button class="ctrl-btn" onclick="restartSlideAnim(8)">↻ 重播</button>
+      </div>
+      <div>
+        <div class="whisper">对【用户增长与平台运营部】的影响 · 机遇与挑战并存</div>
+        <h2 class="headline-lg">稳守传统 App 基本盘，将 Agent 工作从“画页面”转向<span>智能服务编排</span>。</h2>
+      </div>
+
+      <div class="s5-grid">
+        <canvas id="s8-canvas" width="1696" height="746" style="width:1696px;height:746px;"></canvas>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 9: SAFETY & REUSE ==================== -->
+    <section class="slide" data-slide="9">
+      <div class="s9-layout">
+        <div>
+          <div class="whisper">稳健可控 · 尊重既有投入</div>
+          <h2 class="headline-lg">把繁琐手点全部清零，<br/>把<span>最终确认权</span>永远留给客户。</h2>
+
+          <div class="trust-items">
+            <div class="trust-item">
+              <div class="trust-dot">01</div>
+              <div>
+                <h3>100% 复用主站与 AI 涨乐底座</h3>
+                <p>不是推翻重来，而是把前期已打通的投研数据与交易接口变成可外派的“随身投顾”。</p>
+              </div>
+            </div>
+
+            <div class="trust-item">
+              <div class="trust-dot">02</div>
+              <div>
+                <h3>过程全免手点，唯独拍板必经人手</h3>
+                <p>取消一切繁琐输入框与勾选框，但最后一笔资金与交易确认必须由客户本人滑动签字。</p>
+              </div>
+            </div>
+
+            <div class="trust-item">
+              <div class="trust-dot">03</div>
+              <div>
+                <h3>华泰持牌投研与真人投顾构筑排他壁垒</h3>
+                <p>内置适当性规范、研究所框架与持牌投顾体系，让任何外部野生金融插件都无法替代。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center;">
+          <svg width="740" height="740" viewBox="0 0 740 740" fill="none">
+            <defs>
+              <radialGradient id="floorShadow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(20,22,30,0.14)"/>
+                <stop offset="65%" stop-color="rgba(20,22,30,0.04)"/>
+                <stop offset="100%" stop-color="rgba(20,22,30,0)"/>
+              </radialGradient>
+              <radialGradient id="amberCaustic" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(212,148,58,0.34)"/>
+                <stop offset="100%" stop-color="rgba(212,148,58,0)"/>
+              </radialGradient>
+              <linearGradient id="tiRing1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#F2F2F7"/>
+                <stop offset="45%" stop-color="#C7C7CE"/>
+                <stop offset="75%" stop-color="#9E9EA8"/>
+                <stop offset="100%" stop-color="#E5E5EA"/>
+              </linearGradient>
+              <linearGradient id="glassLens" x1="15%" y1="10%" x2="85%" y2="90%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.92)"/>
+                <stop offset="55%" stop-color="rgba(240,242,246,0.52)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0.85)"/>
+              </linearGradient>
+              <radialGradient id="amberSphere" cx="38%" cy="32%" r="65%">
+                <stop offset="0%" stop-color="#FCE3B4"/>
+                <stop offset="42%" stop-color="#DDA04B"/>
+                <stop offset="85%" stop-color="#A66A1E"/>
+                <stop offset="100%" stop-color="#7D4D10"/>
+              </radialGradient>
+            </defs>
+
+            <ellipse cx="370" cy="650" rx="250" ry="38" fill="url(#floorShadow)"/>
+            <ellipse cx="395" cy="650" rx="130" ry="22" fill="url(#amberCaustic)"/>
+
+            <circle cx="370" cy="356" r="254" stroke="url(#tiRing1)" stroke-width="26"/>
+            <circle cx="370" cy="356" r="267" stroke="#FFFFFF" stroke-width="1.5"/>
+            <circle cx="370" cy="356" r="241" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+
+            <circle cx="370" cy="356" r="182" fill="url(#glassLens)" stroke="#FFFFFF" stroke-width="2.5"/>
+            <circle cx="370" cy="356" r="182" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>
+
+            <circle cx="370" cy="356" r="118" stroke="url(#tiRing1)" stroke-width="16"/>
+            <circle cx="370" cy="356" r="126" stroke="#FFFFFF" stroke-width="1.5"/>
+
+            <circle cx="370" cy="356" r="74" fill="url(#amberSphere)"/>
+            <ellipse cx="346" cy="330" rx="25" ry="14" transform="rotate(-25 346 330)" fill="rgba(255,255,255,0.55)"/>
+
+            <g font-family="PingFang SC, sans-serif" font-size="15" font-weight="600" fill="#515154">
+              <text x="370" y="64" text-anchor="middle">外环 · 华泰持牌适当性与投研护栏</text>
+              <text x="370" y="150" text-anchor="middle">中环 · 客户本人最终滑动签字确认</text>
+              <text x="370" y="212" text-anchor="middle">内环 · 复用既有成熟账户与风控底座</text>
+              <text x="370" y="362" text-anchor="middle" fill="#FFFFFF" font-size="17" font-weight="700">客户资产安全</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 10: 3-10 YEAR HORIZON & EARLY PREPARATION ==================== -->
+    <section class="slide" data-slide="10">
+      <div class="s10-bg-echo"></div>
+      <div class="s10-content">
+        <div style="max-width:1240px;margin-top:16px;">
+          <div class="whisper">未来三年到十年最重要的业务变化 · 变革前夕的主动布局</div>
+          <h2 class="headline-xl" style="font-size:70px;">
+            身处变革前夕，<br/><span>早做准备</span>才不会在未来陷入被动。
+          </h2>
+          <p class="subcopy" style="max-width:1060px;">
+            传统 App 仍将长期服务广大存量客群，但等新一代 AI 底座格局定型再追赶就会失去先机。<br/>
+            由<strong>用户增长与平台运营部</strong>双轨并进：稳住当下基本盘，今天就用 90 天轻骑兵跑通涨乐 Agent 样板。
+          </p>
+        </div>
+
+        <div class="pilot-steps">
+          <div class="frosted pilot-card">
+            <div class="pilot-when">第 1 个月 · 新工作流破冰</div>
+            <h4>跑通“克制编排＋场景触达”</h4>
+            <p>拿《智投实盘赛》试水：验证按需上下文裁剪、存量业务顺畅调用，以及未报名高手千人千面动态出卡。</p>
+          </div>
+
+          <div class="frosted pilot-card" style="border:1.5px solid rgba(180,123,43,0.35);background:rgba(255,252,246,0.92);">
+            <div class="pilot-when">第 2–3 个月 · 人机投顾双打</div>
+            <h4>联动 10–20 位华泰真人投顾</h4>
+            <p>打通“签约真人投顾策略方向自动对表持仓＋震荡行情秒级定心解读与 1v1 转接”，将专家服务半径放大数倍。</p>
+          </div>
+
+          <div class="frosted pilot-card">
+            <div class="pilot-when">面向未来 3–10 年 · 主动卡位</div>
+            <h4>入驻主流 Harness 与释放产能</h4>
+            <p>在外部智能体生态占据首选投顾身位，同时将解放出的研发营销力量持续聚焦打磨真正有价值的华泰投资产品。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Minimalist HUD -->
+<div id="hud">
+  <button id="btn-prev">←</button>
+  <span id="hud-counter">1 / 10</span>
+  <button id="btn-next">→</button>
+  <button id="btn-fs">全屏</button>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const stage = document.getElementById('stage');
+  const counter = document.getElementById('hud-counter');
+  const progressBar = document.getElementById('progress-bar');
+
+  const params = new URLSearchParams(window.location.search);
+  const isExport = params.get('export') === '1';
+  let current = Math.max(0, Math.min(slides.length - 1, parseInt(params.get('slide') || '1', 10) - 1));
+  if (isExport) document.body.classList.add('export-mode');
+
+  // Strict 16:9 centered scaling (never distorts aspect ratio!)
+  function resizeStage() {
+    const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+  window.addEventListener('resize', resizeStage);
+  resizeStage();
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  const easeOutCubic = (x) => 1 - Math.pow(1 - clamp(x, 0, 1), 3);
+  const easeInOutCubic = (x) => {
+    const t = clamp(x, 0, 1);
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  };
+
+  let deterministicMode = isExport;
+  let isPaused = false;
+  let pausedElapsed = 0;
+
+  // Preload actual Huatai Trading Contest screenshot (智投实盘系列赛)
+  const contestImg = new Image();
+  contestImg.src = './assets/trading_contest_real.jpg';
+
+  const animStart = {
+    2: performance.now(),
+    3: performance.now(),
+    4: performance.now(),
+    5: performance.now(),
+    6: performance.now(),
+    8: performance.now()
+  };
+  // Total cycle = comfortable step-by-step build + 16s~20.5s calm reading hold at the end!
+  const animBuildEnd = { 2: 10.6, 3: 13.8, 4: 17.5, 5: 14.2, 6: 13.8, 8: 13.0 };
+  const animDur = { 2: 26.0, 3: 30.0, 4: 38.0, 5: 30.0, 6: 32.0, 8: 31.0 };
+
+  function updatePauseButtons() {
+    document.querySelectorAll('.pause-btn').forEach((b) => {
+      b.textContent = isPaused ? '▶ 继续' : '⏸ 暂停';
+    });
+  }
+
+  function togglePauseAnim() {
+    const sNum = current + 1;
+    if (!animDur[sNum]) return;
+    if (!isPaused) {
+      pausedElapsed = ((performance.now() - animStart[sNum]) / 1000) % animDur[sNum];
+      isPaused = true;
+    } else {
+      animStart[sNum] = performance.now() - pausedElapsed * 1000;
+      isPaused = false;
+    }
+    updatePauseButtons();
+  }
+  window.togglePauseAnim = togglePauseAnim;
+
+  function restartSlideAnim(slideNum) {
+    isPaused = false;
+    pausedElapsed = 0;
+    animStart[slideNum] = performance.now();
+    updatePauseButtons();
+  }
+  window.restartSlideAnim = restartSlideAnim;
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawFrostedCard(ctx, x, y, w, h, r, opts = {}) {
+    ctx.save();
+    ctx.shadowColor = opts.shadowColor || 'rgba(20, 22, 32, 0.08)';
+    ctx.shadowBlur = opts.shadowBlur ?? 34;
+    ctx.shadowOffsetY = opts.shadowY ?? 13;
+    roundRect(ctx, x, y, w, h, r);
+    ctx.fillStyle = opts.fill || 'rgba(255, 255, 255, 0.94)';
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    roundRect(ctx, x, y, w, h, r);
+    ctx.strokeStyle = opts.border || 'rgba(255, 255, 255, 0.96)';
+    ctx.lineWidth = opts.borderWidth || 1.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawTitaniumOrb(ctx, cx, cy, radius, glowIntensity = 0.5, label = '随身真人投顾', sub = '华泰专业 Agent') {
+    ctx.save();
+    if (glowIntensity > 0) {
+      const g = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy, radius * 1.95);
+      g.addColorStop(0, `rgba(212, 148, 58, ${0.34 * glowIntensity})`);
+      g.addColorStop(1, 'rgba(212, 148, 58, 0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 1.95, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.shadowColor = 'rgba(20, 22, 32, 0.14)';
+    ctx.shadowBlur = 32;
+    ctx.shadowOffsetY = 14;
+    const ti = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
+    ti.addColorStop(0, '#F5F5F8');
+    ti.addColorStop(0.45, '#D0D0D6');
+    ti.addColorStop(0.75, '#AEAEB6');
+    ti.addColorStop(1, '#EBEBF0');
+    ctx.fillStyle = ti;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    const innerR = radius * 0.74;
+    const amb = ctx.createRadialGradient(cx - innerR * 0.3, cy - innerR * 0.32, innerR * 0.1, cx, cy, innerR);
+    amb.addColorStop(0, '#FBE2B4');
+    amb.addColorStop(0.45, '#D89B44');
+    amb.addColorStop(0.88, '#A56A1C');
+    amb.addColorStop(1, '#825010');
+    ctx.fillStyle = amb;
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.save();
+    ctx.translate(cx - innerR * 0.34, cy - innerR * 0.42);
+    ctx.rotate(-0.42);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.38)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, innerR * 0.28, innerR * 0.13, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    if (label) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(80, 45, 5, 0.45)';
+      ctx.shadowBlur = 6;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `700 ${radius < 70 ? 15 : 18.5}px "PingFang SC", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, cx, cy - 1);
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.font = `500 ${radius < 70 ? 11.5 : 13}px "PingFang SC", sans-serif`;
+      ctx.fillText(sub, cx, cy + (radius < 70 ? 16 : 20));
+      ctx.restore();
+    }
+  }
+
+  // ==================== SLIDE 2: HOST BRAIN + HUATAI SOUL = PERSONAL ADVISOR ====================
+  const s2Canvas = document.getElementById('s2-canvas');
+  const s2Ctx = s2Canvas.getContext('2d');
+  s2Canvas.width = 1080 * 2; s2Canvas.height = 860 * 2; s2Ctx.scale(2, 2);
+
+  function renderS2(t) {
+    const ctx = s2Ctx;
+    ctx.clearRect(0, 0, 1080, 860);
+
+    const pInputs = easeOutCubic(t / 1.3);
+    const pFuse = easeInOutCubic((t - 3.2) / 1.8);
+    const pService = easeOutCubic((t - 9.2) / 1.3);
+
+    ctx.save();
+    ctx.globalAlpha = pInputs;
+    drawFrostedCard(ctx, 56, 42 + (1 - pInputs) * 16, 440, 126, 26);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#86868B'; ctx.font = '600 13px "PingFang SC", sans-serif';
+    ctx.fillText('动态界面底座 · 客户自有底座（Harness）算力', 88, 82);
+    ctx.fillStyle = '#1D1D1F'; ctx.font = '700 22px "PingFang SC", sans-serif';
+    ctx.fillText('为“实时动态生成卡片”提供基础', 88, 116);
+    ctx.fillStyle = '#515154'; ctx.font = '400 15px "PingFang SC", sans-serif';
+    ctx.fillText('破解集中算力与速度瓶颈 · 告别预开发静态网页模块', 88, 146);
+
+    drawFrostedCard(ctx, 584, 42 + (1 - pInputs) * 16, 440, 126, 26, {
+      fill: '#FFFBF3',
+      border: 'rgba(180, 123, 43, 0.42)'
+    });
+    ctx.fillStyle = '#B47B2B'; ctx.font = '700 13px "PingFang SC", sans-serif';
+    ctx.fillText('专业灵魂 · 华泰证券核心壁垒', 616, 82);
+    ctx.fillStyle = '#1D1D1F'; ctx.font = '700 22px "PingFang SC", sans-serif';
+    ctx.fillText('注入华泰投研知识与全业务专权', 616, 116);
+    ctx.fillStyle = '#515154'; ctx.font = '400 15px "PingFang SC", sans-serif';
+    ctx.fillText('研究所框架 · 实时账户持仓 · 免表单交易通道', 616, 146);
+    ctx.restore();
+
+    const hubX = 540, hubY = 330;
+    [[276, 168], [804, 168]].forEach(([sx, sy], i) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.bezierCurveTo(sx, 255, hubX, 225, hubX, hubY - 88);
+      ctx.strokeStyle = '#E0E0E6'; ctx.lineWidth = 2; ctx.stroke();
+      if (pFuse > 0) {
+        ctx.strokeStyle = i === 1 ? '#B47B2B' : '#515154';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([420]);
+        ctx.lineDashOffset = 420 * (1 - pFuse);
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
+
+    const breathe = t > 10.6 ? (0.85 + 0.15 * Math.sin(t * 1.8)) : (0.35 + 0.65 * pFuse);
+    drawTitaniumOrb(ctx, hubX, hubY, 88, breathe, '涨乐随身投顾', '真人感 · 懂业务');
+
+    const legs = [
+      { x: 185, y: 558, title: '盯股市与持仓', sub: '实时扫描持仓异动与估值', status: '✓ 持仓敞口全天候守护中', gold: true },
+      { x: 540, y: 558, title: '盯大宗商品与宏观', sub: '黄金 · 原油 · 伦铜跨市场联动', status: '✓ 捕捉有色期货突发异动', gold: false },
+      { x: 895, y: 558, title: '盯突发新闻与讲话', sub: 'WSJ · 财联社 · X 实时舆情', status: '✓ 自动关联持仓标的利好', gold: false }
+    ];
+
+    legs.forEach((leg, idx) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(hubX, hubY + 88);
+      ctx.bezierCurveTo(hubX, 465, leg.x, 445, leg.x, leg.y - 56);
+      ctx.strokeStyle = '#E2E2E8'; ctx.lineWidth = 2; ctx.stroke();
+      const lp = easeInOutCubic((t - 5.0 - idx * 0.9) / 1.3);
+      if (lp > 0) {
+        ctx.strokeStyle = idx === 0 ? '#B47B2B' : '#8E8E93';
+        ctx.lineWidth = 2.8;
+        ctx.setLineDash([380]);
+        ctx.lineDashOffset = 380 * (1 - lp);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      const ap = easeOutCubic((t - 5.6 - idx * 0.9) / 0.9);
+      drawFrostedCard(ctx, leg.x - 155, leg.y - 56, 310, 126, 24, {
+        fill: leg.gold ? '#FFFDF9' : 'rgba(255,255,255,0.92)',
+        border: leg.gold ? `rgba(180,123,43,${0.25 + 0.4 * ap})` : 'rgba(255,255,255,0.96)'
+      });
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1D1D1F'; ctx.font = '700 20px "PingFang SC", sans-serif';
+      ctx.fillText(leg.title, leg.x - 128, leg.y - 16);
+      ctx.fillStyle = '#86868B'; ctx.font = '400 14px "PingFang SC", sans-serif';
+      ctx.fillText(leg.sub, leg.x - 128, leg.y + 12);
+      if (ap > 0.1) {
+        ctx.save(); ctx.globalAlpha = ap;
+        ctx.fillStyle = leg.gold ? '#B47B2B' : '#1F6F54';
+        ctx.font = '600 14.5px "PingFang SC", sans-serif';
+        ctx.fillText(leg.status, leg.x - 128, leg.y + 44);
+        ctx.restore();
+      }
+    });
+
+    if (pService > 0) {
+      ctx.save();
+      ctx.globalAlpha = pService;
+      const by = 682 + (1 - pService) * 18;
+      drawFrostedCard(ctx, 90, by, 900, 132, 28, {
+        fill: '#FFFFFF',
+        border: 'rgba(180, 123, 43, 0.45)',
+        shadowColor: 'rgba(180, 123, 43, 0.14)'
+      });
+      roundRect(ctx, 126, by + 24, 178, 30, 15);
+      ctx.fillStyle = 'rgba(180, 123, 43, 0.13)'; ctx.fill();
+      ctx.fillStyle = '#B47B2B'; ctx.font = '700 13px "PingFang SC", sans-serif';
+      ctx.textAlign = 'center'; ctx.fillText('与独立 App 的核心差异', 215, by + 44);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1D1D1F'; ctx.font = '700 21px "PingFang SC", sans-serif';
+      ctx.fillText('无需预先开发静态卡片 · 按客户问题当场生成专属交互', 320, by + 45);
+      ctx.fillStyle = '#515154'; ctx.font = '400 17px "PingFang SC", sans-serif';
+      ctx.fillText('依托客户自有 AI 算力突破实时生成瓶颈，让懂华泰业务的“随身投顾”随问随画、全天伴随。', 126, by + 90);
+      ctx.restore();
+    }
+  }
+
+  // ==================== SLIDE 3: WORKING IN HARNESS -> BREAKING NEWS -> INLINE TRADE ====================
+  const s3Canvas = document.getElementById('s3-canvas');
+  const s3Ctx = s3Canvas.getContext('2d');
+  s3Canvas.width = 1696 * 2; s3Canvas.height = 756 * 2; s3Ctx.scale(2, 2);
+
+  function renderS3(t) {
+    const ctx = s3Ctx;
+    ctx.clearRect(0, 0, 1696, 756);
+
+    drawFrostedCard(ctx, 48, 18, 1600, 650, 32, {
+      fill: 'rgba(255, 255, 255, 0.94)',
+      shadowBlur: 48,
+      shadowY: 20
+    });
+
+    ctx.fillStyle = '#F4F4F7';
+    roundRect(ctx, 48, 18, 1600, 56, 32); ctx.fill();
+    ctx.fillRect(48, 50, 1600, 24);
+    ['#FF5F57', '#FEBC2E', '#28C840'].forEach((c, i) => {
+      ctx.fillStyle = c; ctx.beginPath(); ctx.arc(88 + i * 24, 46, 7, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.fillStyle = '#515154'; ctx.font = '600 15px "PingFang SC", sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('个人日常工作底座（Harness） ·  当前正在撰写公司业务方案（未打开任何炒股软件）', 848, 52);
+
+    roundRect(ctx, 88, 102, 820, 530, 22);
+    ctx.fillStyle = '#FAFAFC'; ctx.fill();
+    ctx.strokeStyle = '#E6E6EC'; ctx.lineWidth = 1.2; ctx.stroke();
+
+    roundRect(ctx, 120, 128, 520, 38, 19);
+    ctx.fillStyle = '#FFF9F0'; ctx.fill();
+    ctx.strokeStyle = 'rgba(180,123,43,0.35)'; ctx.stroke();
+    ctx.fillStyle = '#B47B2B'; ctx.font = '600 14px "PingFang SC", sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('● 早间已交代 Harness：“顺便帮我盯今日股市、大宗商品与突发新闻”', 142, 152);
+
+    ctx.fillStyle = '#1D1D1F'; ctx.font = '700 28px "PingFang SC", sans-serif';
+    ctx.fillText('2026 季度供应链与采购预算方案', 120, 222);
+    ctx.fillStyle = '#86868B'; ctx.font = '400 16px "PingFang SC", sans-serif';
+    ctx.fillText('日常本职工作中（与股票完全无关）……', 120, 256);
+
+    const docLines = [
+      '一、本季度核心原材料交付周期评估与备货策略',
+      '二、华东与华南仓储物流成本结构优化目标（预计下降 8.5%）',
+      '三、年度供应商战略合作框架协议续签时间表',
+      '四、跨部门数字化协同排期与里程碑考核节点……'
+    ];
+    docLines.forEach((line, idx) => {
+      ctx.fillStyle = '#515154'; ctx.font = '400 18px "PingFang SC", sans-serif';
+      ctx.fillText(line, 120, 314 + idx * 54);
+      ctx.fillStyle = '#EBEBF0';
+      roundRect(ctx, 120, 328 + idx * 54, 680 - idx * 60, 10, 5); ctx.fill();
+    });
+
+    const pNews = easeOutCubic((t - 3.0) / 1.1);
+    if (pNews > 0) {
+      ctx.save();
+      ctx.globalAlpha = pNews;
+      const ny = 102 + (1 - pNews) * 20;
+      drawFrostedCard(ctx, 944, ny, 664, 152, 24, {
+        fill: '#FFFFFF',
+        border: 'rgba(201, 59, 43, 0.35)',
+        shadowColor: 'rgba(201, 59, 43, 0.08)'
+      });
+      roundRect(ctx, 972, ny + 22, 210, 28, 14);
+      ctx.fillStyle = 'rgba(201, 59, 43, 0.1)'; ctx.fill();
+      ctx.fillStyle = '#C93B2B'; ctx.font = '700 13px "PingFang SC", sans-serif';
+      ctx.textAlign = 'center'; ctx.fillText('⚡ 外部资讯 Agent 突发推送', 1077, ny + 41);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1D1D1F'; ctx.font = '700 19.5px "PingFang SC", sans-serif';
+      ctx.fillText('突发讲话：海外关键矿产出口政策收紧，伦铜期货直线拉升 4%', 972, ny + 84);
+      ctx.fillStyle = '#B47B2B'; ctx.font = '600 15.5px "PingFang SC", sans-serif';
+      ctx.fillText('涨乐随身投顾自动提示：与您关注的【有色金属 / 紫金矿业】强相关', 972, ny + 120);
+      ctx.restore();
+    }
+
+    const pSpeak = easeOutCubic((t - 7.2) / 0.9);
+    if (pSpeak > 0) {
+      ctx.save();
+      ctx.globalAlpha = pSpeak;
+      const sy = 274 + (1 - pSpeak) * 16;
+      roundRect(ctx, 1048, sy, 560, 74, 24);
+      ctx.fillStyle = '#1D1D1F'; ctx.fill();
+      ctx.fillStyle = '#FFFFFF'; ctx.font = '500 17.5px "PingFang SC", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('“不用切软件了，直接按现价帮我买两成仓位紫金矿业！”', 1078, sy + 44);
+      ctx.restore();
+    }
+
+    const pOrder = easeOutCubic((t - 10.2) / 1.0);
+    const pSlide = easeInOutCubic((t - 12.0) / 1.8);
+    if (pOrder > 0) {
+      ctx.save();
+      ctx.globalAlpha = pOrder;
+      const oy = 368 + (1 - pOrder) * 18;
+      drawFrostedCard(ctx, 944, oy, 664, 264, 26, {
+        fill: '#FFFDF9',
+        border: 'rgba(180, 123, 43, 0.5)',
+        shadowColor: 'rgba(180, 123, 43, 0.15)'
+      });
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#B47B2B'; ctx.font = '700 14px "PingFang SC", sans-serif';
+      ctx.fillText('涨乐随身投顾 · 原地即时生成委托视图（无需打开 AI 涨乐）', 976, oy + 38);
+
+      ctx.fillStyle = '#1D1D1F'; ctx.font = '700 24px "PingFang SC", sans-serif';
+      ctx.fillText('买入 紫金矿业 (601899)  ·  现价 ¥17.82', 976, oy + 84);
+      ctx.fillStyle = '#515154'; ctx.font = '500 17px "PingFang SC", sans-serif';
+      ctx.fillText('自动折算可用资金 20%：2,200 股（约 ¥39,204）', 976, oy + 122);
+
+      roundRect(ctx, 976, oy + 158, 600, 62, 31);
+      ctx.fillStyle = pSlide >= 0.98 ? '#1F6F54' : '#F2ECE1';
+      ctx.fill();
+
+      if (pSlide < 0.98) {
+        ctx.fillStyle = '#9A6519'; ctx.font = '600 17px "PingFang SC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('右滑完成原地委托 · 下一秒继续写方案 →', 1310, oy + 196);
+        const kx = 982 + pSlide * 412;
+        roundRect(ctx, kx, oy + 164, 176, 50, 25);
+        ctx.fillStyle = '#B47B2B'; ctx.fill();
+        ctx.fillStyle = '#FFFFFF'; ctx.font = '700 16px "PingFang SC", sans-serif';
+        ctx.fillText('本人滑动确认', kx + 88, oy + 195);
+      } else {
+        ctx.fillStyle = '#FFFFFF'; ctx.font = '700 19px "PingFang SC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('✓ 委托已成交 · 全程零应用切换，工作流毫发无损', 1276, oy + 196);
+      }
+      ctx.restore();
+    }
+
+    drawFrostedCard(ctx, 348, 688, 1000, 54, 27, { shadowBlur: 16, shadowY: 4 });
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#1D1D1F'; ctx.font = '600 17px "PingFang SC", sans-serif';
+    ctx.fillText('体验本质差异：不是等客户想起来去打开“AI 涨乐”，而是在他全天工作的每一个瞬间随时响应交易机会', 848, 721);
+  }
+
+  // ==================== SLIDE 4: 90% LONG-TAIL (TRADING CONTEST LEGACY PAGE) vs TRUE PERSONALIZED AUTO-CARDS ====================
+  const s4L = document.getElementById('s4-left-canvas');
+  const s4R = document.getElementById('s4-right-canvas');
+  const ctx4L = s4L.getContext('2d');
+  const ctx4R = s4R.getContext('2d');
+  s4L.width = 510 * 2; s4L.height = 608 * 2; ctx4L.scale(2, 2);
+  s4R.width = 510 * 2; s4R.height = 608 * 2; ctx4R.scale(2, 2);
+
+  function renderS4(t) {
+    const cl = ctx4L;
+    cl.clearRect(0, 0, 510, 608);
+
+    if (t < 3.6) {
+      roundRect(cl, 24, 10, 462, 36, 10);
+      cl.fillStyle = '#EFEFF4'; cl.fill();
+      cl.fillStyle = '#515154'; cl.font = '600 13px "PingFang SC", sans-serif'; cl.textAlign = 'left';
+      cl.fillText('核心行情/条件单虽有卡片，但一进《智投实盘赛》等活动…', 38, 33);
+
+      roundRect(cl, 76, 68, 404, 60, 18);
+      cl.fillStyle = '#2C2C2E'; cl.fill();
+      cl.fillStyle = '#FFFFFF'; cl.font = '500 15.5px "PingFang SC", sans-serif';
+      cl.fillText('“我想看看最近的智投实盘大赛，顺便报个名”', 98, 104);
+
+      const cp = easeOutCubic((t - 0.8) / 0.8);
+      if (cp > 0) {
+        cl.save(); cl.globalAlpha = cp;
+        drawFrostedCard(cl, 28, 152, 454, 186, 20, { fill: '#FFFFFF' });
+        cl.fillStyle = '#1D1D1F'; cl.font = '700 17px "PingFang SC", sans-serif';
+        cl.fillText('智投实盘系列赛（未经过 AI 化重构）', 52, 192);
+        cl.fillStyle = '#86868B'; cl.font = '400 14.5px "PingFang SC", sans-serif';
+        cl.fillText('存量活动与非高频功能太多，研发根本没时间逐一改写', 52, 224);
+        roundRect(cl, 52, 256, 406, 52, 14);
+        cl.fillStyle = '#E8E8ED'; cl.fill();
+        cl.fillStyle = '#1D1D1F'; cl.font = '600 15.5px "PingFang SC", sans-serif'; cl.textAlign = 'center';
+        cl.fillText('点击跳转传统 H5 静态活动页 →', 255, 288);
+        cl.restore();
+      }
+    } else {
+      roundRect(cl, 24, 8, 462, 34, 10);
+      cl.fillStyle = '#FDECEC'; cl.fill();
+      cl.fillStyle = '#C93B2B'; cl.font = '700 12.5px "PingFang SC", sans-serif'; cl.textAlign = 'left';
+      cl.fillText('实拍现状：所有人点进来都是同一套固定页面 · 需手点选赛区参赛', 36, 30);
+
+      cl.save();
+      roundRect(cl, 26, 50, 458, 392, 20);
+      cl.fillStyle = '#FFFFFF'; cl.fill();
+      cl.clip();
+
+      if (contestImg.complete && contestImg.naturalWidth > 0) {
+        const drawW = 458;
+        const drawH = (contestImg.naturalHeight / contestImg.naturalWidth) * drawW;
+        let scrollOffset = -45;
+        if (t >= 4.6 && t < 6.8) {
+          scrollOffset = -45 - easeInOutCubic((t - 4.6) / 2.2) * 410;
+        } else if (t >= 6.8) {
+          scrollOffset = -455 + easeInOutCubic((t - 6.8) / 1.4) * 245;
+        }
+        cl.drawImage(contestImg, 26, 50 + scrollOffset, drawW, drawH);
+      }
+      cl.restore();
+
+      roundRect(cl, 26, 50, 458, 392, 20);
+      cl.strokeStyle = 'rgba(0,0,0,0.08)'; cl.lineWidth = 1; cl.stroke();
+
+      const wp = easeOutCubic((t - 6.4) / 0.9);
+      if (wp > 0) {
+        cl.save(); cl.globalAlpha = wp;
+        roundRect(cl, 26, 454, 458, 134, 22);
+        cl.fillStyle = '#FDF2F0'; cl.fill();
+        cl.strokeStyle = 'rgba(201, 59, 43, 0.4)'; cl.lineWidth = 1.5; cl.stroke();
+        cl.fillStyle = '#C93B2B'; cl.textAlign = 'center';
+        cl.font = '700 18.5px "PingFang SC", sans-serif';
+        cl.fillText('✕ 千人一面老页面 · 未关注活动的高手根本不会点', 255, 494);
+        cl.fillStyle = '#515154'; cl.font = '400 14px "PingFang SC", sans-serif';
+        cl.fillText('周度赛/季度价投赛/大师赛全靠自己翻看，对话框在此完全失灵', 255, 526);
+        cl.fillText('几百个非核心业务靠人工排期永远改不完', 255, 554);
+        cl.restore();
+      }
+    }
+
+    const cr = ctx4R;
+    cr.clearRect(0, 0, 510, 608);
+
+    if (t < 8.8) {
+      cr.save();
+      roundRect(cr, 46, 220, 418, 130, 24);
+      cr.fillStyle = 'rgba(255, 255, 255, 0.72)'; cr.fill();
+      cr.strokeStyle = 'rgba(180, 123, 43, 0.22)'; cr.stroke();
+      cr.fillStyle = '#86868B'; cr.textAlign = 'center';
+      cr.font = '600 16px "PingFang SC", sans-serif';
+      cr.fillText('请先看左屏传统活动页痛点', 255, 274);
+      cr.fillStyle = '#B47B2B'; cr.font = '500 14px "PingFang SC", sans-serif';
+      cr.fillText('随后演示：新形态如何对未报名高手主动生成专属卡…', 255, 308);
+      cr.restore();
+      return;
+    }
+
+    const pPrompt = easeOutCubic((t - 8.9) / 1.0);
+    if (pPrompt > 0) {
+      cr.save(); cr.globalAlpha = pPrompt;
+      const py = 10 + (1 - pPrompt) * 14;
+      roundRect(cr, 26, py, 458, 112, 22);
+      cr.fillStyle = '#FFF9F0'; cr.fill();
+      cr.strokeStyle = 'rgba(180, 123, 43, 0.45)'; cr.lineWidth = 1.5; cr.stroke();
+
+      cr.textAlign = 'left';
+      cr.fillStyle = '#B47B2B'; cr.font = '700 12.5px "PingFang SC", sans-serif';
+      cr.fillText('● 客户原本未报名 · 随身投顾发现其实盘收益达标后主动报喜', 44, py + 28);
+
+      cr.fillStyle = '#1D1D1F'; cr.font = '500 14.2px "PingFang SC", sans-serif';
+      cr.fillText('“您本季收益达 +26.4%，在《智投实盘赛·季度价投赛》已达', 44, py + 56);
+      cr.fillText('前 3% 获奖水平！报名即可角逐 30g 金牛与 MacBook Pro。”', 44, py + 82);
+      cr.restore();
+    }
+
+    const cardP = easeOutCubic((t - 12.4) / 1.0);
+    if (cardP > 0) {
+      cr.save(); cr.globalAlpha = cardP;
+      const cy = 134 + (1 - cardP) * 16;
+      drawFrostedCard(cr, 26, cy, 458, 340, 26, {
+        fill: '#FFFFFF',
+        border: 'rgba(180, 123, 43, 0.48)'
+      });
+
+      cr.textAlign = 'left';
+      cr.fillStyle = '#B47B2B'; cr.font = '700 12.5px "PingFang SC", sans-serif';
+      cr.fillText('✦ 依托用户端算力动态生成 · 智投实盘系列赛专属卡片', 46, cy + 30);
+
+      cr.fillStyle = '#1D1D1F'; cr.font = '700 20px "PingFang SC", sans-serif';
+      cr.fillText('已为您匹配【季度价投赛】· 稳居前 3% 冲奖圈', 46, cy + 62);
+
+      roundRect(cr, 46, cy + 78, 418, 96, 14);
+      cr.fillStyle = '#FAF8F5'; cr.fill();
+
+      const curveP = easeInOutCubic((t - 13.2) / 1.6);
+      cr.fillStyle = '#515154'; cr.font = '600 12.5px "PingFang SC", sans-serif';
+      cr.textAlign = 'left'; cr.fillText('您的本季收益曲线 vs 赛区获奖线', 62, cy + 100);
+      cr.fillStyle = '#C93B2B'; cr.font = '700 15px "SF Mono", sans-serif';
+      cr.textAlign = 'right'; cr.fillText('我 +26.4%（前 3%）', 448, cy + 101);
+
+      cr.save();
+      cr.beginPath(); cr.rect(62, cy + 106, 386 * curveP, 62); cr.clip();
+      cr.strokeStyle = '#C7C7CC'; cr.lineWidth = 1.8;
+      cr.beginPath();
+      cr.moveTo(62, cy + 158); cr.lineTo(160, cy + 152); cr.lineTo(260, cy + 155); cr.lineTo(355, cy + 146); cr.lineTo(446, cy + 142);
+      cr.stroke();
+
+      cr.strokeStyle = '#D4943A'; cr.lineWidth = 1.5; cr.setLineDash([4, 4]);
+      cr.beginPath(); cr.moveTo(62, cy + 134); cr.lineTo(446, cy + 134); cr.stroke();
+      cr.setLineDash([]);
+
+      cr.strokeStyle = '#C93B2B'; cr.lineWidth = 3;
+      cr.beginPath();
+      cr.moveTo(62, cy + 158); cr.lineTo(155, cy + 142); cr.lineTo(245, cy + 136); cr.lineTo(345, cy + 118); cr.lineTo(446, cy + 110);
+      cr.stroke();
+      cr.restore();
+
+      cr.fillStyle = '#9A6519'; cr.font = '500 11.5px "PingFang SC", sans-serif';
+      cr.textAlign = 'left'; cr.fillText('--- 获奖晋级线 (+18.0%)       — 沪深300 (+6.8%)', 62, cy + 168);
+
+      [
+        ['AI 自动选组', '季度价投赛（识别中长线风格 · 免手选 Tab）'],
+        ['可角逐奖品', '30g 金牛 · 华为智慧屏 · 新款 MacBook Pro']
+      ].forEach(([k, v], idx) => {
+        const ry = cy + 186 + idx * 42;
+        roundRect(cr, 46, ry, 418, 35, 10);
+        cr.fillStyle = '#F7F7FA'; cr.fill();
+        cr.fillStyle = '#86868B'; cr.font = '500 13px "PingFang SC", sans-serif';
+        cr.textAlign = 'left'; cr.fillText(k, 60, ry + 23);
+        cr.fillStyle = '#1D1D1F'; cr.font = '600 13px "PingFang SC", sans-serif';
+        cr.textAlign = 'right'; cr.fillText(v, 450, ry + 23);
+      });
+
+      const slideP = easeInOutCubic((t - 15.6) / 1.5);
+      roundRect(cr, 46, cy + 278, 418, 46, 23);
+      cr.fillStyle = slideP >= 0.98 ? '#1F6F54' : '#F2ECE1'; cr.fill();
+      if (slideP < 0.98) {
+        cr.fillStyle = '#9A6519'; cr.font = '600 14px "PingFang SC", sans-serif'; cr.textAlign = 'center';
+        cr.fillText('无需跳老网页 · 右滑一键报名【季度价投赛】→', 274, cy + 307);
+        const kx = 50 + slideP * 288;
+        roundRect(cr, kx, cy + 282, 122, 38, 19);
+        cr.fillStyle = '#B47B2B'; cr.fill();
+        cr.fillStyle = '#FFF'; cr.font = '700 13.5px "PingFang SC", sans-serif';
+        cr.fillText('立即参赛', kx + 61, cy + 306);
+      } else {
+        cr.fillStyle = '#FFFFFF'; cr.font = '700 15px "PingFang SC", sans-serif'; cr.textAlign = 'center';
+        cr.fillText('✓ 报名成功 · 已同步实盘冲击 30g 金牛大奖', 255, cy + 307);
+      }
+      cr.restore();
+    }
+
+    if (t >= 16.8) {
+      const bp = easeOutCubic((t - 16.8) / 0.8);
+      cr.save(); cr.globalAlpha = bp;
+      drawFrostedCard(cr, 26, 486, 458, 102, 22, {
+        fill: '#EDF7F3',
+        border: 'rgba(31,111,84,0.35)',
+        shadowBlur: 16,
+        shadowY: 4
+      });
+      cr.fillStyle = '#1F6F54'; cr.textAlign = 'center';
+      cr.font = '700 18px "PingFang SC", sans-serif';
+      cr.fillText('✓ 对达标高手主动报喜出卡 · 对浮亏客户安静零打扰', 255, 524);
+      cr.fillStyle = '#515154'; cr.font = '400 14px "PingFang SC", sans-serif';
+      cr.fillText('免排期重做老网页，完完全全实现领导期望的“千人千面”', 255, 556);
+      cr.restore();
+    }
+  }
+
+  // ==================== SLIDE 5: AWKWARD APPENDED AD vs OFFLINE BRANCH ADVISOR GREETING ====================
+  const s5Canvas = document.getElementById('s5-canvas');
+  const s5Ctx = s5Canvas.getContext('2d');
+  s5Canvas.width = 1696 * 2; s5Canvas.height = 746 * 2; s5Ctx.scale(2, 2);
+
+  function renderS5(t) {
+    const ctx = s5Ctx;
+    ctx.clearRect(0, 0, 1696, 746);
+
+    drawFrostedCard(ctx, 12, 18, 636, 696, 34, {
+      fill: 'rgba(244, 244, 248, 0.88)',
+      shadowBlur: 24
+    });
+
+    ctx.fillStyle = '#86868B'; ctx.font = '600 16px "PingFang SC", sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('现有 AI 炒股 App · 强诉求问答后生硬塞卡片', 54, 70);
+
+    roundRect(ctx, 114, 108, 490, 58, 18);
+    ctx.fillStyle = '#2C2C2E'; ctx.fill();
+    ctx.fillStyle = '#FFFFFF'; ctx.font = '500 16px "PingFang SC", sans-serif';
+    ctx.fillText('客户带着急事来：“帮我看下今日半导体板块资金流”', 138, 143);
+
+    roundRect(ctx, 54, 188, 550, 110, 18);
+    ctx.fillStyle = '#FFFFFF'; ctx.fill();
+    ctx.fillStyle = '#1D1D1F'; ctx.font = '500 16px "PingFang SC", sans-serif';
+    ctx.fillText('AI 回答：今日半导体主力净流入 32.4 亿元，前排龙头……', 78, 232);
+    ctx.fillStyle = '#86868B'; ctx.font = '400 14.5px "PingFang SC", sans-serif';
+    ctx.fillText('（客户看完答案就准备关掉软件了）', 78, 268);
+
+    const pAwk = easeOutCubic((t - 1.8) / 0.9);
+    if (pAwk > 0) {
+      ctx.save(); ctx.globalAlpha = pAwk;
+      roundRect(ctx, 54, 326, 550, 150, 18);
+      ctx.fillStyle = '#FDF2F0'; ctx.fill();
+      ctx.strokeStyle = 'rgba(201,59,43,0.35)'; ctx.setLineDash([6, 5]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = '#C93B2B'; ctx.font = '700 16px "PingFang SC", sans-serif';
+      ctx.fillText('✕ 回答末尾硬塞营销卡：“快来开通两融享优惠礼包！”', 78, 372);
+      ctx.fillStyle = '#515154'; ctx.font = '400 15px "PingFang SC", sans-serif';
+      ctx.fillText('弊端：客户正在急着办正事，强挂推广关联度弱、生硬违和，', 78, 412);
+      ctx.fillText('给人的感觉依然是“机器人在插播广告”。', 78, 442);
+      ctx.restore();
+    }
+
+    ctx.fillStyle = '#86868B'; ctx.font = '500 16px "PingFang SC", sans-serif';
+    ctx.fillText('结果：工具属性太强，缺乏人与人交流的松弛感与信任铺垫。', 54, 654);
+
+    drawFrostedCard(ctx, 684, 18, 998, 696, 34, {
+      fill: '#FFFFFF',
+      border: 'rgba(180, 123, 43, 0.36)',
+      shadowColor: 'rgba(180, 123, 43, 0.1)'
+    });
+
+    ctx.fillStyle = '#B47B2B'; ctx.font = '700 16px "PingFang SC", sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('Harness 涨乐随身投顾 · 像在线下营业厅跟熟悉的专属投顾当面聊天', 736, 70);
+
+    const b1 = easeOutCubic((t - 4.8) / 1.0);
+    if (b1 > 0) {
+      ctx.save(); ctx.globalAlpha = b1;
+      roundRect(ctx, 736, 106, 894, 118, 22);
+      ctx.fillStyle = '#F7F8FA'; ctx.fill();
+      ctx.fillStyle = '#1F6F54'; ctx.font = '700 15px "PingFang SC", sans-serif';
+      ctx.fillText('✓ 第一步：先把客户交代的正事利落办妥（绝不中途插播打断）', 768, 144);
+      ctx.fillStyle = '#515154'; ctx.font = '400 17.5px "PingFang SC", sans-serif';
+      ctx.fillText('刚帮客户办完调仓委托，客户依然停留在日常 Harness 的轻松上下文中，并授予了适度推荐权限。', 768, 186);
+      ctx.restore();
+    }
+
+    const b2 = easeOutCubic((t - 8.0) / 1.1);
+    if (b2 > 0) {
+      ctx.save(); ctx.globalAlpha = b2;
+      const y2 = 256 + (1 - b2) * 20;
+      roundRect(ctx, 736, y2, 894, 286, 28);
+      ctx.fillStyle = '#FFFBF4'; ctx.fill();
+      ctx.strokeStyle = 'rgba(180, 123, 43, 0.45)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+      drawTitaniumOrb(ctx, 804, y2 + 72, 34, 0.4, '', '');
+      ctx.fillStyle = '#FFFFFF'; ctx.font = '700 16px "PingFang SC", sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('涨乐', 804, y2 + 78);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#B47B2B'; ctx.font = '700 15px "PingFang SC", sans-serif';
+      ctx.fillText('下午空闲时刻 · 涨乐随身投顾主动温和打招呼', 862, y2 + 54);
+
+      ctx.fillStyle = '#1D1D1F'; ctx.font = '500 21px "PingFang SC", sans-serif';
+      ctx.fillText('“嗨，刚那笔调仓已经办妥啦。看你最近几次波段节奏踩得特别稳，', 862, y2 + 98);
+      ctx.fillText('刚好我们华泰新出了一套很契合你目前持仓结构的信用融券锁定与大宗对冲方案，', 862, y2 + 136);
+      ctx.fillText('这会儿不忙的话，要不要我给你简单聊两句？”', 862, y2 + 174);
+
+      const b3 = easeOutCubic((t - 12.4) / 0.9);
+      if (b3 > 0) {
+        ctx.save(); ctx.globalAlpha = b3;
+        roundRect(ctx, 862, y2 + 206, 360, 48, 24);
+        ctx.fillStyle = '#1F6F54'; ctx.fill();
+        ctx.fillStyle = '#FFFFFF'; ctx.font = '600 16px "PingFang SC", sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('客户自然回应：“行啊，拿出来我看看” →', 1042, y2 + 236);
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    if (t >= 13.4) {
+      const bp = easeOutCubic((t - 13.4) / 0.9);
+      ctx.save(); ctx.globalAlpha = bp;
+      roundRect(ctx, 736, 572, 894, 108, 22);
+      ctx.fillStyle = '#F5FAF8'; ctx.fill();
+      ctx.fillStyle = '#1F6F54'; ctx.font = '700 19px "PingFang SC", sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('这才是金融服务最理想的模样：懂业务、知冷暖、有分寸的“数字私人银行家”', 768, 616);
+      ctx.fillStyle = '#515154'; ctx.font = '400 16.5px "PingFang SC", sans-serif';
+      ctx.fillText('把线下营业部金牌投顾对高净值客户的服务温度，零边际成本复刻给每一位客户。', 768, 652);
+      ctx.restore();
+    }
+  }
+
+  // ==================== SLIDE 6: NEW! VIRTUAL AGENT × HUMAN ADVISOR CO-PILOT ====================
+  const s6Canvas = document.getElementById('s6-canvas');
+  const s6Ctx = s6Canvas.getContext('2d');
+  s6Canvas.width = 1696 * 2; s6Canvas.height = 746 * 2; s6Ctx.scale(2, 2);
+
+  function renderS6(t) {
+    // Unhurried build:
+    // 0.0 -> 2.4s: Left Human Advisor card establishes advisor's strategy output & 1-to-500 bottleneck
+    // 2.6 -> 5.8s: Center Titanium Bridge lights up + Right Synergy 01 (Direction observation & portfolio alignment)
+    // 6.4 -> 9.6s: Right Synergy 02 (Market drop emotional companion & 1v1 escalation)
+    // 10.2 -> 13.8s: Right Synergy 03 (One-swipe rebalance execution & HNW advisor signing referral)
+    // 13.8 -> 32.0s: 18.2s calm reading hold!
+    const ctx = s6Ctx;
+    ctx.clearRect(0, 0, 1696, 746);
+
+    const pLeft = easeOutCubic(t / 1.2);
+    ctx.save();
+    ctx.globalAlpha = pLeft;
+    drawFrostedCard(ctx, 16, 18 + (1 - pLeft) * 16, 496, 696, 32, {
+      fill: '#FFFBF4',
+      border: 'rgba(180, 123, 43, 0.38)',
+      shadowColor: 'rgba(180, 123, 43, 0.09)'
+    });
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#B47B2B'; ctx.font = '700 15px "PingFang SC", sans-serif';
+    ctx.fillText('华泰持牌真人投顾 · 策略大脑与深度温度', 48, 62);
+
+    // Advisor profile badge
+    roundRect(ctx, 48, 86, 432, 96, 20);
+    ctx.fillStyle = '#FFFFFF'; ctx.fill();
+    ctx.strokeStyle = 'rgba(180, 123, 43, 0.22)'; ctx.stroke();
+
+    ctx.save();
+    ctx.beginPath(); ctx.arc(98, 134, 28, 0, Math.PI * 2);
+    ctx.fillStyle = '#2C2C2E'; ctx.fill();
+    ctx.fillStyle = '#FBE2B4'; ctx.font = '700 18px "PingFang SC", sans-serif';
+    ctx.textAlign = 'center'; ctx.fillText('张', 98, 140);
+    ctx.restore();
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#1D1D1F'; ctx.font = '700 18.5px "PingFang SC", sans-serif';
+    ctx.fillText('签约专属真人投顾 · 张顾问', 142, 124);
+    ctx.fillStyle = '#86868B'; ctx.font = '400 13.5px "PingFang SC", sans-serif';
+    ctx.fillText('专注主线研判 · 模拟组合调仓 · 高净值复杂配置', 142, 154);
+
+    // Morning strategy output
+    roundRect(ctx, 48, 204, 432, 164, 20);
+    ctx.fillStyle = '#FFFFFF'; ctx.fill();
+    ctx.fillStyle = '#1F6F54'; ctx.font = '700 13.5px "PingFang SC", sans-serif';
+    ctx.fillText('● 今早 08:45 · 真人投顾发布最新投资方向', 68, 236);
+    ctx.fillStyle = '#1D1D1F'; ctx.font = '600 16px "PingFang SC", sans-serif';
+    ctx.fillText('“建议逢高兑现部分高估值算力仓位，将组合', 68, 270);
+    ctx.fillText('向低波红利央企与高股息资源品适度倾斜。”', 68, 298);
+    ctx.fillStyle = '#86868B'; ctx.font = '400 13.5px "PingFang SC", sans-serif';
+    ctx.fillText('传统痛点：客户上班忙常漏看，或不知如何对应自己持仓', 68, 340);
+
+    // 1-to-500 service bottleneck
+    roundRect(ctx, 48, 390, 432, 148, 20);
+    ctx.fillStyle = '#FDF5F3'; ctx.fill();
+    ctx.fillStyle = '#C93B2B'; ctx.font = '700 13.5px "PingFang SC", sans-serif';
+    ctx.fillText('▲ 盘中急跌痛点 · 1 名投顾难同时安抚 500 位客户', 68, 422);
+    ctx.fillStyle = '#515154'; ctx.font = '400 15px "PingFang SC", sans-serif';
+    ctx.fillText('财富管理“三分投、七分顾”。大跌时客户集体恐慌，', 68, 456);
+    ctx.fillText('真人分身乏术；而日常跟调组合又苦于手点繁琐跟丢。', 68, 484);
+    ctx.fillStyle = '#9A6519'; ctx.font = '600 13.5px "PingFang SC", sans-serif';
+    ctx.fillText('亟需虚拟随身 Agent 做全天候“神经延伸” →', 68, 516);
+
+    // Bottom division principle
+    roundRect(ctx, 48, 560, 432, 124, 20);
+    ctx.fillStyle = '#F6F6FA'; ctx.fill();
+    ctx.fillStyle = '#1D1D1F'; ctx.font = '700 15.5px "PingFang SC", sans-serif';
+    ctx.fillText('人机黄金分工：', 68, 594);
+    ctx.fillStyle = '#515154'; ctx.font = '400 14.5px "PingFang SC", sans-serif';
+    ctx.fillText('• 真人投顾：定策略方向、给信任温度、1v1 攻坚大客', 68, 626);
+    ctx.fillText('• 随身 Agent：盯投顾观点、对表实盘持仓、秒级触达', 68, 656);
+    ctx.restore();
+
+    // Center Bridge & Titanium Orb (x = 596, y = 366)
+    const hubX = 596, hubY = 366;
+    const pBridge = easeInOutCubic((t - 2.0) / 1.2);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(512, hubY);
+    ctx.lineTo(hubX - 60, hubY);
+    ctx.strokeStyle = '#DCDCE4'; ctx.lineWidth = 2.5; ctx.stroke();
+    if (pBridge > 0) {
+      ctx.strokeStyle = '#B47B2B'; ctx.lineWidth = 3.5;
+      ctx.setLineDash([80]); ctx.lineDashOffset = 80 * (1 - pBridge); ctx.stroke();
+    }
+    ctx.restore();
+
+    const targetYs = [125, 366, 604];
+    const startTimes = [2.8, 6.6, 10.4];
+
+    targetYs.forEach((ty, idx) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(hubX + 60, hubY);
+      ctx.bezierCurveTo(646, hubY, 642, ty, 680, ty);
+      ctx.strokeStyle = '#E2E2E8'; ctx.lineWidth = 2; ctx.stroke();
+
+      const lp = easeInOutCubic((t - startTimes[idx] + 0.3) / 1.0);
+      if (lp > 0) {
+        ctx.strokeStyle = idx === 0 ? '#B47B2B' : (idx === 1 ? '#1F6F54' : '#515154');
+        ctx.lineWidth = 3;
+        ctx.setLineDash([340]);
+        ctx.lineDashOffset = 340 * (1 - lp);
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
+
+    const orbGlow = t > 13.8 ? (0.82 + 0.18 * Math.sin(t * 1.8)) : (0.3 + 0.7 * pBridge);
+    drawTitaniumOrb(ctx, hubX, hubY, 60, orbGlow, '涨乐 Agent', '人机协同桥');
+
+    // Right 3 Synergy Cards (x = 680, w = 1000)
+    const cards = [
+      {
+        y: 18, h: 214, t0: 2.8,
+        pill: '协同 01 · 主动观察真人投顾方向并与实盘“对表”',
+        pillBg: 'rgba(180, 123, 43, 0.13)', pillColor: '#B47B2B',
+        border: 'rgba(180, 123, 43, 0.45)', fill: '#FFFFFF',
+        title: '自动订阅签约真人投顾最新观点，发现持仓背离时主动提醒并拟定跟调卡',
+        line1: '“观察到您签约的张顾问今早建议下调高估值算力，而您当前账户算力仓位仍占 46% 偏高；',
+        line2: '已按张顾问方向为您生成一笔 10% 仓位平衡预案（转向红利央企 ETF），是否滑动查看？”',
+        tag: '防漏看 · 免手算一键跟调'
+      },
+      {
+        y: 256, h: 214, t0: 6.6,
+        pill: '协同 02 · 震荡行情秒级“心理按摩”与高危情绪转接',
+        pillBg: 'rgba(31, 111, 84, 0.12)', pillColor: '#1F6F54',
+        border: 'rgba(31, 111, 84, 0.36)', fill: '#FFFFFF',
+        title: '急跌时秒级向数百客户同步专属投顾定心解读，精准筛出高危客呼叫真人 1v1',
+        line1: '盘中大跌时结合每位客户的持仓回撤，即时传递张顾问刚录制的安抚复盘，防止恐慌割肉；',
+        line2: '一旦识别客户重仓焦虑或两融逼近警戒线，立即附带《持仓与情绪简报》无缝转接张顾问本人。',
+        tag: '把真人精力花在刀刃上'
+      },
+      {
+        y: 494, h: 220, t0: 10.4,
+        pill: '协同 03 · 普惠潜客孵化与高净值“带画像签约导流”',
+        pillBg: 'rgba(29, 29, 31, 0.07)', pillColor: '#1D1D1F',
+        border: 'rgba(255, 255, 255, 0.96)', fill: 'rgba(255, 255, 255, 0.94)',
+        title: '日常陪伴识别复杂财富配置诉求，精准引荐签约风格契合的华泰真人投顾',
+        line1: '海量普通散户先由零边际成本的虚拟随身投顾陪伴；当捕捉到客户大额入金或跨品种配置需求时，',
+        line2: '自动匹配风格最契合的华泰持牌真人投顾促成付费签约，让单名真人投顾有效服务半径放大 10 倍。',
+        tag: '投顾业务超级增长漏斗'
+      }
+    ];
+
+    cards.forEach((c) => {
+      const cp = easeOutCubic((t - c.t0) / 1.0);
+      if (cp <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = cp;
+      const cy = c.y + (1 - cp) * 18;
+      drawFrostedCard(ctx, 680, cy, 1000, c.h, 28, {
+        fill: c.fill,
+        border: c.border
+      });
+
+      // Top pill + right tag
+      roundRect(ctx, 714, cy + 24, 386, 30, 15);
+      ctx.fillStyle = c.pillBg; ctx.fill();
+      ctx.fillStyle = c.pillColor; ctx.font = '700 13px "PingFang SC", sans-serif';
+      ctx.textAlign = 'left'; ctx.fillText(c.pill, 732, cy + 44);
+
+      ctx.fillStyle = '#86868B'; ctx.font = '600 13.5px "PingFang SC", sans-serif';
+      ctx.textAlign = 'right'; ctx.fillText(c.tag, 1644, cy + 44);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1D1D1F'; ctx.font = '700 20.5px "PingFang SC", sans-serif';
+      ctx.fillText(c.title, 714, cy + 92);
+
+      roundRect(ctx, 714, cy + 112, 932, 80, 16);
+      ctx.fillStyle = '#F8F8FB'; ctx.fill();
+      ctx.fillStyle = '#515154'; ctx.font = '400 15.5px "PingFang SC", sans-serif';
+      ctx.fillText(c.line1, 734, cy + 144);
+      ctx.fillText(c.line2, 734, cy + 174);
+      ctx.restore();
+    });
+  }
+
+  // ==================== SLIDE 8: NEW! IMPACT ON USER GROWTH & PLATFORM OPS DEPT ====================
+  const s8Canvas = document.getElementById('s8-canvas');
+  const s8Ctx = s8Canvas.getContext('2d');
+  s8Canvas.width = 1696 * 2; s8Canvas.height = 746 * 2; s8Ctx.scale(2, 2);
+
+  function renderS8(t) {
+    // Unhurried build:
+    // 0.0 -> 2.4s: Top Foundation Banner (Sober dual-track reality: traditional Apps stay!)
+    // 2.6 -> 4.6s: Left Muted Card (Legacy static-page pipeline)
+    // 4.8 -> 10.8s: Right Luminous Card + 3 new Agent orchestration imperatives unfolding cleanly
+    // 11.4 -> 13.0s: Bottom Strategic Dividend Banner (Liberating manpower to build valuable investment products)
+    // 13.0 -> 31.0s: 18.0s calm reading hold!
+    const ctx = s8Ctx;
+    ctx.clearRect(0, 0, 1696, 746);
+
+    // 1. Top Foundation Banner: Dual-Track Reality
+    const pTop = easeOutCubic(t / 1.1);
+    if (pTop > 0) {
+      ctx.save();
+      ctx.globalAlpha = pTop;
+      const ty = 12 + (1 - pTop) * 14;
+      drawFrostedCard(ctx, 16, ty, 1664, 122, 26, {
+        fill: '#FFFFFF',
+        border: 'rgba(29, 29, 31, 0.1)',
+        shadowBlur: 24,
+        shadowY: 8
+      });
+
+      roundRect(ctx, 48, ty + 22, 232, 30, 15);
+      ctx.fillStyle = 'rgba(29, 29, 31, 0.07)'; ctx.fill();
+      ctx.fillStyle = '#1D1D1F'; ctx.font = '700 13px "PingFang SC", sans-serif';
+      ctx.textAlign = 'center'; ctx.fillText('清醒前提 · 双轨长期并进', 164, ty + 42);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1D1D1F'; ctx.font = '700 20.5px "PingFang SC", sans-serif';
+      ctx.fillText('传统 App 绝不会立刻淘汰 —— 服务存量基本盘的传统工作必须稳扎稳打继续做', 298, ty + 44);
+
+      ctx.fillStyle = '#515154'; ctx.font = '400 16px "PingFang SC", sans-serif';
+      ctx.fillText('绝大多数用户短期内还不会转向纯 AI 助手工作方式，也不是人人都能拥有充足个人算力；手机/电脑客户端运营仍是压舱石。', 48, ty + 90);
+      ctx.restore();
+    }
+
+    // 2. Middle Left: Legacy Page-Delivery Pipeline
+    const pLeft = easeOutCubic((t - 2.4) / 1.0);
+    if (pLeft > 0) {
+      ctx.save();
+      ctx.globalAlpha = pLeft;
+      const ly = 156 + (1 - pLeft) * 16;
+      drawFrostedCard(ctx, 16, ly, 532, 404, 28, {
+        fill: 'rgba(244, 244, 248, 0.9)',
+        shadowBlur: 20
+      });
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#86868B'; ctx.font = '700 15px "PingFang SC", sans-serif';
+      ctx.fillText('过去熟悉的工作流 · 围绕“静态页面”交付', 48, ly + 44);
+
+      const oldSteps = [
+        ['01', '接各业务条线需求'],
+        ['02', '设计固定静态页面与点击流'],
+        ['03', '拉通前后端排期逐页开发'],
+        ['04', '客户端发版交付与挂位推广']
+      ];
+      oldSteps.forEach(([num, label], idx) => {
+        const sy = ly + 72 + idx * 66;
+        roundRect(ctx, 48, sy, 468, 52, 14);
+        ctx.fillStyle = '#FFFFFF'; ctx.fill();
+        ctx.fillStyle = '#86868B'; ctx.font = '700 14px "SF Mono", sans-serif';
+        ctx.fillText(num, 70, sy + 32);
+        ctx.fillStyle = '#1D1D1F'; ctx.font = '600 16.5px "PingFang SC", sans-serif';
+        ctx.fillText(label, 110, sy + 32);
+      });
+
+      ctx.fillStyle = '#86868B'; ctx.font = '400 14px "PingFang SC", sans-serif';
+      ctx.fillText('局限：功能越多排期越堵，大量精力内耗在重复画页面上', 48, ly + 368);
+      ctx.restore();
+    }
+
+    // Center Arrow Bridge
+    const pArrow = easeInOutCubic((t - 4.2) / 0.9);
+    if (pArrow > 0) {
+      ctx.save();
+      ctx.globalAlpha = pArrow;
+      roundRect(ctx, 562, 332, 82, 52, 26);
+      ctx.fillStyle = '#FFF8EC'; ctx.fill();
+      ctx.strokeStyle = 'rgba(180, 123, 43, 0.45)'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = '#B47B2B'; ctx.font = '700 14px "PingFang SC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('转型 →', 603, 364);
+      ctx.restore();
+    }
+
+    // 3. Middle Right: New Workflow for 涨乐 Agent
+    const pRight = easeOutCubic((t - 4.6) / 1.0);
+    if (pRight > 0) {
+      ctx.save();
+      ctx.globalAlpha = pRight;
+      const ry = 156 + (1 - pRight) * 16;
+      drawFrostedCard(ctx, 658, ry, 1022, 404, 28, {
+        fill: '#FFFDF9',
+        border: 'rgba(180, 123, 43, 0.46)',
+        shadowColor: 'rgba(180, 123, 43, 0.12)'
+      });
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#B47B2B'; ctx.font = '700 15.5px "PingFang SC", sans-serif';
+      ctx.fillText('针对“涨乐 Agent”的全新工作流 · 将华泰无数专业服务合理触达用户侧', 692, ry + 44);
+
+      const newTasks = [
+        {
+          t0: 5.2, badge: '课题 01 · 克制编排', badgeColor: '#C93B2B', badgeBg: 'rgba(201,59,43,0.1)',
+          title: '绝不能把海量服务一股脑堆过去（严防耗算力 · 占上下文 · 响应慢）',
+          desc: '设计分级意图路由与渐进式加载，每次对话只按需挂载最薄、最准的华泰服务，守护极致速度。'
+        },
+        {
+          t0: 7.4, badge: '课题 02 · 场景挖掘', badgeColor: '#B47B2B', badgeBg: 'rgba(180,123,43,0.13)',
+          title: '深度挖掘契合客户的业务场景（从“挂 Banner 等人点”到“懂语境送方案”）',
+          desc: '围绕客户实盘收益、持仓异动与对话脉络设计触发规则（如向未报名高收益客精准推实盘大赛）。'
+        },
+        {
+          t0: 9.6, badge: '课题 03 · 顺畅闭环', badgeColor: '#1F6F54', badgeBg: 'rgba(31,111,84,0.12)',
+          title: '保障传统存量业务通过 Agent 调用时 100% 顺畅完结',
+          desc: '做好语义中间层适配与状态兜底，消除老业务表单断点，确保 Agent 调用底层柜台丝滑到底。'
+        }
+      ];
+
+      newTasks.forEach((nt, idx) => {
+        const tp = easeOutCubic((t - nt.t0) / 0.9);
+        if (tp <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = tp;
+        const iy = ry + 68 + idx * 106 + (1 - tp) * 12;
+        roundRect(ctx, 692, iy, 954, 92, 18);
+        ctx.fillStyle = '#FFFFFF'; ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.06)'; ctx.lineWidth = 1; ctx.stroke();
+
+        roundRect(ctx, 712, iy + 16, 152, 26, 13);
+        ctx.fillStyle = nt.badgeBg; ctx.fill();
+        ctx.fillStyle = nt.badgeColor; ctx.font = '700 12.5px "PingFang SC", sans-serif';
+        ctx.textAlign = 'center'; ctx.fillText(nt.badge, 788, iy + 34);
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#1D1D1F'; ctx.font = '700 17.5px "PingFang SC", sans-serif';
+        ctx.fillText(nt.title, 880, iy + 35);
+
+        ctx.fillStyle = '#515154'; ctx.font = '400 15px "PingFang SC", sans-serif';
+        ctx.fillText(nt.desc, 712, iy + 70);
+        ctx.restore();
+      });
+
+      ctx.restore();
+    }
+
+    // 4. Bottom Strategic Dividend Banner
+    const pBot = easeOutCubic((t - 11.6) / 1.1);
+    if (pBot > 0) {
+      ctx.save();
+      ctx.globalAlpha = pBot;
+      const by = 582 + (1 - pBot) * 16;
+      drawFrostedCard(ctx, 16, by, 1664, 138, 28, {
+        fill: '#F3FAF6',
+        border: 'rgba(31, 111, 84, 0.38)',
+        shadowColor: 'rgba(31, 111, 84, 0.1)'
+      });
+
+      roundRect(ctx, 48, by + 26, 250, 32, 16);
+      ctx.fillStyle = 'rgba(31, 111, 84, 0.14)'; ctx.fill();
+      ctx.fillStyle = '#1F6F54'; ctx.font = '700 13.5px "PingFang SC", sans-serif';
+      ctx.textAlign = 'center'; ctx.fillText('机遇与挑战并存 · 战略红利', 173, by + 47);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1D1D1F'; ctx.font = '700 22px "PingFang SC", sans-serif';
+      ctx.fillText('解放华泰人员力量，更多投入到“生产真正有价值的投资产品”上', 318, by + 48);
+
+      ctx.fillStyle = '#515154'; ctx.font = '400 17px "PingFang SC", sans-serif';
+      ctx.fillText('告别低水平重复画页面，把宝贵精力聚焦于打磨优质策略与金融产品 —— 全面拉升【客户满意度】与【开发营销资源利用率】。', 48, by + 98);
+      ctx.restore();
+    }
+  }
+
+  // ==================== MASTER ANIMATION CONTROLLER ====================
+  function renderAnimForSlide(slideNum, t) {
+    if (slideNum === 2) renderS2(t);
+    else if (slideNum === 3) renderS3(t);
+    else if (slideNum === 4) renderS4(t);
+    else if (slideNum === 5) renderS5(t);
+    else if (slideNum === 6) renderS6(t);
+    else if (slideNum === 8) renderS8(t);
+  }
+
+  window.__setAnimTime = function(slideNum, t) {
+    deterministicMode = true;
+    showSlide(slideNum - 1, false);
+    renderAnimForSlide(slideNum, t);
+  };
+
+  window.__setDeterministicState = function(slideNum) {
+    deterministicMode = true;
+    showSlide(slideNum - 1, false);
+    const posterTimes = { 2: 14.0, 3: 18.0, 4: 22.0, 5: 18.0, 6: 18.0, 8: 16.0 };
+    if (posterTimes[slideNum] !== undefined) {
+      renderAnimForSlide(slideNum, posterTimes[slideNum]);
+    }
+  };
+
+  function tick(now) {
+    if (!deterministicMode) {
+      const sNum = current + 1;
+      if (animDur[sNum]) {
+        const elapsed = isPaused
+          ? pausedElapsed
+          : ((now - animStart[sNum]) / 1000) % animDur[sNum];
+        renderAnimForSlide(sNum, elapsed);
+
+        const statusEl = document.getElementById(`status-${sNum}`);
+        if (statusEl) {
+          if (isPaused) {
+            statusEl.textContent = '已暂停定格';
+          } else if (elapsed < animBuildEnd[sNum]) {
+            statusEl.textContent = '动态演绎中…';
+          } else {
+            const remain = Math.ceil(animDur[sNum] - elapsed);
+            statusEl.textContent = `完整画面停留阅读 · ${remain}s 后重播`;
+          }
+        }
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function showSlide(idx, resetTimer = true) {
+    current = clamp(idx, 0, slides.length - 1);
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    counter.textContent = `${current + 1} / ${slides.length}`;
+    progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
+    if (resetTimer) {
+      isPaused = false;
+      updatePauseButtons();
+      if (animDur[current + 1]) {
+        animStart[current + 1] = performance.now();
+      }
+    }
+  }
+
+  document.getElementById('btn-prev').addEventListener('click', () => showSlide(current - 1));
+  document.getElementById('btn-next').addEventListener('click', () => showSlide(current + 1));
+  document.getElementById('btn-fs').addEventListener('click', () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); showSlide(current + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); showSlide(current - 1); }
+    else if (e.key === 'p' || e.key === 'P') { togglePauseAnim(); }
+    else if (e.key === 'r' || e.key === 'R') { if (animDur[current + 1]) restartSlideAnim(current + 1); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  showSlide(current, true);
+  requestAnimationFrame(tick);
+</script>
+</body>
+</html>
