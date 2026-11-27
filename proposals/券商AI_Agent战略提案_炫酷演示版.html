@@ -1830,31 +1830,34 @@
     padding-left: 14px;
   }
 
-  .llmos-use { display: flex; flex-direction: column; }
+  .llmos-use {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    margin-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
 
   .lu {
-    display: grid;
-    grid-template-columns: 56px 62px 1fr;
-    gap: 8px;
-    align-items: baseline;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--rule);
-    font-size: 13px;
-    line-height: 1.45;
+    padding: 9px 16px 9px 0;
+    font-size: 12.5px;
+    line-height: 1.44;
     color: var(--ink-secondary);
   }
 
-  .lu .lu-n {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    letter-spacing: 0.8px;
-    color: var(--ink-muted);
+  .lu + .lu {
+    border-left: 1px solid var(--rule);
+    padding-left: 16px;
   }
 
-  .lu .lu-t {
+  .lu .lu-n {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.9px;
+    color: var(--terracotta);
     font-weight: 700;
-    color: var(--ink);
-    font-size: 13.5px;
+    margin-bottom: 3px;
   }
 
   .llmos-right { display: flex; flex-direction: column; }
@@ -3405,11 +3408,10 @@
           </div>
           <p class="llmos-foot">这张表最有用的地方在于：它把"我们该做什么"变成了填空——凡是能找到对应"券商实物"的格子就是我们的活；找不到的，交给上游。</p>
 
-          <div class="k-label muted" style="margin-top:16px;">HOW WE USE THIS TABLE · 这张表在本提案里的三个用法</div>
           <div class="llmos-use">
-            <div class="lu"><span class="lu-n">用法一</span><span class="lu-t">定边界</span><span class="lu-d">凡能填进"券商实物"一列的，才是要投人投钱的地方；填不进的一律不立项。</span></div>
-            <div class="lu"><span class="lu-n">用法二</span><span class="lu-t">定预算</span><span class="lu-d">宿主层能力（记忆、沙箱、并发）预算为零；能力层能力按切片递增。</span></div>
-            <div class="lu"><span class="lu-n">用法三</span><span class="lu-t">定话术</span><span class="lu-d">对内外统一说"我们是宿主里的能力包"，避免被误解为"要自造 OS"。</span></div>
+            <div class="lu"><span class="lu-n">用法一 · 定边界</span><span>能填进"券商实物"一列的才立项，填不进的直接砍掉。</span></div>
+            <div class="lu"><span class="lu-n">用法二 · 定预算</span><span>宿主层预算为零，能力层按业务切片递增投入。</span></div>
+            <div class="lu"><span class="lu-n">用法三 · 定话术</span><span>统一说"宿主里的能力包"，别被听成"要自造 OS"。</span></div>
           </div>
         </div>
 
