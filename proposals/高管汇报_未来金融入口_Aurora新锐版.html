@@ -372,15 +372,22 @@ svg.wires { position: absolute; inset: 0; overflow: visible; pointer-events: non
 /* =====================================================================
    P06 人机协同
    ===================================================================== */
-.s6-stage { position: relative; margin-top: 40px; height: 690px; }
-.s6-left { position: absolute; left: 0; top: 0; width: 500px; height: 690px; display: flex; flex-direction: column; gap: 14px; }
-.s6-left .card { padding: 20px 24px; border-radius: 22px; }
+/* 标题下小标题：把「分工」从左侧卡片里提出来，成为全页命题的注解 */
+.s6-sub { display: flex; align-items: center; gap: 12px; margin-top: 16px; font-size: 18px; color: var(--fg2); }
+.s6-sub b { font-weight: 600; color: var(--fg); }
+.s6-sub .sb-sep { color: var(--amber); font-family: var(--mono); font-size: 13px; letter-spacing: .12em; padding-right: 4px; border-right: 1px solid rgba(255,181,71,.3); }
+.s6-sub .sb-dot { color: var(--fg4); }
+.s6-stage { position: relative; margin-top: 20px; height: 672px; }
+.s6-left { position: absolute; left: 0; top: 0; width: 500px; height: 100%; display: flex; flex-direction: column; gap: 12px; }
+.s6-left .card { flex: 1; padding: 24px 26px; border-radius: 22px; }
+.s6-left .card.stack { display: flex; flex-direction: column; justify-content: center; }
 .avatar { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; font-weight: 600; color: #2A1500; background: var(--grad-warm); box-shadow: 0 0 0 4px rgba(255,181,71,.15); flex-shrink: 0; }
 .big-ratio { font-family: var(--mono); font-size: 52px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
-.syn { position: absolute; left: 680px; width: 1000px; padding: 24px 30px; border-radius: 26px; }
+.s6-right { position: absolute; left: 680px; top: 0; width: 1000px; height: 100%; display: flex; flex-direction: column; gap: 12px; }
+.syn { position: relative; flex: 1; padding: 22px 30px; border-radius: 26px; }
 .syn .top { display: flex; justify-content: space-between; align-items: center; }
 .syn .tag { font-family: var(--mono); font-size: 13px; letter-spacing: .1em; color: var(--fg3); }
-.syn h4 { margin: 16px 0 14px; font-size: 22px; font-weight: 600; letter-spacing: -0.005em; }
+.syn h4 { margin: 13px 0 11px; font-size: 22px; font-weight: 600; letter-spacing: -0.005em; }
 .syn .q { padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.035); border-left: 2px solid var(--c, var(--amber)); font-size: 16px; line-height: 1.7; color: var(--fg2); }
 
 /* =====================================================================
@@ -820,6 +827,12 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
     <section class="slide" data-title="人机协同" data-aurora="200,-200,.7|1100,300,.55|500,600,.5">
       <div class="eyebrow fx" data-t="0"><span class="num">06</span><span class="dash"></span><span class="zh">虚拟随身投顾 × 华泰真人投顾（三分投、七分顾）</span></div>
       <h2 class="h h-md" data-t="0.1"><span class="ln"><span>不是替代真人投顾，而是把专家服务半径<span class="g">放大十倍</span>。</span></span></h2>
+      <div class="s6-sub fx" data-t="0.35">
+        <span class="sb-sep">真人投顾侧</span>
+        <span><b>定策略方向</b></span><span class="sb-dot">·</span>
+        <span><b>给信任温度</b></span><span class="sb-dot">·</span>
+        <span><b>1v1 攻坚大客</b></span>
+      </div>
 
       <div class="s6-stage">
         <svg class="wires" width="1680" height="690" viewBox="0 0 1680 690">
@@ -839,7 +852,7 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
             <div class="avatar">张</div>
             <div><h4 style="font-size:20px;margin:0 0 4px;">签约专属真人投顾 · 张顾问</h4><p style="font-size:14.5px;">专注主线研判 · 模拟组合调仓 · 高净值复杂配置</p></div>
           </div>
-          <div class="card glass fx l" data-t="0.5">
+          <div class="card glass stack fx l" data-t="0.5">
             <div class="lbl" style="color:var(--mint)">● 今早 08:45 · 真人投顾发布最新投资方向</div>
             <p style="font-size:17px;color:var(--fg);line-height:1.6;">“建议逢高兑现部分高估值算力仓位，将组合向低波红利央企与高股息资源品适度倾斜。”</p>
             <p style="font-size:14px;color:var(--fg3);margin-top:8px;">传统痛点：客户上班忙常漏看，或不知如何对应自己持仓</p>
@@ -847,11 +860,6 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
           <div class="card glass redish fx l" data-t="0.7" style="display:flex;gap:22px;align-items:center;">
             <div class="big-ratio" style="color:var(--red)">1<span style="color:var(--fg4)">:</span>500</div>
             <div><div class="lbl" style="color:var(--red);margin-bottom:6px;">盘中急跌 · 服务瓶颈</div><p style="font-size:15px;">大跌时客户集体恐慌，真人分身乏术；日常跟调组合又苦于手点繁琐跟丢。</p></div>
-          </div>
-          <div class="card glass flat fx l" data-t="0.9" style="flex:1;">
-            <h4 style="font-size:18px;">人机黄金分工</h4>
-            <p style="font-size:15.5px;"><b style="color:var(--amber)">真人投顾</b>　定策略方向 · 给信任温度 · 1v1 攻坚大客</p>
-            <p style="font-size:15.5px;margin-top:6px;"><b style="color:#BFAEFF">随身 Agent</b>　盯投顾观点 · 对表实盘持仓 · 秒级触达</p>
           </div>
         </div>
 
@@ -861,20 +869,22 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
           </div>
         </div>
 
-        <div class="syn glass beam fx r" data-t="2.3" style="top:0;--c:var(--amber);">
+        <div class="s6-right">
+        <div class="syn glass beam fx r" data-t="2.3" style="--c:var(--amber);">
           <div class="top"><span class="pill amber">协同 01 · 主动观察真人投顾方向并与实盘“对表”</span><span class="tag">防漏看 · 免手算一键跟调</span></div>
           <h4>自动订阅签约投顾最新观点，发现持仓背离时主动提醒并拟定跟调卡</h4>
           <div class="q">“观察到您签约的张顾问今早建议下调高估值算力，而您当前账户算力仓位仍占 <b class="mono" style="color:var(--fg)">46%</b> 偏高；已按张顾问方向为您生成一笔 10% 仓位平衡预案（转向红利央企 ETF），是否滑动查看？”</div>
         </div>
-        <div class="syn glass mint fx r" data-t="4.1" style="top:234px;--c:var(--mint);">
+        <div class="syn glass mint fx r" data-t="4.1" style="--c:var(--mint);">
           <div class="top"><span class="pill mint">协同 02 · 震荡行情秒级“心理按摩”与高危情绪转接</span><span class="tag">把真人精力花在刀刃上</span></div>
           <h4>急跌时秒级向数百客户同步专属投顾定心解读，精准筛出高危客呼叫真人 1v1</h4>
           <div class="q">盘中大跌时结合每位客户的持仓回撤，即时传递张顾问刚录制的安抚复盘，防止恐慌割肉；一旦识别重仓焦虑或两融逼近警戒线，立即附带《持仓与情绪简报》无缝转接张顾问本人。</div>
         </div>
-        <div class="syn glass fx r" data-t="5.9" style="top:468px;--c:var(--violet);">
+        <div class="syn glass fx r" data-t="5.9" style="--c:var(--violet);">
           <div class="top"><span class="pill violet">协同 03 · 普惠潜客孵化与高净值“带画像签约导流”</span><span class="tag">投顾业务超级增长漏斗</span></div>
           <h4>日常陪伴识别复杂财富配置诉求，精准引荐风格契合的华泰真人投顾</h4>
           <div class="q">海量普通客户先由零边际成本的随身投顾陪伴；捕捉到大额入金或跨品种配置需求时，自动匹配最契合的持牌真人投顾促成付费签约，让单名投顾有效服务半径放大 10 倍。</div>
+        </div>
         </div>
       </div>
     </section>
