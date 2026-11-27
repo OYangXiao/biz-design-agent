@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>从 App 到 Agent — 下一代券商零售服务入口重构</title>
+<title>从 App 到 Agent — 下一代券商零售服务入口重构（战略提案 · 认知与趋势补充）</title>
 <style>
   :root {
     /* Anthropic Opus Warm Editorial × Swiss Architectural Palette */
@@ -1162,6 +1162,87 @@
     gap: 24px;
   }
 
+  /* 异步页补充视觉件：短信示意 + 状态机时间轴 */
+  .sms-mock {
+    margin-top: 20px;
+    background: var(--paper-bright);
+    border: 1px solid var(--rule);
+    padding: 16px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .sms-mock .sm-ic {
+    flex-shrink: 0;
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    background: var(--ink-muted);
+    color: var(--paper);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .sms-mock .sm-k {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--ink-muted);
+    margin-bottom: 5px;
+  }
+
+  .sms-mock .sm-t {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+  }
+
+  .sms-mock .sm-tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--terracotta);
+    border: 1px solid currentColor;
+    padding: 1px 8px;
+  }
+
+  .state-rail {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid rgba(244,241,234,0.22);
+    padding-top: 14px;
+  }
+
+  .state-rail .sr-cell {
+    position: relative;
+    padding-right: 14px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: #B7B1A7;
+  }
+
+  .state-rail .sr-cell::before {
+    content: '';
+    position: absolute;
+    left: 0; top: -16px;
+    width: 6px; height: 6px;
+    background: rgba(244,241,234,0.35);
+  }
+
+  .state-rail .sr-cell.hot::before { background: var(--terracotta); box-shadow: 0 0 0 3px rgba(200,90,50,0.22); }
+  .state-rail .sr-cell.hot { color: #F4F1EA; }
+  .state-rail .sr-n {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--terracotta);
+    margin-bottom: 4px;
+  }
+
   .async-cta {
     background: var(--terracotta);
     color: #FFFFFF;
@@ -1560,6 +1641,1218 @@
     line-height: 1.55;
   }
 
+  /* ==================================================================
+     STRATEGY ADDENDUM — 概念 / 业界共识 / 趋势 / 执行 新增页
+     沿用编辑部语言：paper + ink serif 标题 · mono 小标签 · 细分割线 · 砖红强调
+     新类只使用已有 CSS 变量，不引入任何外部依赖
+     ================================================================== */
+
+  .slide.tight {
+    padding: 58px 88px 50px 88px;
+  }
+
+  .slide.tight .ed-topbar {
+    padding-bottom: 14px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    letter-spacing: 1.4px;
+  }
+
+  .slide.tight .ed-header { margin-bottom: 24px; }
+
+  .slide.tight .ed-title {
+    font-size: 40px;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+  }
+
+  .slide.tight .ed-lead {
+    font-size: 18px;
+    margin-top: 8px;
+    line-height: 1.45;
+    max-width: 1600px;
+  }
+
+  .slide.tight .ed-footer {
+    padding-top: 14px;
+    font-size: 16px;
+  }
+
+  .k-label {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 10px;
+  }
+
+  .k-label.muted { color: var(--ink-muted); }
+
+  /* ---------- P04 · 术语与缩写全景词典 ---------- */
+  .lex-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    border-top: 2px solid var(--ink);
+    border-left: 1px solid var(--rule);
+    margin-bottom: 16px;
+  }
+
+  .lex-cell {
+    padding: 10px 14px 9px 14px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+  }
+
+  .lex-h {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .lex-abbr {
+    font-family: var(--font-mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--terracotta);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+
+  .lex-cn {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lex-plain {
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--ink-secondary);
+  }
+
+  .lex-ex {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--petrol);
+    margin-top: 5px;
+  }
+
+  .lex-cell.dark .lex-ex { color: #8FB5AF; }
+
+  .lex-ctx {
+    margin-top: auto;
+    padding-top: 4px;
+    border-top: 1px dotted var(--rule);
+    font-size: 12.5px;
+    line-height: 1.34;
+    color: var(--ink-muted);
+  }
+
+  .lex-ctx b {
+    color: var(--petrol);
+    font-weight: 700;
+  }
+
+  .lex-cell.dark { background: var(--charcoal); }
+  .lex-cell.dark .lex-cn { color: var(--paper); }
+  .lex-cell.dark .lex-plain { color: #C2BCB1; }
+  .lex-cell.dark .lex-ctx { color: #8F897F; border-top-color: rgba(244, 241, 234, 0.18); }
+  .lex-cell.dark .lex-ctx b { color: var(--terracotta); }
+
+  /* ---------- P05 · LLM OS 与 Harness Engineering ---------- */
+  .llmos-wrap {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 44px;
+  }
+
+  .llmos-table { border-top: 2px solid var(--ink); }
+
+  .llmos-row {
+    display: grid;
+    grid-template-columns: 132px 1fr 1.02fr;
+    gap: 16px;
+    align-items: baseline;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 16px;
+  }
+
+  .llmos-row.hd {
+    padding: 8px 0;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 1.2px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+  }
+
+  .llmos-row .c1 {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 16.5px;
+  }
+
+  .llmos-row .c2 {
+    font-weight: 700;
+    color: var(--petrol);
+    font-size: 16.5px;
+  }
+
+  .llmos-row .c3 {
+    color: var(--ink-secondary);
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .llmos-foot {
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-secondary);
+    border-left: 3px solid var(--terracotta);
+    padding-left: 14px;
+  }
+
+  .llmos-use { display: flex; flex-direction: column; }
+
+  .lu {
+    display: grid;
+    grid-template-columns: 56px 62px 1fr;
+    gap: 8px;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+  }
+
+  .lu .lu-n {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.8px;
+    color: var(--ink-muted);
+  }
+
+  .lu .lu-t {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 13.5px;
+  }
+
+  .llmos-right { display: flex; flex-direction: column; }
+
+  .llmos-lead {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+    margin-bottom: 14px;
+  }
+
+  .llmos-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--rule);
+  }
+
+  .llmos-list li {
+    display: grid;
+    grid-template-columns: 132px 1fr;
+    gap: 14px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 14.5px;
+    line-height: 1.42;
+    color: var(--ink-secondary);
+  }
+
+  .llmos-list li span:first-child {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: var(--ink);
+    padding-top: 2px;
+  }
+
+  .llmos-quote {
+    margin-top: 14px;
+    background: var(--sand);
+    border-left: 3px solid var(--terracotta);
+    padding: 13px 18px;
+    font-family: var(--font-serif);
+    font-size: 18px;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .split-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .sb-col {
+    padding: 9px 16px 9px 0;
+    font-size: 13.5px;
+    line-height: 1.46;
+    color: var(--ink-secondary);
+  }
+
+  .sb-col + .sb-col {
+    border-left: 1px solid var(--rule);
+    padding-left: 16px;
+    padding-right: 0;
+  }
+
+  .sb-col b {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+  }
+
+  .sb-col.given b { color: var(--ink-muted); }
+  .sb-col.ours b { color: var(--terracotta); }
+
+  .ph-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .ph-list li {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+    padding-left: 12px;
+    position: relative;
+  }
+
+  .ph-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--terracotta);
+  }
+
+  .mcp-ph.p-now .ph-list li { color: #BFB9AE; }
+  .ph-list li b { color: var(--ink); }
+  .mcp-ph.p-now .ph-list li b { color: #F0EBE2; }
+
+  .llmos-bottom {
+    margin-top: 20px;
+    background: var(--charcoal);
+    color: var(--paper);
+    padding: 20px 30px 20px 28px;
+    border-left: 5px solid var(--terracotta);
+    display: grid;
+    grid-template-columns: 1fr 330px;
+    gap: 30px;
+    align-items: center;
+  }
+
+  .llmos-bottom h3 {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+
+  .llmos-bottom h3 em { font-style: normal; color: var(--terracotta); }
+
+  .llmos-bottom p {
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: #C6C0B5;
+  }
+
+  .llmos-verdict {
+    border-left: 1px solid rgba(244, 241, 234, 0.2);
+    padding-left: 26px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: #A8A298;
+  }
+
+  .llmos-verdict b { color: var(--paper); display: block; margin-bottom: 6px; letter-spacing: 1px; }
+  .llmos-verdict i { color: var(--terracotta); font-style: normal; }
+
+  /* ---------- P06 · MCP 三段式演进 ---------- */
+  .mcp-phases {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.06fr;
+    gap: 0;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .mcp-ph {
+    padding: 22px 26px 20px 26px;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mcp-ph:last-child { border-right: none; }
+
+  .mcp-ph.p-now {
+    background: var(--charcoal);
+    color: var(--paper);
+    border-top: 4px solid var(--terracotta);
+    margin-top: -2px;
+  }
+
+  .mcp-ph.p-mid { background: rgba(235, 230, 220, 0.55); }
+
+  .mcp-ph .ph-era {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .mcp-ph .ph-era .yr { color: var(--terracotta); }
+
+  .mcp-ph h3 {
+    font-family: var(--font-serif);
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1.28;
+  }
+
+  .mcp-ph p {
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--ink-secondary);
+  }
+
+  .mcp-ph.p-now p { color: #C4BEB3; }
+
+  .ph-evi {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: rgba(212, 206, 194, 0.4);
+    border-left: 2px solid var(--ink-muted);
+  }
+
+  .ph-evi.dark {
+    background: rgba(244, 241, 234, 0.07);
+    border-left-color: var(--terracotta);
+  }
+
+  .ph-evi .pe-k {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    color: var(--ink-muted);
+    margin-bottom: 2px;
+  }
+
+  .ph-evi.dark .pe-k { color: #8F897F; }
+
+  .ph-evi .pe-v {
+    font-size: 13px;
+    line-height: 1.46;
+    color: var(--ink-secondary);
+    margin-bottom: 7px;
+  }
+
+  .ph-evi .pe-v:last-child { margin-bottom: 0; }
+
+  .ph-evi.dark .pe-v { color: #C2BCB1; }
+
+  .mcp-ph .ph-tag {
+    margin-top: auto;
+    padding-top: 11px;
+    border-top: 1px solid var(--rule);
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-muted);
+  }
+
+  .mcp-ph.p-now .ph-tag { border-top-color: rgba(244, 241, 234, 0.18); color: #9C968D; }
+
+  .mcp-ph .ph-tag b { color: var(--ink); display: block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; margin-bottom: 3px; }
+  .mcp-ph.p-now .ph-tag b { color: var(--terracotta); }
+
+  .mcp-quote {
+    background: var(--sand-deep);
+    border-left: 3px solid var(--ink);
+    padding: 12px 16px;
+    font-family: var(--font-serif);
+    font-size: 17px;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .mcp-fail {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 1fr 372px;
+    gap: 30px;
+    align-items: stretch;
+  }
+
+  .mcp-chain {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .mcp-chain .cs {
+    flex: 1;
+    padding: 12px 14px 12px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid var(--rule);
+    font-size: 13.5px;
+    line-height: 1.42;
+    color: var(--ink-secondary);
+  }
+
+  .mcp-chain .cs:last-child { border-right: none; padding-right: 0; }
+
+  .mcp-chain .cs b {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--terracotta);
+    margin-bottom: 4px;
+  }
+
+  .mcp-chain .cs.arrow {
+    flex: 0 0 26px;
+    padding: 0;
+    border-right: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    color: var(--terracotta);
+    font-size: 16px;
+  }
+
+  .mcp-caption {
+    margin-top: 12px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+    border-left: 3px solid var(--ink-muted);
+    padding-left: 12px;
+  }
+
+  .mcp-calc {
+    background: var(--paper-bright);
+    border: 1.5px solid var(--ink);
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .mcp-calc .cc-k {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 1.2px;
+    color: var(--terracotta);
+    font-weight: 700;
+  }
+
+  .mcp-calc .cc-line {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .mcp-calc .cc-line i { color: var(--ink-muted); font-style: normal; }
+  .mcp-calc .cc-line em { color: var(--terracotta); font-style: normal; font-weight: 700; }
+
+  /* ---------- P07 · SEO → AEO → B2A ---------- */
+  .aeo-table {
+    display: grid;
+    grid-template-columns: 142px 1fr 1fr 1fr;
+    border-top: 2px solid var(--ink);
+    border-left: 1px solid var(--rule);
+  }
+
+  .aeo-cell {
+    padding: 11px 18px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+  }
+
+  .aeo-cell.rowlab {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--ink-muted);
+    background: var(--sand);
+    display: flex;
+    align-items: center;
+  }
+
+  .aeo-cell.colhd {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: var(--ink);
+    background: var(--paper-bright);
+    padding: 9px 18px;
+  }
+
+  .aeo-cell.colhd.a1 { color: var(--ink-muted); }
+  .aeo-cell.colhd.a2 { color: var(--petrol); }
+  .aeo-cell.colhd.a3 { color: var(--terracotta); }
+
+  .aeo-cell.future {
+    background: rgba(239, 224, 216, 0.5);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .aeo-cell strong { color: var(--ink); }
+
+  .aeo-bottom {
+    flex: 1;
+    min-height: 0;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: stretch;
+  }
+
+  .aeo-code {
+    background: var(--charcoal);
+    color: #E6E1D7;
+    padding: 16px 20px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.62;
+    border-top: 3px solid var(--terracotta);
+    white-space: pre;
+    overflow: hidden;
+  }
+
+  .aeo-code .ck { color: #8FB5AF; }
+  .aeo-code .cs { color: #D89276; }
+  .aeo-code .cv { color: #F4F1EA; }
+
+  .aeo-why { display: flex; flex-direction: column; gap: 10px; }
+
+  .aeo-why-item {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 10px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 10px;
+    font-size: 14.5px;
+    line-height: 1.48;
+    color: var(--ink-secondary);
+  }
+
+  .aeo-why-item:last-child { border-bottom: none; }
+
+  .aeo-why-item .n {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--terracotta);
+    line-height: 1.1;
+  }
+
+  .aeo-why-item b { color: var(--ink); }
+
+  .aeo-skus { margin-top: 16px; }
+
+  .sku-row {
+    display: grid;
+    grid-template-columns: 118px 1fr 1.32fr;
+    border-top: 1px solid var(--rule);
+    align-items: stretch;
+  }
+
+  .sku-row:last-child { border-bottom: 1px solid var(--rule); }
+
+  .sku-name {
+    padding: 8px 12px 8px 0;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.35;
+  }
+
+  .sku-bad {
+    padding: 8px 16px;
+    border-left: 1px solid var(--rule);
+    font-size: 13px;
+    line-height: 1.42;
+    color: #8A847A;
+    font-family: var(--font-serif);
+  }
+
+  .sku-good {
+    padding: 8px 0 8px 16px;
+    border-left: 1px solid var(--rule);
+    font-size: 13px;
+    line-height: 1.42;
+    color: var(--ink-secondary);
+  }
+
+  .sku-good span {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--petrol);
+    font-weight: 600;
+    display: inline;
+    line-height: 1.5;
+  }
+
+  .sku-note {
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    margin-top: 3px;
+    font-family: var(--font-sans);
+  }
+
+  .sku-bad .sku-note { color: #A09A90; }
+
+  /* ---------- P08 · 三类势力的博弈 ---------- */
+  .pw-cols {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+
+  .pw-card {
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--ink);
+    background: var(--paper-bright);
+    padding: 18px 22px 16px 22px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pw-card.mid { background: var(--sand); }
+
+  .pw-card .pc-k {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    color: var(--terracotta);
+    margin-bottom: 4px;
+  }
+
+  .pw-card h3 {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.22;
+    margin-bottom: 3px;
+  }
+
+  .pw-card .pc-players {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-muted);
+    line-height: 1.45;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .pw-pair { margin-bottom: 9px; }
+
+  .pw-pair .pk {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: var(--terracotta);
+    margin-bottom: 1px;
+  }
+
+  .pw-pair .pk.neg { color: var(--ink-muted); }
+
+  .pw-pair p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+  }
+
+  .pw-card .pc-us {
+    margin-top: 8px;
+    background: var(--charcoal);
+    color: #E8E3D9;
+    padding: 11px 14px;
+    font-size: 13px;
+    line-height: 1.48;
+    border-left: 3px solid var(--terracotta);
+  }
+
+  .pw-card .pc-us b { color: var(--terracotta); font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; display: block; margin-bottom: 3px; }
+
+  .pw-bottom {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1.28fr 0.72fr;
+    gap: 26px;
+    align-items: stretch;
+  }
+
+  .pw-verdict {
+    background: var(--charcoal);
+    color: var(--paper);
+    padding: 20px 26px;
+    border-left: 5px solid var(--terracotta);
+  }
+
+  .pw-verdict h3 {
+    font-family: var(--font-serif);
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .pw-verdict .pv-row {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 12px;
+    font-size: 14.5px;
+    line-height: 1.5;
+    padding: 5px 0;
+    border-top: 1px solid rgba(244, 241, 234, 0.14);
+    color: #C4BEB3;
+  }
+
+  .pw-verdict .pv-row span:first-child {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.8px;
+    color: var(--terracotta);
+    padding-top: 3px;
+  }
+
+  .pw-verdict .pv-row b { color: var(--paper); }
+
+  .pw-risk {
+    background: var(--sand-deep);
+    border: 1px solid var(--rule-strong);
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pw-risk .rk2 {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .pw-risk p {
+    font-size: 14px;
+    line-height: 1.52;
+    color: var(--ink-secondary);
+    margin-bottom: 8px;
+  }
+
+  .pw-risk p:last-child { margin-bottom: 0; margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(25, 24, 23, 0.2); }
+  .pw-risk p b { color: var(--terracotta-dark); }
+
+  /* ---------- P09 · 趋势时间表 & 反向风险 ---------- */
+  .trend-wrap {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1.32fr 1fr;
+    gap: 36px;
+  }
+
+  .trend-axis { display: flex; flex-direction: column; }
+
+  .tr-item {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 18px;
+    padding: 12px 0;
+    border-top: 1px solid var(--rule);
+    flex: 1;
+  }
+
+  .tr-item:first-child { border-top: 2px solid var(--ink); }
+
+  .tr-when {
+    font-family: var(--font-mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: var(--terracotta);
+    line-height: 1.5;
+  }
+
+  .tr-when span { display: block; color: var(--ink-muted); font-size: 11px; letter-spacing: 0.8px; margin-top: 4px; line-height: 1.35; }
+
+  .tr-item h3 {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.25;
+  }
+
+  .tr-lead {
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-muted);
+    margin: -2px 0 8px 0;
+  }
+
+  .tr-fields { display: flex; flex-direction: column; gap: 3px; }
+
+  .tr-fields .f {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    gap: 10px;
+    font-size: 15px;
+    line-height: 1.5;
+    margin-top: 3px;
+    color: var(--ink-secondary);
+  }
+
+  .tr-fields .f span:first-child {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.6px;
+    color: var(--ink-muted);
+    padding-top: 2px;
+  }
+
+  .tr-fields .f.warn span:first-child { color: var(--terracotta); }
+  .tr-fields .f.warn { color: var(--ink); }
+
+  .risk-panel { display: flex; flex-direction: column; min-height: 0; }
+
+  .risk-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .risk-item:first-of-type { border-top: 2px solid var(--ink); }
+
+  .risk-item .risk-t {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 9px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: 3px;
+  }
+
+  .risk-item .risk-t em {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-style: normal;
+    color: var(--terracotta);
+    padding-top: 3px;
+    font-weight: 700;
+  }
+
+  .risk-item .risk-h {
+    margin-left: 33px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--petrol);
+  }
+
+  .risk-item .risk-h b { color: var(--petrol); }
+
+  .risk-item .risk-a {
+    margin-left: 33px;
+    margin-top: 5px;
+    font-size: 13px;
+    line-height: 1.48;
+    color: var(--ink-secondary);
+  }
+
+  .risk-item .risk-a b {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.8px;
+    color: var(--ink);
+    margin-right: 6px;
+  }
+
+  .risk-item .risk-e {
+    margin-left: 33px;
+    margin-top: 5px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.42;
+    color: var(--ink-muted);
+  }
+
+  /* ---------- P13 · 执行路径与组织能力 ---------- */
+  .exec-top {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1.06fr 1fr 0.94fr;
+    gap: 24px;
+  }
+
+  .exec-card {
+    display: flex;
+    flex-direction: column;
+    border-top: 2px solid var(--ink);
+    padding-top: 12px;
+    min-height: 0;
+  }
+
+  .exec-card .ec-num {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: var(--terracotta);
+    margin-bottom: 5px;
+  }
+
+  .exec-card h3 {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.28;
+    margin-bottom: 8px;
+  }
+
+  .exec-card > p {
+    font-size: 14.5px;
+    line-height: 1.52;
+    color: var(--ink-secondary);
+    margin-bottom: 12px;
+  }
+
+  .role-list { display: flex; flex-direction: column; }
+
+  .role-row {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 8px;
+    padding: 9px 0;
+    border-bottom: 1px dotted var(--rule);
+    font-size: 13.5px;
+    line-height: 1.46;
+    color: var(--ink-secondary);
+    align-items: baseline;
+  }
+
+  .role-row .rn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--terracotta);
+    font-weight: 700;
+  }
+
+  .role-row b { color: var(--ink); font-size: 14px; }
+
+  .exec-note {
+    margin-top: 12px;
+    background: var(--sand);
+    padding: 11px 14px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink);
+    border-left: 3px solid var(--ink-muted);
+  }
+
+  .exec-cap { display: flex; flex-direction: column; gap: 7px; }
+
+  .rhythm {
+    margin-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .rh-row {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule);
+    font-size: 12.5px;
+    line-height: 1.42;
+    color: var(--ink-secondary);
+  }
+
+  .rh-row span:first-child {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    color: var(--terracotta);
+    font-weight: 700;
+    padding-top: 2px;
+  }
+
+  .cap-item {
+    border-left: 3px solid var(--petrol);
+    padding: 9px 0 9px 12px;
+    font-size: 13.5px;
+    line-height: 1.48;
+    color: var(--ink-secondary);
+  }
+
+  .cap-item b {
+    display: block;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .exec-bottom {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 1.24fr 0.76fr;
+    gap: 26px;
+    align-items: stretch;
+  }
+
+  .kpi-band {
+    background: var(--charcoal);
+    color: var(--paper);
+    padding: 16px 22px;
+    border-top: 4px solid var(--terracotta);
+  }
+
+  .kpi-band .kb-t {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+
+  .kpi-band .kb-t h3 {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .kpi-band .kb-t span {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    color: var(--terracotta);
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid rgba(244, 241, 234, 0.16);
+  }
+
+  .kpi-cell {
+    padding: 7px 14px 7px 0;
+    border-bottom: 1px solid rgba(244, 241, 234, 0.1);
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: #B6B0A6;
+  }
+
+  .kpi-cell .old { text-decoration: line-through; text-decoration-color: rgba(200, 90, 50, 0.6); color: #8A857C; }
+
+  .kpi-cell .new { display: block; color: var(--paper); font-weight: 700; font-size: 13.5px; margin-top: 2px; }
+
+  .kpi-cell .new em { color: var(--terracotta); font-style: normal; }
+
+  .org-compare {
+    background: var(--sand);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--rule);
+  }
+
+  .org-compare .oc-h {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+  }
+
+  .oc-opt {
+    padding: 7px 0;
+    border-top: 1px solid var(--rule);
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+  }
+
+  .oc-opt b {
+    display: block;
+    font-size: 13.5px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .oc-opt.bad b { color: var(--ink-muted); }
+  .oc-opt.good { color: var(--ink); }
+  .oc-opt.good b { color: var(--terracotta-dark); }
+  .oc-opt.good span { color: var(--petrol); font-weight: 600; }
+
   /* ==================== HUD & OVERVIEW ==================== */
   #hud {
     position: fixed;
@@ -1665,33 +2958,33 @@
     <!-- ==================== SLIDE 1: HERO COVER (DARK EDITORIAL) ==================== -->
     <section class="slide dark active" data-title="封面：从 App 到 Agent">
       <div class="ed-topbar">
-        <span><span class="sec-tag">INTERNAL VENTURE PROPOSAL</span> &nbsp;/&nbsp; 券商零售服务演进研究</span>
+        <span><span class="sec-tag">INTERNAL STRATEGY BRIEF</span> &nbsp;/&nbsp; 券商零售服务演进研究 · 认知与趋势补充篇</span>
         <span>2026 · EDITION 01</span>
       </div>
 
       <div class="cover-grid">
         <div>
-          <div class="cover-kicker">FROM ICON GRIDS TO INTENT OS</div>
+          <div class="cover-kicker">STRATEGY BRIEF · COGNITION, INDUSTRY, EXECUTION</div>
           <h1 class="cover-h1">
             从 App 到 <em>Agent</em><br/>
             券商零售入口重构
           </h1>
           <p class="cover-desc">
-            当 Harness 成为新一代个人操作系统、Marketplace 取代传统应用商店，<br/>
-            我们如何以最小阻力打造官方金牌金融 Agent，赢得下一代客户与业绩增量。
+            这不是一份"我们要做什么"的汇报，而是一份补齐认知底座的战略提案：<br/>
+            先把 20 个绕不开的概念讲成人话，再看清业界共识与趋势，最后回答"我们准备怎么去做"。
           </p>
           <div class="cover-index">
             <div class="cover-idx-item">
               <div class="idx-num">01 / COGNITION</div>
-              <div class="idx-text">厘清概念：一图看懂 Harness 与 Agent</div>
+              <div class="idx-text">概念与缩写：Harness、MCP、B2A、AEO 一页讲清</div>
             </div>
             <div class="cover-idx-item">
-              <div class="idx-num">02 / VALUE</div>
-              <div class="idx-text">体验与业绩：顾问式增值与极速交易</div>
+              <div class="idx-num">02 / INDUSTRY</div>
+              <div class="idx-text">业界共识与趋势：谁在造 OS，入口归谁</div>
             </div>
             <div class="cover-idx-item">
               <div class="idx-num">03 / EXECUTION</div>
-              <div class="idx-text">务实起步：先赋能头部投顾 MVP</div>
+              <div class="idx-text">组织与执行：轻骑兵编制、协作机制与新考核</div>
             </div>
           </div>
         </div>
@@ -1746,8 +3039,8 @@
       </div>
 
       <div class="ed-footer" style="border-top-color:rgba(244,241,234,0.16);color:#9C968D;">
-        <div>发起部门：<strong style="color:#F4F1EA;">用户增长与平台运营部</strong> &nbsp;·&nbsp; 定位：未来 3–10 年最重要的业务变革前夕主动准备</div>
-        <div class="page-code" style="color:#9C968D;">01 / 12</div>
+        <div>发起部门：<strong style="color:#F4F1EA;">用户增长与平台运营部</strong> &nbsp;·&nbsp; 定位：为下一代入口补齐全员的认知底座与执行准备</div>
+        <div class="page-code" style="color:#9C968D;">01 / 14</div>
       </div>
     </section>
 
@@ -1806,7 +3099,7 @@
 
       <div class="ed-footer">
         <div><span class="takeaway-label">TAKEAWAY</span><strong>券商不需要去重造“大脑”或“宿主底座”，而应专注打造宿主中最不可或缺的专业金融 Agent。</strong></div>
-        <div class="page-code">02 / 12</div>
+        <div class="page-code">02 / 14</div>
       </div>
     </section>
 
@@ -1932,301 +3225,653 @@
 
       <div class="ed-footer">
         <div><span class="takeaway-label">ONE-LINER</span><strong>大模型是智商，MCP 是专线，Skill 是手册，Agent 是专员，而 Harness 是未来的操作系统（办公室主任）。</strong></div>
-        <div class="page-code">03 / 12</div>
+        <div class="page-code">03 / 14</div>
       </div>
     </section>
 
-    <!-- ==================== SLIDE 4: PARADIGM SHIFT (1.5 AI APP vs 2.0 HARNESS AGENT) ==================== -->
-    <section class="slide split-slide" data-title="代际跃迁：从独立 AI 炒股 App 到 Harness 随身投顾">
-      <!-- Left: 1.5 Standalone AI Stock App -->
-      <div class="split-left">
-        <div class="ed-topbar" style="margin-bottom:28px;">
-          <span><span class="sec-tag">SECTION 02</span> &nbsp;/&nbsp; 找准对比参照系</span>
-          <span>GENERATION 1.5 CEILING</span>
-        </div>
 
-        <div class="split-kicker" style="color:var(--ink-muted);">AI INSIDE AN APP · 装在软件壳子里的 AI</div>
-        <h2 class="split-h2" style="color:var(--ink);">独立 AI 炒股 App 的天花板</h2>
-        <p class="split-sub" style="color:var(--ink-secondary);">即使如“AI 涨乐”已实现对话、卡片与盯盘，受限于独立 App 形态仍存四道枷锁</p>
 
-        <div class="silo-list">
-          <div class="silo-tile">
-            <div class="st-code">LIMIT 01 · 驻留孤岛</div>
-            <div class="st-name">平时工作不会打开</div>
-            <div class="st-desc">没人全天泡在炒股软件里，日常工作时处于断联态</div>
-          </div>
-          <div class="silo-tile">
-            <div class="st-code">LIMIT 02 · 二八长尾死结</div>
-            <div class="st-name">90% 非核心功能未重构</div>
-            <div class="st-desc">交易大赛等活动进页仍是千人一面老 H5 手点</div>
-          </div>
-          <div class="silo-tile">
-            <div class="st-code">LIMIT 03 · 算力死结</div>
-            <div class="st-name">集中算力撑不起动态 UI</div>
-            <div class="st-desc">总算力与速度不够实时画卡，被迫预开发固定模块</div>
-          </div>
-          <div class="silo-tile">
-            <div class="st-code">LIMIT 04 · 推广生硬</div>
-            <div class="st-name">问答末尾硬塞营销卡</div>
-            <div class="st-desc">强工具诉求下插播推广，违和感强、难建信任</div>
-          </div>
-        </div>
 
-        <ul class="ed-list" style="color:var(--ink-secondary);">
-          <li><strong style="color:var(--terracotta);">01</strong><span><strong style="color:var(--ink);">跨软件割裂：</strong>在电脑写方案看到突发讲话，还得掏手机切去 AI 涨乐才能操作。</span></li>
-          <li><strong style="color:var(--terracotta);">02</strong><span><strong style="color:var(--ink);">存量包袱重：</strong>成百上千张继承自老 App 的输入框/勾选框网页，永远改不完。</span></li>
-          <li><strong style="color:var(--terracotta);">03</strong><span><strong style="color:var(--ink);">工具冰冷感：</strong>给人的体感依然是“带语音入口的软件”，而非身边的真人顾问。</span></li>
-        </ul>
-
-        <div class="ed-footer" style="margin-top:28px;font-size:15px;">
-          <span>1.5 代已打通宝贵的投研与交易底座，急需向 2.0 形态释放</span>
-          <span></span>
-        </div>
-      </div>
-
-      <!-- Right: 2.0 Harness-Native Personal Advisor Agent -->
-      <div class="split-right">
-        <div class="ed-topbar" style="margin-bottom:28px;">
-          <span><span class="sec-tag">GENERATION 2.0</span></span>
-          <span>HARNESS-NATIVE ADVISOR</span>
-        </div>
-
-        <div class="split-kicker" style="color:var(--terracotta);">BORROWED BRAIN · 走出 App 住进日常底座</div>
-        <h2 class="split-h2" style="color:var(--paper);">Harness 随身真人投顾时代</h2>
-        <p class="split-sub" style="color:#BEB8AE;">借用用户宿主算力做大脑，注入华泰专业灵魂，全天候陪伴在日常工作流旁</p>
-
-        <div class="os-schematic">
-          <div class="os-prompt">正在写日常工作文档时收到突发矿产新闻 → 原地一句：“直接买两成紫金矿业”</div>
-          <div class="os-nodes">
-            <div class="os-node primary">
-              <div class="n-k">HUATAI SOUL</div>
-              <div class="n-t">华泰随身投顾 Agent</div>
-              <div class="n-s">懂投研 · 免跳出原地生成委托</div>
-            </div>
-            <div class="os-node">
-              <div class="n-k">CROSS-STREAM</div>
-              <div class="n-t">新闻 / 大宗商品 Agent</div>
-              <div class="n-s">工作流内实时捕捉突发讲话</div>
-            </div>
-            <div class="os-node">
-              <div class="n-k">DYNAMIC UI BASE</div>
-              <div class="n-t">个人算力支撑实时画卡</div>
-              <div class="n-s">解开算力死结 · 零预开发模块</div>
-            </div>
-          </div>
-          <div class="os-market-bar">
-            <span>HARNESS MARKETPLACE ＝ 新一代服务分发主阵地</span>
-            <span style="font-family:var(--font-mono);font-size:13px;">零应用切换 · 全天伴随</span>
-          </div>
-        </div>
-
-        <ul class="ed-list" style="color:#CFC9BE;">
-          <li><strong style="color:var(--terracotta);">01</strong><span><strong style="color:#F4F1EA;">全天候工作流伴随：</strong>边干本职工作边后台盯股市/大宗/新闻，突发机会原地一句话成交。</span></li>
-          <li><strong style="color:var(--terracotta);">02</strong><span><strong style="color:#F4F1EA;">抛弃预置死卡片：</strong>业务怎么变，界面就当场实时长成什么样，彻底告别存量网页手点。</span></li>
-          <li><strong style="color:var(--terracotta);">03</strong><span><strong style="color:#F4F1EA;">站内＋站外双轮互补：</strong>100% 复用 AI 涨乐与主站接口底座，零重复造轮子赢下站外新入口。</span></li>
-        </ul>
-
-        <div class="ed-footer" style="margin-top:28px;border-top-color:rgba(244,241,234,0.16);color:#9C968D;font-size:15px;">
-          <span>定位清晰：让华泰投顾走出单一 App 笼子，住进用户的日常工作台</span>
-          <span class="page-code" style="color:#9C968D;">04 / 12</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== SLIDE 5: UPSELL REVOLUTION ==================== -->
-    <section class="slide" data-title="商业模式重构：像线下营业厅投顾一样寒暄推荐">
+    <!-- ==================== SLIDE 4: CONCEPT GLOSSARY ==================== -->
+    <section class="slide tight" data-title="概念词典：Harness / MCP / B2A 一页讲清">
       <div class="ed-topbar">
-        <span><span class="sec-tag">SECTION 02</span> &nbsp;/&nbsp; 商业变现逻辑跃迁</span>
-        <span>FROM APPENDED CARDS TO HUMAN ADVISOR RAPPORT</span>
+        <span><span class="sec-tag">SECTION 01</span> &nbsp;/&nbsp; 概念与缩写 · CONCEPT GLOSSARY</span>
+        <span>20 TERMS · 每条四层信息</span>
       </div>
 
       <div class="ed-header">
-        <h2 class="ed-title">告别问答后硬塞卡片：还原<span class="hl">线下营业厅投顾</span>当面交流的松弛感</h2>
-        <p class="ed-lead">在工具型 App 里插播推广依然像广告；而在持续陪伴的 Harness 上下文里，办完正事后的主动寒暄最自然。</p>
+        <h2 class="ed-title">记不住 B2A、AEO、MCP？<span class="hl">一页把 20 个高频词讲成人话</span></h2>
+        <p class="ed-lead">每格四层：缩写 → 中文全称 → 一句话人话解释 → 在本提案语境里具体指什么。看完这页，后面九页不该再有听不懂的黑话。</p>
       </div>
 
-      <div class="upsell-split">
-        <!-- Left: Old Interruptive & 1.5 Awkward Card -->
-        <div class="upsell-left">
-          <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--ink-muted);letter-spacing:1.4px;">APP DILEMMA · 弹窗与强挂卡片之困</div>
-          <div class="big-stat-red">&lt; 1%</div>
-          <div style="font-size:19px;font-weight:600;color:var(--ink);">传统弹窗与生硬附带推广卡有效转化率</div>
-
-          <div class="noise-list">
-            <div class="noise-row">
-              <span>传统 App：开屏弹窗与首页 Banner</span>
-              <span class="dismiss">秒点关闭 ✕</span>
-            </div>
-            <div class="noise-row">
-              <span>AI 炒股 App：严肃问答末尾硬挂营销卡</span>
-              <span class="dismiss">突兀违和</span>
-            </div>
-            <div class="noise-row">
-              <span>用完即关：客户离开 App 后无法自然触达</span>
-              <span class="dismiss">连接中断</span>
-            </div>
-          </div>
-
-          <p style="font-size:18px;line-height:1.6;color:var(--ink-secondary);margin-top:auto;">
-            <strong>核心症结：</strong>当客户在炒股 App 里带着强目的提问时，顺手塞广告会破坏专业感；而当客户真正空闲时，他又根本不在炒股 App 里。
-          </p>
+      <div class="lex-grid">
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">Harness</span><span class="lex-cn">智能体宿主 / 编排层</span></div>
+          <div class="lex-plain">管理上下文、记忆、权限与调度的运行环境，被视为下一代"操作系统"候选。</div>
+          <div class="lex-ex">例：Claude Code 打开的那个窗口</div>
+          <div class="lex-ctx">本文：<b>不做宿主，只做宿主里的能力包</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">LLM</span><span class="lex-cn">大语言模型</span></div>
+          <div class="lex-plain">提供推理"智商"的引擎，是一项技术组件，本身不是产品。</div>
+          <div class="lex-ex">例：DeepSeek / Claude / GPT 本体</div>
+          <div class="lex-ctx">本文：<b>智商已商品化，差异在数据与牌照</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">Context</span><span class="lex-cn">上下文窗口</span></div>
+          <div class="lex-plain">模型当次能看到的临时内存，关掉窗口即失忆。</div>
+          <div class="lex-ex">例：聊到第 40 轮开始忘前面的话</div>
+          <div class="lex-ctx">本文：<b>Token 预算＝成本与体验的总开关</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">Agent</span><span class="lex-cn">智能体 / 数字专员</span></div>
+          <div class="lex-plain">有明确职责与授权，能独立完成一个任务闭环的执行单元。</div>
+          <div class="lex-ex">例："盯盘专员""报税专员"</div>
+          <div class="lex-ctx">本文：<b>交付单元，不是聊天框</b></div>
         </div>
 
-        <!-- Right: New Offline-Branch Advisor Rapport -->
-        <div class="upsell-right">
-          <div class="editorial-steps">
-            <div class="ed-step">
-              <div class="ed-step-n">01</div>
-              <div>
-                <h4>办正事时绝对纯粹，先建立专业信任</h4>
-                <p>客户在交易或查询时，华泰随身投顾干净利落完成指令，绝不中途插播无关推销。</p>
-              </div>
-            </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">MCP</span><span class="lex-cn">模型上下文协议</span></div>
+          <div class="lex-plain">让模型安全调用外部工具与数据的开放协议，Anthropic 于 2024 年提出。</div>
+          <div class="lex-ex">例：一行配置就接上行情源</div>
+          <div class="lex-ctx">本文：<b>给专员发门禁卡与内线电话</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">Skill</span><span class="lex-cn">技能 / 工作流</span></div>
+          <div class="lex-plain">固化的岗位 SOP 手册，可复用、可版本化、可回归测试。</div>
+          <div class="lex-ex">例：把"财报三表核对"写成一个能力</div>
+          <div class="lex-ctx">本文：<b>把投顾经验与合规核查写成步骤</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">GEN-UI</span><span class="lex-cn">生成式界面</span></div>
+          <div class="lex-plain">按意图实时生成的界面，用完即走，不留下固定页面。</div>
+          <div class="lex-ex">例：说"看下两融"当场长出一张卡</div>
+          <div class="lex-ctx">本文：<b>取代预先写死的静态页面</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">MCP Apps</span><span class="lex-cn">对话内嵌微界面</span></div>
+          <div class="lex-plain">在 Agent 对话里直接嵌入的可交互图表、表单与交易卡。</div>
+          <div class="lex-ex">例：对话里那张可滑动的下单卡</div>
+          <div class="lex-ctx">本文：<b>成交动作的最后一厘米</b></div>
+        </div>
 
-            <div class="ed-step">
-              <div class="ed-step-n">02</div>
-              <div>
-                <h4>借用宿主大脑，深度理解持仓结构与授权偏好</h4>
-                <p>结合客户近期交易风格与华泰全套业务库（两融锁券、大宗对冲、极速行情），在后台默默匹配最契合的方案。</p>
-              </div>
-            </div>
+        <div class="lex-cell dark">
+          <div class="lex-h"><span class="lex-abbr">B2A</span><span class="lex-cn">企业对智能体</span></div>
+          <div class="lex-plain">把能力、价格、权益做成机器可读接口，供客户的私人 Agent 询价与调用。</div>
+          <div class="lex-ex">例：客户 Agent 来问"两融多少钱"</div>
+          <div class="lex-ctx">本文：<b>取代面向人眼的 Banner 与弹窗</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">Agentic Upsell</span><span class="lex-cn">智能体式增值推荐</span></div>
+          <div class="lex-plain">由 Agent 在真实任务场景中自然完成的增值推荐。</div>
+          <div class="lex-ex">例：调仓完成后顺手推荐对冲工具</div>
+          <div class="lex-ctx">本文：<b>区别于打断式广告</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">AEO</span><span class="lex-cn">面向智能体优化</span></div>
+          <div class="lex-plain">取代 SEO：让自家能力更容易被 Agent 检索、比较、选中。</div>
+          <div class="lex-ex">例：让"港股实时行情"被优先检索到</div>
+          <div class="lex-ctx">本文：<b>新的流量分配规则</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">HITL / OOB</span><span class="lex-cn">人在环 / 带外确认</span></div>
+          <div class="lex-plain">资金、下单、改密必须由人类在独立安全通道确认，不经模型。</div>
+          <div class="lex-ex">例：指纹 ＋ 交易密码双通道确认</div>
+          <div class="lex-ctx">本文：<b>合规底线，不给模型留开关</b></div>
+        </div>
 
-            <div class="ed-step" style="border-bottom:none;padding-bottom:6px;">
-              <div class="ed-step-n">03</div>
-              <div>
-                <h4>在闲暇余韵中主动打招呼，像老朋友一样自然开口</h4>
-                <p>客户办完业务仍留在 Harness 上下文（或授权闲时触达），投顾适时温和寒暄，高信任水到渠成。</p>
-              </div>
-            </div>
-          </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">Agent Gateway</span><span class="lex-cn">智能体网关</span></div>
+          <div class="lex-plain">把为页面而生的碎接口，重组成语义化工具层的中间件。</div>
+          <div class="lex-ex">例：把 37 个碎接口收成 12 个</div>
+          <div class="lex-ctx">本文：<b>半年内最重的一次中台改造</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">BFF</span><span class="lex-cn">面向前端的后端</span></div>
+          <div class="lex-plain">为某个前端聚合接口的中间层，是 Gateway 的前身。</div>
+          <div class="lex-ex">例：行情 BFF、交易 BFF 各自为战</div>
+          <div class="lex-ctx">本文：<b>现有 BFF 升级为语义网关</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">Marketplace</span><span class="lex-cn">能力分发市场</span></div>
+          <div class="lex-plain">Agent 的服务分发市场，相当于新一代 App Store。</div>
+          <div class="lex-ex">例：金融类目里的"券商官方"标签</div>
+          <div class="lex-ctx">本文：<b>新的上架渠道与类目榜单</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">AUM</span><span class="lex-cn">管理资产规模</span></div>
+          <div class="lex-plain">客户放在我们这里的资产总量，规模与结构的总账。</div>
+          <div class="lex-ex">例：客户 120 万里有 80 万在这</div>
+          <div class="lex-ctx">本文：<b>留存与份额的最终答案</b></div>
+        </div>
 
-          <div class="advisor-quote">
-            <div class="aq-k">BRANCH ADVISOR EXPERIENCE · 线下营业部投顾体感还原</div>
-            <p>“嗨，刚那笔调仓已经办妥啦。看你最近几次波段踩得很准，刚好华泰新出了一套很贴合你目前仓位结构的两融方案，这会儿不忙的话，要不要我展开聊两句？”</p>
-          </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">C1–C5</span><span class="lex-cn">投资者适当性分级</span></div>
+          <div class="lex-plain">按风险承受力分五档，产品只能卖给匹配档位的客户。</div>
+          <div class="lex-ex">例：C2 客户买不了 R4 产品</div>
+          <div class="lex-ctx">本文：<b>网关层硬拦截，模型无权绕过</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">Level-2</span><span class="lex-cn">逐笔委托行情</span></div>
+          <div class="lex-plain">比基础行情多十档盘口与逐笔成交的付费行情。</div>
+          <div class="lex-ex">例：十档盘口 ＋ 逐笔委托</div>
+          <div class="lex-ctx">本文：<b>最有说服力的增值 SKU</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">VWAP / TWAP</span><span class="lex-cn">量价 / 时间加权均价</span></div>
+          <div class="lex-plain">把大单拆小、按成交量或时间分批成交的执行算法。</div>
+          <div class="lex-ex">例："分 5 天买完 3000 万"</div>
+          <div class="lex-ctx">本文：<b>Agent 可直接调用的执行原语</b></div>
+        </div>
+        <div class="lex-cell">
+          <div class="lex-h"><span class="lex-abbr">PWA</span><span class="lex-cn">渐进式 Web 应用</span></div>
+          <div class="lex-plain">可安装、可离线的网页应用，无需走应用商店。</div>
+          <div class="lex-ex">例：扫码即用的轻量网页版</div>
+          <div class="lex-ctx">本文：<b>过渡期的低成本承载形态</b></div>
         </div>
       </div>
 
       <div class="ed-footer">
-        <div><span class="takeaway-label">RAPPORT FIRST</span><strong>不是机器人在回答尾巴贴小广告，而是随时陪在身边的华泰真人投顾，在最恰当的闲暇时刻找你聊聊天。</strong></div>
-        <div class="page-code">05 / 12</div>
+        <div><span class="takeaway-label">TAKEAWAY</span><strong>券商要交付的不是"一个 App 的对话入口"，而是一份可被任何 Harness 安装、机器可读的金融能力包。</strong></div>
+        <div class="page-code">04 / 14</div>
       </div>
     </section>
 
-    <!-- ==================== SLIDE 6: 90% LONG-TAIL & TRADING CONTEST -> TRUE PERSONALIZATION ==================== -->
-    <section class="slide" data-title="交互范式革命：攻克 90% 非核心功能，实现真千人千面">
+    <!-- ==================== SLIDE 5: LLM OS & HARNESS ENGINEERING ==================== -->
+    <section class="slide tight" data-title="业界共识 I：LLM OS 蓝图与 Harness Engineering">
       <div class="ed-topbar">
-        <span><span class="sec-tag">SECTION 03</span> &nbsp;/&nbsp; 破解“二八长尾重构死结”</span>
-        <span>DYNAMIC CARDS · TRUE PERSONALIZATION</span>
+        <span><span class="sec-tag">SECTION 02</span> &nbsp;/&nbsp; 业界共识 I · INDUSTRY CONSENSUS</span>
+        <span>LLM OS · HARNESS ENGINEERING</span>
       </div>
 
       <div class="ed-header">
-        <h2 class="ed-title">攻克来不及重构的 90% 功能：把<span class="hl">交易大赛与长尾业务</span>真正做成“千人千面”</h2>
-        <p class="ed-lead">核心看盘与条件单虽已做好卡片，但海量运营活动与低频功能根本没时间逐一改写——依托用户端算力动态画卡，让每个功能都自动千人千面。</p>
+        <h2 class="ed-title">Karpathy 的 <span class="hl">LLM OS</span> 蓝图：真正被卷的不是参数，是宿主</h2>
+        <p class="ed-lead">把大模型当 CPU 看之后，2025–2026 年 X 与技术社区的讨论焦点，已从"基座模型多大"整体转向"宿主工程做得多好"。</p>
       </div>
 
-      <div class="ux-spread">
-        <!-- Left: 1.5 Long-Tail Bottleneck vs 2.0 Dynamic Personalization -->
+      <div class="llmos-wrap">
         <div>
-          <div class="funnel-block">
-            <div class="fb-head">
-              <h3 style="color:var(--ink-secondary);">现状困局：非核心功能点进去仍是“老一套页面”</h3>
-              <span class="time" style="color:var(--ink-muted);">千人一面 · 排期无解</span>
-            </div>
-            <div class="step-strip">
-              <span class="step-unit">点进交易大赛</span><span>→</span>
-              <span class="step-unit">跳回传统静态 H5</span><span>→</span>
-              <span class="step-unit">看统一死板总榜</span><span>→</span>
-              <span class="step-unit">手动选赛区勾选</span><span>→</span>
-              <span class="step-unit">对话框完全失灵</span>
-            </div>
-            <p style="margin-top:14px;font-size:17px;color:var(--ink-muted);line-height:1.5;">存量与新增运营活动太多，靠人工排期永远不可能把所有页面都做一遍 AI 重构。</p>
+          <div class="k-label">BLUEPRINT MAP · 操作系统类比逐层对照</div>
+          <div class="llmos-table">
+            <div class="llmos-row hd"><span class="c1">OS 部件</span><span class="c2">LLM OS 对应</span><span class="c3">券商语境里的实物</span></div>
+            <div class="llmos-row"><span class="c1">CPU</span><span class="c2">基座大模型</span><span class="c3">各家模型 API 已高度同质，选型不构成护城河</span></div>
+            <div class="llmos-row"><span class="c1">RAM</span><span class="c2">上下文窗口</span><span class="c3">一次能装入多少持仓、行情、研报与历史</span></div>
+            <div class="llmos-row"><span class="c1">硬盘</span><span class="c2">文件与记忆库</span><span class="c3">客户偏好、历史决策、适当性档案</span></div>
+            <div class="llmos-row"><span class="c1">外设驱动</span><span class="c2">工具层 / MCP</span><span class="c3">柜台、行情、两融、银证转账、条件单</span></div>
+            <div class="llmos-row"><span class="c1">应用程序</span><span class="c2">Agent / Skill</span><span class="c3">投顾专员、盯盘专员、合规核查专员各司其职</span></div>
+            <div class="llmos-row"><span class="c1">进程调度</span><span class="c2">Harness 编排</span><span class="c3">子 Agent 并发、权限沙箱、失败重试与回滚</span></div>
+            <div class="llmos-row"><span class="c1">图形界面</span><span class="c2">GEN-UI</span><span class="c3">意图驱动的交易卡，不再预写固定页面</span></div>
+            <div class="llmos-row"><span class="c1">应用商店</span><span class="c2">Marketplace</span><span class="c3">能力分发、类目排序与抽成规则的新入口</span></div>
           </div>
+          <p class="llmos-foot">这张表最有用的地方在于：它把"我们该做什么"变成了填空——凡是能找到对应"券商实物"的格子就是我们的活；找不到的，交给上游。</p>
 
-          <div class="funnel-block featured">
-            <div class="fb-head">
-              <h3 style="color:var(--ink);">新形态破局：只供业务接口 · 自动生成千人千面卡片</h3>
-              <span class="time" style="color:var(--terracotta);">ZERO H5 · 随人变形</span>
-            </div>
-            <div class="new-3-steps">
-              <div class="n3-box">
-                <div class="n3-k">01 / API ONLY</div>
-                <div class="n3-v">暴露赛制与榜单</div>
-              </div>
-              <div class="n3-box">
-                <div class="n3-k">02 / USER COMPUTE</div>
-                <div class="n3-v">结合持仓实时画卡</div>
-              </div>
-              <div class="n3-box">
-                <div class="n3-k">03 / 1-TO-1</div>
-                <div class="n3-v">百万人百万张卡</div>
-              </div>
-            </div>
-            <p style="font-size:18px;line-height:1.6;color:var(--ink-secondary);">
-              <strong>真正兑现公司期望的“千人千面”：</strong>同一场交易大赛，稳健 ETF 客看到的是低回撤配置赛区邀请卡，短线活跃客看到的则是实盘冲榜战报卡。
-            </p>
+          <div class="k-label muted" style="margin-top:16px;">HOW WE USE THIS TABLE · 这张表在本提案里的三个用法</div>
+          <div class="llmos-use">
+            <div class="lu"><span class="lu-n">用法一</span><span class="lu-t">定边界</span><span class="lu-d">凡能填进"券商实物"一列的，才是要投人投钱的地方；填不进的一律不立项。</span></div>
+            <div class="lu"><span class="lu-n">用法二</span><span class="lu-t">定预算</span><span class="lu-d">宿主层能力（记忆、沙箱、并发）预算为零；能力层能力按切片递增。</span></div>
+            <div class="lu"><span class="lu-n">用法三</span><span class="lu-t">定话术</span><span class="lu-d">对内外统一说"我们是宿主里的能力包"，避免被误解为"要自造 OS"。</span></div>
           </div>
         </div>
 
-        <!-- Right: Trading Contest Dynamic Personalized Card Illustration -->
-        <div class="ui-frame">
-          <div class="ui-statusbar">
-            <span>TRADING CONTEST · AUTO-GENERATED PERSONALIZED CARD</span>
-            <span class="ui-live">● 零静态 H5 网页开发</span>
+        <div class="llmos-right">
+          <div class="k-label muted">2025–2026 讨论焦点迁移 · X / REDDIT / 技术社区</div>
+          <p class="llmos-lead">大家在吵的不再是"哪个模型更聪明"，而是这六件工程活干得好不好——它们全部属于宿主层，与券商无关。</p>
+          <ul class="llmos-list">
+            <li><span>MEMORY</span><span>跨会话长期记忆：记住客户偏好，而不是每次重喂一遍资料</span></li>
+            <li><span>STATE</span><span>任务状态机：长任务可中断、可续跑，不必一次对话走完</span></li>
+            <li><span>SUBAGENT</span><span>子 Agent 并发：一个主 Agent 派五个后台专员同时干活</span></li>
+            <li><span>SANDBOX</span><span>权限沙箱：能碰文件、能跑代码，但碰不到不该碰的东西</span></li>
+            <li><span>COST</span><span>上下文成本工程：裁剪、缓存、摘要，直接决定这门生意的毛利</span></li>
+            <li><span>EVAL</span><span>评测与回归：意图 → 工具调用的准确率必须可测量、可对比</span></li>
+          </ul>
+          <div class="llmos-quote">"模型是新的 CPU，上下文是新的 RAM；而真正被卷的，是跑在它上面的那套宿主工程。"</div>
+          <div class="k-label muted" style="margin-top:20px;">SO WHAT FOR A BROKER · 这六件事与我们的关系</div>
+          <div class="split-bar">
+            <div class="sb-col given"><b>不用自研</b>记忆系统、沙箱、并发调度——宿主厂商会比我们做得更好、更便宜，且年年升级。</div>
+            <div class="sb-col ours"><b>必须自建</b>工具语义层、意图评测集、合规留痕。这三样没人替我们做，也做不了。</div>
+          </div>
+          <div class="llmos-lead" style="margin-top:12px;">换句话说：宿主工程决定 AI 有多聪明好用，能力包工程决定它能不能真的替客户下单。前者我们无牌可打，后者我们握着一手好牌。</div>
+
+        </div>
+      </div>
+
+      <div class="llmos-bottom">
+        <div>
+          <h3>所以我们的结论是：<em>不去造 OS，而去做宿主里最专业的那个垂直能力包</em></h3>
+          <p>造宿主是千亿美金级、赢家通吃的战争，券商没有任何胜算；而官方投顾的价值恰恰落在编排层永远做不出来的四样东西上——牌照、柜台、数据与适当性判断。</p>
+        </div>
+        <div class="llmos-verdict">
+          <b>OUR FOCUS · 资源投向</b>
+          90% 工程力 · 能力包语义化与评测<br/>
+          10% 工程力 · 宿主适配与上架运营<br/>
+          <i>0% · 造模型、造宿主</i>
+        </div>
+      </div>
+
+      <div class="ed-footer">
+        <div><span class="takeaway-label">IMPLICATION</span><strong>谁定义宿主，谁收过路费；谁定义垂直能力，谁定价。券商的战场在后者。</strong></div>
+        <div class="page-code">05 / 14</div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 6: MCP THREE-STAGE EVOLUTION ==================== -->
+    <section class="slide tight" data-title="业界共识 II：「App Store 已死」与 MCP 的三段式演进">
+      <div class="ed-topbar">
+        <span><span class="sec-tag">SECTION 02</span> &nbsp;/&nbsp; 业界共识 II · 协议的三段式演进</span>
+        <span>MCP · SKILLS · PLUGIN MARKETPLACE</span>
+      </div>
+
+      <div class="ed-header">
+        <h2 class="ed-title">从"万物皆 MCP"到"<span class="hl">MCP is dead</span>"：一条被走完的炒作曲线</h2>
+        <p class="ed-lead">2023–2026 年，协议层走过了典型的三段：狂热、幻灭、收敛。看清这条曲线，可以帮我们省下两年学费。</p>
+      </div>
+
+      <div class="mcp-phases">
+        <div class="mcp-ph">
+          <div class="ph-era"><span>① 协议狂热期</span><span class="yr">2024–2025</span></div>
+          <h3>万物皆 MCP：<br/>把每个功能都包成插件</h3>
+          <p>只要能调用就做成 Server，装机量等于把整本菜单一次打开；评测只看"接了多少个工具"。</p>
+          <ul class="ph-list">
+            <li><b>行为特征：</b>工具越多越显专业，市场按数量排名</li>
+            <li><b>隐藏代价：</b>每次对话都要把全部工具说明书读一遍</li>
+            <li><b>券商侧镜像：</b>把 200 个柜台功能全部注册给宿主</li>
+          </ul>
+          <div class="ph-evi">
+            <div class="pe-k">当时的典型话语</div>
+            <div class="pe-v">"我们已经有 XX 个 MCP Server，生态覆盖最全。"——把工具数量当成了产品力。</div>
+            <div class="pe-k">事后回看</div>
+            <div class="pe-v">数量是可被一夜追平的优势，且每多一个工具，模型选错的概率就上升一点。</div>
+          </div>
+          <div class="ph-tag"><b>阶段结局</b>上下文被工具定义占满，模型开始在相似工具间选错，Token 账单失控。</div>
+        </div>
+
+        <div class="mcp-ph p-mid">
+          <div class="ph-era"><span>② 幻灭争论期</span><span class="yr">2025–2026</span></div>
+          <h3>"MCP is dead"：<br/>上下文臃肿与 Token 爆炸</h3>
+          <p>Reddit 与 X 上出现大规模吐槽：工具一多，匹配率反而下降；Skills 与按需加载开始取代"全量挂载"。</p>
+          <div class="mcp-quote">"装 40 个 MCP 之后，我花了更多时间纠正它选错工具。"</div>
+          <ul class="ph-list">
+            <li><b>核心矛盾：</b>工具的发现成本 × 上下文占用 ≈ 反比体验</li>
+            <li><b>认知转变：</b>从"多即是好"翻转为"少即是快"</li>
+            <li><b>技术应对：</b>按需加载、工具分组、检索式发现开始替代"一次全挂"</li>
+          </ul>
+          <div class="ph-evi">
+            <div class="pe-k">争论的真实价值</div>
+            <div class="pe-v">它把行业注意力从"接协议"推回到"设计供给"——这正是券商最该参与的部分。</div>
+            <div class="pe-k">对券商的警示</div>
+            <div class="pe-v">如果我们的能力描述写得像一份"菜单"，无论用哪种协议，都会被这一轮淘汰。</div>
+          </div>
+          <div class="ph-tag"><b>阶段结局</b>协议之争退潮，"该给模型看什么"取代"接了多少协议"成为核心命题。</div>
+        </div>
+
+        <div class="mcp-ph p-now">
+          <div class="ph-era"><span>③ 成熟收敛期</span><span class="yr">2026 →</span></div>
+          <h3>按需发现 ＋ MCP Apps：<br/>只取当下需要的三五个能力</h3>
+          <p>先检索发现、再按需加载；结果直接内嵌成可交互微界面（图表 / 表单 / 交易卡），上下文按任务裁剪。</p>
+          <ul class="ph-list">
+            <li><b>分发方式：</b>从"装插件"变成"用时发现"</li>
+            <li><b>体验分水岭：</b>发现率 ＋ 内嵌交互，而不是协议兼容性</li>
+            <li><b>券商侧动作：</b>做能被一句话检索到的那 5 个能力，不做全量</li>
+            <li><b>竞争新维度：</b>描述质量 &gt; 协议兼容性；场景覆盖 &gt; 功能覆盖</li>
+          </ul>
+          <div class="ph-evi dark">
+            <div class="pe-k">判断标准</div>
+            <div class="pe-v">问自己一句：客户说"我港股又跌了"，我们的能力包能不能被第一时间取用？</div>
+            <div class="pe-k">交付物形态</div>
+            <div class="pe-v">一句可检索的能力描述 ＋ 一张可直接确认的交易卡 ＋ 一条完整的合规留痕。</div>
+          </div>
+          <div class="ph-tag"><b>阶段结局</b>协议选择不再重要，"最小上下文 ＋ 内嵌可交互"成为生死线。</div>
+        </div>
+      </div>
+
+      <div class="split-bar" style="margin-top:16px;">
+        <div class="sb-col given"><b>NOT THE POINT · 不重要的</b>用的是 MCP 还是自家私有协议、接入了多少家宿主、Server 数量有多少——这些在 2026 年已经不是竞争维度。</div>
+        <div class="sb-col ours"><b>THE POINT · 生死线</b>能否被一句话检索到 ＋ 能否把结果直接变成可交互的交易卡 ＋ 能否把上下文压到最小。</div>
+      </div>
+
+      <div class="mcp-fail">
+        <div>
+        <div class="mcp-chain">
+          <div class="cs"><b>STEP 01</b>200 个柜台接口一次性注册给宿主</div>
+          <div class="cs arrow">→</div>
+          <div class="cs"><b>STEP 02</b>首轮上下文被工具说明书吃掉三分之一</div>
+          <div class="cs arrow">→</div>
+          <div class="cs"><b>STEP 03</b>客户问"港股盘口"却被调去两融开户</div>
+          <div class="cs arrow">→</div>
+          <div class="cs"><b>STEP 04</b>多轮纠错、体验崩坏、成本双输</div>
+        </div>
+        <p class="mcp-caption">这不是模型不够聪明的错，而是供给侧的包装方式错了：把"功能清单"当成"能力描述"，宿主只能照单全收。</p>
+        </div>
+        <div class="mcp-calc">
+          <div class="cc-k">失败推演 · 量级示意（非严谨 benchmark）</div>
+          <div class="cc-line">200 个工具 × ~350 tokens <i>=</i> <em>7 万 tokens</em></div>
+          <div class="cc-line">单轮预算 20 万 <i>→</i> 首轮已占 <em>35%</em></div>
+          <div class="cc-line">工具数 &gt; 30 后选错率显著上升</div>
+          <div class="cc-line">每轮重付 <i>→</i> 手续费赚不回 Token 费</div>
+        </div>
+      </div>
+
+      <div class="ed-footer">
+        <div><span class="takeaway-label">DESIGN RULE</span><strong>给宿主的不是整本菜单，而是"一句能检索到的五个招牌菜 ＋ 一张能直接下单的卡"。</strong></div>
+        <div class="page-code">06 / 14</div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 7: SEO -> AEO -> B2A ==================== -->
+    <section class="slide tight" data-title="商业范式：从 SEO 到 AEO，从流量广告到 B2A">
+      <div class="ed-topbar">
+        <span><span class="sec-tag">SECTION 02</span> &nbsp;/&nbsp; 商业范式的迁移 · SEO → AEO → B2A</span>
+        <span>FROM EYEBALLS TO MACHINE-READABLE</span>
+      </div>
+
+      <div class="ed-header">
+        <h2 class="ed-title">视觉说服正在失效：<span class="hl">从抢关键词，到被 Agent 选中</span></h2>
+        <p class="ed-lead">当 Agent 替客户横向比较五家券商的两融利率时，Banner 上那句"限时 3.8%"不会被看见——能被解析的结构化报价才会。</p>
+      </div>
+
+      <div class="aeo-table">
+        <div class="aeo-cell rowlab">比较维度</div>
+        <div class="aeo-cell colhd a1">人眼时代 · SEO / 信息流</div>
+        <div class="aeo-cell colhd a2">过渡期 · AI 问答末尾挂卡</div>
+        <div class="aeo-cell colhd a3">Agent 时代 · AEO / B2A</div>
+
+        <div class="aeo-cell rowlab">客户怎么选</div>
+        <div class="aeo-cell">自己刷 App、比界面、被弹窗打动，注意力是货币</div>
+        <div class="aeo-cell">读完一段答案，末尾顺手点开推荐卡</div>
+        <div class="aeo-cell future">私人 Agent 代询价、代比较、代执行，人只看最终确认</div>
+
+        <div class="aeo-cell rowlab">竞争面在哪</div>
+        <div class="aeo-cell">视觉与文案：Banner、开屏图、信息流素材</div>
+        <div class="aeo-cell">答案的相关性，以及那张卡的点击率</div>
+        <div class="aeo-cell future">结构化能力描述：capability ＋ price ＋ constraint</div>
+
+        <div class="aeo-cell rowlab">核心指标</div>
+        <div class="aeo-cell">曝光量、点击率、注册转化率</div>
+        <div class="aeo-cell">卡片点击率、留资率</div>
+        <div class="aeo-cell future">意图匹配率、被选中率、签约率、调用次数</div>
+
+        <div class="aeo-cell rowlab">关键动作</div>
+        <div class="aeo-cell">SEO 抢关键词排名，投放买位置</div>
+        <div class="aeo-cell">在答案里"挂卡"，优化话术与选品</div>
+        <div class="aeo-cell future">AEO：让能力可被检索、可被比较、可被直接调用</div>
+
+        <div class="aeo-cell rowlab">组织含义</div>
+        <div class="aeo-cell">运营 ＋ 设计 ＋ 投放三件套</div>
+        <div class="aeo-cell">运营 ＋ 模型调优 ＋ 内容审核</div>
+        <div class="aeo-cell future">中台语义化 ＋ 数据治理 ＋ 权益定价能力</div>
+
+        <div class="aeo-cell rowlab">失效风险</div>
+        <div class="aeo-cell">弹窗被秒关，有效转化长期低于 1%</div>
+        <div class="aeo-cell">挂卡被识破为广告，专业信任受损</div>
+        <div class="aeo-cell future">能力不可解析 ＝ 在 Agent 眼里根本不存在</div>
+      </div>
+
+      <div class="aeo-bottom">
+        <div>
+          <div class="k-label">STRUCTURED UPGRADE META · 接口应当暴露的升级元数据</div>
+          <div class="aeo-code">{
+  <span class="ck">"capability"</span>: <span class="cv">"LV2_HK_REALTIME"</span>,
+  <span class="ck">"trigger"</span>:    <span class="cv">"高频查看港股盘口"</span>,
+  <span class="ck">"constraint"</span>: <span class="cv">"适当性 C3+ 且近 30 日交易≥5 笔"</span>,
+  <span class="ck">"trial"</span>:      <span class="cv">"7 天免费"</span>,
+  <span class="ck">"price"</span>:      { <span class="ck">"month"</span>: <span class="cv">68</span>, <span class="ck">"year"</span>: <span class="cv">588</span> },
+  <span class="ck">"compliance"</span>: <span class="cs">"风险揭示 R2 · 留痕审计 ON"</span>,
+  <span class="ck">"agent_hint"</span>: <span class="cs">"正在高频盯港股者，先给试用到顶格再加购"</span>
+}</div>
+        </div>
+        <div class="aeo-why">
+          <div class="k-label muted">WHY STRUCTURED BEATS COPY · 为什么这比一句营销话术有用</div>
+          <div class="aeo-why-item"><div class="n">01</div><div><b>机器能解析，才有资格被比较。</b>"行业领先、极速行情"无法被比较，一个 <b>price</b> 字段可以；Agent 只对可比较项做排序。</div></div>
+          <div class="aeo-why-item"><div class="n">02</div><div><b>约束先声明，Agent 才敢推。</b>适当性、地域、开户条件写进接口，才不会在错误客户身上推错产品——这是它替你规避合规风险的方式。</div></div>
+          <div class="aeo-why-item"><div class="n">03</div><div><b>场景触发词比口号值钱。</b><b>trigger</b> 让能力在"客户正在做这件事"的瞬间被取用，这正是开屏广告永远买不到的时机。</div></div>
+        </div>
+      </div>
+
+      <div class="aeo-skus">
+        <div class="k-label muted" style="margin-bottom:8px;">SAME ABILITY, THREE LANGUAGES · 同一项能力，三种写法（右为机器可读版）</div>
+        <div class="sku-row">
+          <div class="sku-name">Level-2<br/>极速行情</div>
+          <div class="sku-bad">旧："十档盘口，毫秒级推送，行业领先行情体验"<div class="sku-note">Agent 无法解析"领先"，也无法比较"毫秒级"。</div></div>
+          <div class="sku-good"><span>{capability:"LV2_HK_REALTIME", trigger:"高频看港股盘口", trial:"7天", price:68}</span><div class="sku-note">可比较、可试用、可触发——Agent 会主动取用。</div></div>
+        </div>
+        <div class="sku-row">
+          <div class="sku-name">两融<br/>专项利率</div>
+          <div class="sku-bad">旧："限时 3.8% 起，额度充足，先到先得"<div class="sku-note">约束条件缺失，Agent 无法判断谁符合准入。</div></div>
+          <div class="sku-good"><span>{capability:"MARGIN_RATE", constraint:"C3+ & 20日日均资产≥50万", price:{apy:3.8}, approval:"T+1"}</span><div class="sku-note">先声明门槛，再报价格，避免在错误客户身上推错。</div></div>
+        </div>
+        <div class="sku-row">
+          <div class="sku-name">研究所<br/>付费研报包</div>
+          <div class="sku-bad">旧："顶级分析师团队力作，把握每一次机会"<div class="sku-note">无法被检索，也无法与持仓场景建立关联。</div></div>
+          <div class="sku-good"><span>{capability:"RESEARCH_PACK", scope:"电子/新能源", tie_to:"持仓行业", price:99, unlock:"月交易≥10笔可抵扣"}</span><div class="sku-note">绑定持仓场景，Agent 能在最需要的那一刻递上来。</div></div>
+        </div>
+      </div>
+
+      <div class="ed-footer">
+        <div><span class="takeaway-label">SHIFT</span><strong>过去我们花钱让人看见，未来我们花力气让机器读懂。后者的复利更高，且无法被预算买到。</strong></div>
+        <div class="page-code">07 / 14</div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 8: THREE CAMPS ==================== -->
+    <section class="slide tight" data-title="入口之争：OS 原厂、模型巨头与垂直 Harness 的博弈">
+      <div class="ed-topbar">
+        <span><span class="sec-tag">SECTION 03</span> &nbsp;/&nbsp; 入口竞争 · WHO OWNS THE ENTRY POINT</span>
+        <span>THREE CAMPS &amp; OUR POSITION</span>
+      </div>
+
+      <div class="ed-header">
+        <h2 class="ed-title">谁会赢下"入口"？<span class="hl">三种势力</span>的博弈与我们的站位</h2>
+        <p class="ed-lead">入口之争不是"谁的 AI 更聪明"，而是"谁掌握调用发生的那一瞬"。三派各有必赢的战场，也各有结构性弱点。</p>
+      </div>
+
+      <div class="pw-cols">
+        <div class="pw-card">
+          <div class="pc-k">CAMP 01 · PLATFORM OWNERS</div>
+          <h3>操作系统原厂派</h3>
+          <div class="pc-players">APPLE APP INTENTS / 安卓系统级 AGENT / WINDOWS</div>
+          <div class="pw-pair">
+            <div class="pk">STRENGTH · 握有什么</div>
+            <p>开机入口、默认语音助手位、跨 App 调度与通知权限的最高优先级；用户不必安装任何东西。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk neg">WEAKNESS · 结构性弱点</div>
+            <p>跨生态中立性最差；金融深度几乎为零；对抽成与类目竞价有天然冲动。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk">SIGNAL · 现状信号</div>
+            <p>2025 年起开放三方"意图注册"，但审核与排序规则不透明。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk">TIME HORIZON · 时间窗</div>
+            <p>系统级挂载约 2027 年才对金融类目开放，此前入场是品牌预埋。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk neg">BARGAINING POWER · 议价力</div>
+            <p>渠道强、供给弱：类目满三家后，排序必然转向竞价与抽成。</p>
+          </div>
+          <div class="pw-pair"><div class="pk">SO WHAT · 对我们的启示</div><p>三家并行接、一套能力包、零定制分支——一次改造，多处复用。</p></div>
+          <div class="pw-pair"><div class="pk neg">WATCH OUT · 提防</div><p>索要"系统独有功能"者，直接放弃该单点。</p></div>
+          <div class="pc-us"><b>我方动作</b>做它们的合格供应商，绝不签独家；同一能力包同步上架多家。</div>
+        </div>
+
+        <div class="pw-card mid">
+          <div class="pc-k">CAMP 02 · MODEL &amp; SUPER-APP</div>
+          <h3>模型与超级客户端派</h3>
+          <div class="pc-players">OPENAI / ANTHROPIC / 各家大模型桌面端</div>
+          <div class="pw-pair">
+            <div class="pk">STRENGTH · 握有什么</div>
+            <p>最强推理能力与付费意愿最高的种子用户；上下文与工具调用的工程水平领先半年以上。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk neg">WEAKNESS · 结构性弱点</div>
+            <p>没有牌照、柜台与清算；荐股与交易的合规风险无法外包给他人。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk">SIGNAL · 现状信号</div>
+            <p>2025–2026 各家建"连接器市场"，金融类目却缺可执行的交易能力。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk">TIME HORIZON · 时间窗</div>
+            <p>最活跃用户集中于此，2026 年内形成默认调用习惯，先入者优势最大。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk neg">BARGAINING POWER · 议价力</div>
+            <p>与 OS 厂相反：他们需要我们的牌照与柜台，胜过我们需要它的流量。</p>
+          </div>
+          <div class="pw-pair"><div class="pk">SO WHAT · 对我们的启示</div><p>优先接用户最大、生态最开放的两家；差异点是"可执行"。</p></div>
+          <div class="pw-pair"><div class="pk neg">WATCH OUT · 提防</div><p>最易给真实收入也最易反悔：计价与退出条款进合同。</p></div>
+          <div class="pc-us"><b>我方动作</b>成为它们"自己不敢做"的持牌执行层，按调用与成交计费。</div>
+        </div>
+
+        <div class="pw-card">
+          <div class="pc-k">CAMP 03 · VERTICAL HARNESS</div>
+          <h3>垂直 Harness 派</h3>
+          <div class="pc-players">金融投研 / 开发工程 / 跨境电商 / 医疗</div>
+          <div class="pw-pair">
+            <div class="pk">STRENGTH · 握有什么</div>
+            <p>工作流够深、客单价够高、巨头做不深；行业数据与合规门槛本身就是壁垒。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk neg">WEAKNESS · 结构性弱点</div>
+            <p>单一垂直天花板低；没有通用入口的流量；必须依附于前两派的宿主生态。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk">SIGNAL · 现状信号</div>
+            <p>2025 年多家垂直 Harness 拿到大额融资，验证深工作流付费意愿。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk">TIME HORIZON · 时间窗</div>
+            <p>金融垂直尚无赢家，窗口约 18–24 个月，之后被资质与数据锁死。</p>
+          </div>
+          <div class="pw-pair">
+            <div class="pk neg">BARGAINING POWER · 议价力</div>
+            <p>对上是弱势渠道、对下是强势供给：只有客户离不开你时，价值才成立。</p>
+          </div>
+          <div class="pw-pair"><div class="pk">SO WHAT · 对我们的启示</div><p>先把能力格式、适当性字段、留痕要求写成事实标准，再谈生态。</p></div>
+          <div class="pw-pair"><div class="pk neg">WATCH OUT · 提防</div><p>标准谁都能用，先写的人定默认值。</p></div>
+          <div class="pc-us"><b>我方动作</b>这是主战场——也是唯一能由我们定义标准的地方。</div>
+        </div>
+      </div>
+
+      <div class="pw-bottom">
+        <div class="pw-verdict">
+          <h3>结论与取舍：我们把"通用入口"让出去，只抢金融</h3>
+          <div class="pv-row"><span>判断</span><span>通用生活入口会被 OS 厂垄断，因为它们握的是<b>开机那一秒</b>。</span></div>
+          <div class="pv-row"><span>机会</span><span>金融是高监管、高价值、强工作流的垂直入口，<b>独立机会真实存在</b>。</span></div>
+          <div class="pv-row"><span>策略</span><span>跨宿主中立 ＋ 只做能力包 ＋ 抢占<b>"默认首选调用位"</b>。</span></div>
+          <div class="pv-row"><span>红线</span><span>不签独家、不做某一家 OS 的深度定制分支、不做封闭生态里的专供版。</span></div>
+        </div>
+        <div class="pw-risk">
+          <div class="rk2">反向推演 · 如果押错边</div>
+          <p>只给某一家 OS 做深度绑定，等于把全部筹码押在别人换帅的那一天：份额不达标则能力白做，改规则则无议价权，客户换机则服务随之中断。</p>
+          <p>更致命的不是丢了开发费，而是<b>品牌被降格成"某系统的内置功能"</b>——再想以独立券商身份被客户记住，很贵。</p>
+          <p><b>对冲：</b>能力包与宿主彻底解耦；私域与真人投顾网络兜住最后一段确定性。</p>
+        </div>
+      </div>
+
+      <div class="ed-footer">
+        <div><span class="takeaway-label">POSITION</span><strong>不做某一家的功能，要做所有宿主都绕不开的那一层——这在入口时代是唯一可持续的位置。</strong></div>
+        <div class="page-code">08 / 14</div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 9: TIMELINE & REVERSE RISKS ==================== -->
+    <section class="slide tight" data-title="趋势时间表：三段窗口与四个反向风险">
+      <div class="ed-topbar">
+        <span><span class="sec-tag">SECTION 03</span> &nbsp;/&nbsp; 趋势分析 · TIMELINE &amp; REVERSE RISKS</span>
+        <span>2025 → 2036</span>
+      </div>
+
+      <div class="ed-header">
+        <h2 class="ed-title">三段窗口与<span class="hl">四个反向风险</span>：什么时候必须已经站在场上</h2>
+        <p class="ed-lead">趋势不是用来预测的，是用来排期的。每段给出三样东西：市场信号、我们的动作窗口、错过会怎样。</p>
+      </div>
+
+      <div class="trend-wrap">
+        <div class="trend-axis">
+          <div class="tr-item">
+            <div class="tr-when">2025–2026<span>PHASE 01 · 形态收敛</span></div>
+            <div>
+              <h3>协议与宿主形态收敛</h3>
+              <p class='tr-lead'>这一段的胜负手不在产品，而在「接口是否已经可被外部调用」。</p>
+              <div class="tr-fields">
+                <div class="f"><span>信号</span><span>MCP 成为事实标准；几家 Harness 定型；插件市场出现真实流水而非演示</span></div>
+                <div class="f"><span>动作</span><span>完成 Agent Gateway 与首个可被外部调用的能力包——本提案的编制即为此而设</span></div>
+                <div class="f"><span>指标</span><span>网关语义工具数收敛到 12~15 个；首轮上下文占用 &lt;20%；意图准确率 ≥90%</span></div>
+                <div class="f warn"><span>代价</span><span>只能做被动"接入方"：能力何时被调用、排在第几位，全部由宿主的规则决定，我们连议价的资格都没有</span></div>
+              </div>
+            </div>
           </div>
 
-          <div class="ui-user-msg" style="background:var(--terracotta);">投顾主动提示：“您本季收益达 +26.4%，在《智投实盘赛·季度价投赛》已达前 3% 获奖水平，报名即可角逐 30g 金牛与 MacBook Pro！”</div>
-
-          <div class="ui-gen-module">
-            <div class="ui-mod-head">
-              <span class="t">智投实盘系列赛 · 为未报名的达标高手自动生成专属冲奖卡</span>
-              <span class="b">真·千人千面</span>
+          <div class="tr-item">
+            <div class="tr-when">2027–2029<span>PHASE 02 · 挂载分发</span></div>
+            <div>
+              <h3>系统级 Agent 挂载与 Marketplace 成型</h3>
+              <p class='tr-lead'>这一段的胜负手不在技术，而在「类目里的位置与分成谈判」。</p>
+              <div class="tr-fields">
+                <div class="f"><span>信号</span><span>手机 OS 原生 Agent 开放三方能力；Marketplace 出现类目榜单、审核与抽成规则</span></div>
+                <div class="f"><span>动作</span><span>3~5 个宿主同时在线，抢占金融类目默认位与首屏推荐位，用数据换排名</span></div>
+                <div class="f"><span>指标</span><span>金融类目进入前三；被调用的意图覆盖主要业务；分成比例锁进合同而非口头</span></div>
+                <div class="f warn"><span>代价</span><span>类目被两三家先发者占满，后来者只能持续买流量；且流量成本会随类目成熟逐步上涨</span></div>
+              </div>
             </div>
+          </div>
 
-            <div class="ui-table-row selected">
-              <div><div class="ui-s-name">您的本季实盘曲线</div><div class="ui-s-code">大幅跑赢沪深300 (+6.8%) 与晋级线</div></div>
-              <div class="ui-s-up">+26.4%</div>
-              <div class="ui-s-flow">季度价投赛前 3%</div>
-              <div style="text-align:right;font-weight:700;color:var(--terracotta);">冲奖圈内</div>
+          <div class="tr-item">
+            <div class="tr-when">2030–2036<span>PHASE 03 · 商业成熟</span></div>
+            <div>
+              <h3>Agent 商业与计费体系成熟</h3>
+              <p class='tr-lead'>这一段的胜负手不在规模，而在「按结果计费时你是否不可替代」。</p>
+              <div class="tr-fields">
+                <div class="f"><span>信号</span><span>按调用与按成交计费成为常态；Agent 之间出现代理议价；监管明确 Agent 荐股边界</span></div>
+                <div class="f"><span>动作</span><span>从"卖权益"升级为"卖可被调用的执行能力"，按结果计费，嵌入客户工作流</span></div>
+                <div class="f"><span>指标</span><span>非佣金收入占零售营收的可观比例；执行类调用成为主要成交入口</span></div>
+                <div class="f warn"><span>代价</span><span>沦为纯通道：佣金被 Agent 侧持续挤压，客户认的是那个宿主，不再记得券商是谁</span></div>
+              </div>
             </div>
+          </div>
+        </div>
 
-            <div class="ui-table-row selected">
-              <div><div class="ui-s-name">可角逐实物大奖</div><div class="ui-s-code">AI 自动匹配【季度价投赛】免手选</div></div>
-              <div class="ui-s-up">30g 金牛</div>
-              <div class="ui-s-flow">MateTV / MacBook</div>
-              <div style="text-align:right;font-weight:700;color:var(--terracotta);">一键锁资格</div>
-            </div>
-
-            <div class="ui-table-row">
-              <div><div class="ui-s-name">对浮亏/非目标客户</div><div class="ui-s-code">告别全员无差别挂 Banner</div></div>
-              <div style="font-weight:700;color:var(--petrol);">安静零打扰</div>
-              <div class="ui-s-flow">只向能拿奖的人报喜</div>
-              <div style="text-align:right;color:var(--ink-muted);">智能克制</div>
-            </div>
-
-            <div style="display:flex;justify-content:space-between;font-size:15px;color:var(--ink-secondary);padding-top:4px;">
-              <span>依托用户端 AI 算力实时渲染，彻底解放客户端排期瓶颈</span>
-              <span style="color:var(--petrol);font-weight:600;">✓ 一键滑动即可报名参赛</span>
-            </div>
-
-            <div class="ui-confirm-bar">
-              <span class="ui-slide-btn">右滑一键报名参赛 →</span>
-              <span style="font-size:15px;font-weight:600;color:var(--ink);">已自动匹配最优赛区与参赛权益</span>
-            </div>
+        <div class="risk-panel">
+          <div class="k-label">REVERSE RISKS · 四条反向风险与对冲</div>
+          <div class="risk-item">
+            <div class="risk-t"><em>01</em><span>模型能力跃迁，把"插件"价值整个吞掉</span></div>
+            <div class="risk-h"><b>对冲：</b>持牌、柜台、清算与适当性判断不在模型的能力半径内——这四样越强，我们越不可替代。</div>
+            <div class="risk-a"><b>处置</b>预留"能力包版本"开关：模型一夜变强时，我们能在一周内把重推理场景切给宿主，只保留执行与合规段。</div>
+            <div class="risk-e">早期信号 · 宿主开始用自家模型直连交易通道，或监管放开非持牌主体接入</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-t"><em>02</em><span>监管对 AI 荐股与生成内容收紧</span></div>
+            <div class="risk-h"><b>对冲：</b>只做客观筛选 ＋ 持牌研究所观点 ＋ 全链路留痕，先合规再智能，不做擦边功能。</div>
+            <div class="risk-a"><b>处置</b>建立话术红线库与双人复核；所有对外内容默认走"客观数据 + 持牌观点 + 风险揭示"三段式模板。</div>
+            <div class="risk-e">早期信号 · 出现针对"AI 生成投顾内容"的处罚案例，或投资者适当性指引更新</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-t"><em>03</em><span>客户不接受，仍愿意自己点</span></div>
+            <div class="risk-h"><b>对冲：</b>先给投顾与内部员工用，用服务半径的实测数据说服客户，再向 C 端放量。</div>
+            <div class="risk-a"><b>处置</b>每条新流程先跑投顾侧 A/B；用完成率、复访率两个硬指标决定是否向 C 端开放，不做全量强推。</div>
+            <div class="risk-e">早期信号 · 内测客群二次使用率低、主动切回 App 操作；语音输入占比始终上不去</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-t"><em>04</em><span>厂商抽成与类目竞价，把分发成本推高</span></div>
+            <div class="risk-h"><b>对冲：</b>私域 ＋ 真人投顾网络是唯一不必付"过路费"的渠道，必须与 Agent 渠道并重。</div>
+            <div class="risk-a"><b>处置</b>同步建设私域与投顾的直达路径；渠道预算设上限，超过上限即转向自有渠道，不让成本结构被单点绑架。</div>
+            <div class="risk-e">早期信号 · Marketplace 上线竞价位与包年套餐；头部能力位开始被两三家轮流买断</div>
           </div>
         </div>
       </div>
 
       <div class="ed-footer">
-        <div><span class="takeaway-label">UX PRINCIPLE</span><strong>消除“看到机会”与“完成交易”之间的每一秒摩擦——既比传统 App 快 5 倍，又比纯聊天直观 10 倍。</strong></div>
-        <div class="page-code">06 / 12</div>
+        <div><span class="takeaway-label">RESOLUTION</span><strong>趋势判断可以错，排期不能等——押一个"无论谁赢都需要"的位置，就是对冲。</strong></div>
+        <div class="page-code">09 / 14</div>
       </div>
     </section>
+
 
     <!-- ==================== SLIDE 7: SUBAGENTS & ASYNC WAKEUP ==================== -->
     <section class="slide" data-title="超越对话：24h 云盯盘与异步业务自动唤醒">
       <div class="ed-topbar">
-        <span><span class="sec-tag">SECTION 03</span> &nbsp;/&nbsp; 传统 App 无法企及的主动服务</span>
+        <span><span class="sec-tag">SECTION 04</span> &nbsp;/&nbsp; 传统 App 无法企及的主动服务</span>
         <span>MULTI-AGENT &amp; ASYNC STATE MACHINE</span>
       </div>
 
@@ -2257,7 +3902,7 @@
 
         <!-- Bottom Band: Async Wakeup vs SMS -->
         <div class="async-band">
-          <div class="async-left" style="justify-content:space-between;">
+          <div class="async-left">
             <div>
               <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--ink-muted);letter-spacing:1.2px;margin-bottom:10px;">OLD FLOW · 传统异步等待痛点</div>
               <h3 style="font-family:var(--font-serif);font-size:26px;margin-bottom:12px;">冷冰冰的短信 ＝ 高流失断点</h3>
@@ -2265,12 +3910,25 @@
                 新股申购、权限开通、场外基金赎回等非实时业务，传统模式只能发一条易被忽略的短信通知——客户忘缴款、找不到二次入口，体验断层且造成客诉。
               </p>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px;padding-top:16px;border-top:1px solid var(--rule);font-size:14px;color:var(--ink-secondary);text-align:center;">
+            <div class="sms-mock">
+              <div class="sm-ic">106</div>
+              <div>
+                <div class="sm-k">短信 · 16:41 · 常被折叠进营销短信堆</div>
+                <div class="sm-t">【XX证券】您申购的新股已中签 500 股，请于今日 16:00 前确保资金账户有足额缴款资金，逾期视为放弃。</div>
+                <span class="sm-tag">无下一步动作 · 需自行回忆入口</span>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--rule);font-size:14px;color:var(--ink-secondary);text-align:center;">
               <div style="background:var(--paper-bright);padding:10px 6px;border:1px solid var(--rule);">01 提交申请</div>
               <div style="background:var(--paper-bright);padding:10px 6px;border:1px solid var(--rule);">02 干等审核</div>
               <div style="background:var(--paper-bright);padding:10px 6px;border:1px solid var(--rule);color:var(--terracotta);font-weight:600;">03 短信漏看</div>
               <div style="background:var(--paper-bright);padding:10px 6px;border:1px solid var(--rule);color:var(--terracotta);font-weight:600;">04 错失缴款</div>
             </div>
+
+            <p style="margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--ink-muted);border-left:2px solid var(--rule);padding-left:12px;">
+              量化一下代价：一次漏看＝一次打新收益归零＋一次客诉工单；而这类“等结果”的业务在券商清单里还有几十项。
+            </p>
           </div>
 
           <div class="async-right">
@@ -2288,20 +3946,31 @@
               </div>
               <div class="async-cta">拉起转账确认单 →</div>
             </div>
+
+            <p style="margin-top:16px;font-size:15px;line-height:1.55;color:#B7B1A7;">
+              关键差异不在“提醒更醒目”，而在<strong style="color:#F4F1EA;">唤醒时上下文已经备齐</strong>：券商侧知道中签哪只、差多少钱、哪张卡够付；宿主侧知道客户此刻在电脑前。两边一对，用户只剩一次确认。
+            </p>
+
+            <div class="state-rail">
+              <div class="sr-cell"><span class="sr-n">S1</span>业务提交，Agent 建立挂起任务</div>
+              <div class="sr-cell"><span class="sr-n">S2</span>柜台状态变更，事件推送到宿主</div>
+              <div class="sr-cell hot"><span class="sr-n">S3</span>补齐上下文，预填确认单递到手边</div>
+              <div class="sr-cell"><span class="sr-n">S4</span>客户确认，回执与留痕自动归档</div>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="ed-footer">
         <div><span class="takeaway-label">SERVICE SHIFT</span><strong>传统 App 是“发消息通知你去干活”，Agent 是“后台一直替你盯着，时机一到把单子备好等你签字”。</strong></div>
-        <div class="page-code">07 / 12</div>
+        <div class="page-code">10 / 14</div>
       </div>
     </section>
 
     <!-- ==================== SLIDE 8: REVENUE IMPACT (MCKINSEY BIG-NUMBERS) ==================== -->
     <section class="slide" data-title="公司业绩引擎：四维核心商业增长">
       <div class="ed-topbar">
-        <span><span class="sec-tag">SECTION 03</span> &nbsp;/&nbsp; 对公司业绩的硬核拉动</span>
+        <span><span class="sec-tag">SECTION 04</span> &nbsp;/&nbsp; 对公司业绩的硬核拉动</span>
         <span>REVENUE &amp; RETENTION IMPACT</span>
       </div>
 
@@ -2346,14 +4015,14 @@
 
       <div class="ed-footer">
         <div><span class="takeaway-label">BOTTOM LINE</span><strong>更快成交（佣金 ↑）＋ 盯盘促活（频次 ↑）＋ 顾问推荐（增值 ↑）＋ 研报记忆锁客（AUM ↑）。</strong></div>
-        <div class="page-code">08 / 12</div>
+        <div class="page-code">11 / 14</div>
       </div>
     </section>
 
     <!-- ==================== SLIDE 9: SECURITY & COMPLIANCE (2x2 CROSSHAIR) ==================== -->
     <section class="slide" data-title="零信任安全与合规防火墙">
       <div class="ed-topbar">
-        <span><span class="sec-tag">SECTION 04</span> &nbsp;/&nbsp; 金融底线与零信任架构</span>
+        <span><span class="sec-tag">SECTION 05</span> &nbsp;/&nbsp; 金融底线与零信任架构</span>
         <span>SECURITY · COMPLIANCE · COST CONTROL</span>
       </div>
 
@@ -2402,196 +4071,144 @@
 
       <div class="ed-footer">
         <div><span class="takeaway-label">COMPETITIVE MOAT</span><strong>持牌合规与带外安全签名不是束缚，而是正规券商碾压一切野生金融 AI 工具的最大护城河。</strong></div>
-        <div class="page-code">09 / 12</div>
+        <div class="page-code">12 / 14</div>
       </div>
     </section>
 
-    <!-- ==================== SLIDE 10: TEAM & WORKFLOW TRANSFORMATION ==================== -->
-    <section class="slide" data-title="部门职能演进：双轨稳进与工作流重构">
+
+
+    <!-- ==================== SLIDE 13: EXECUTION PATH & ORG CAPABILITY ==================== -->
+    <section class="slide tight" data-title="准备怎么做：编制、协作机制、能力建设与考核口径">
       <div class="ed-topbar">
-        <span><span class="sec-tag">SECTION 05</span> &nbsp;/&nbsp; 对【用户增长与平台运营部】的影响</span>
-        <span>DUAL-TRACK REALITY &amp; WORKFLOW SHIFT</span>
+        <span><span class="sec-tag">SECTION 06</span> &nbsp;/&nbsp; 执行路径 · EXECUTION &amp; ORGANIZATION</span>
+        <span>TEAM · MECHANISM · METRICS</span>
       </div>
 
       <div class="ed-header">
-        <h2 class="ed-title">稳守传统 App 基本盘，从“画静态页面”转向<span class="hl">智能服务编排</span></h2>
-        <p class="ed-lead">清醒前提：传统 App 绝不会立刻淘汰（多数用户尚未习惯 AI 助手，且并非人人拥有个人算力），传统工作必须稳健继续；同时启动面向涨乐 Agent 的职能升维。</p>
+        <h2 class="ed-title">准备怎么去做：一支<span class="hl">轻骑兵</span>，一套新考核</h2>
+        <p class="ed-lead">时间表另稿已述。这里只讲四件决定成败的事：谁来做、怎么和后台协作、要建设什么、以及用什么考核它。</p>
       </div>
 
-      <div class="org-spread">
-        <!-- Left 3-Tier Blueprint -->
-        <div class="tier-blueprint">
-          <div class="tier-row t-top">
-            <div>
-              <h4>双轨并进 · 客户端与外部 Harness 分发层</h4>
-              <p>传统 App 稳守广大存量客群 &nbsp;｜&nbsp; 涨乐 Agent 面向先锋客群与真人投顾协同放大</p>
-            </div>
-            <span class="tier-owner" style="color:var(--petrol);">双轮长期并存</span>
+      <div class="exec-top">
+        <div class="exec-card">
+          <div class="ec-num">01 / STAFFING</div>
+          <h3>5–8 人轻骑兵编制</h3>
+          <p>不求人多，求六个角色齐。任一角色缺失，项目就会退化成一个"带对话框的客服页"。</p>
+          <div class="role-list">
+            <div class="role-row"><span class="rn">A</span><span><b>Agent 架构师 ×1</b>：定网关边界、上下文预算与工具体系</span></div>
+            <div class="role-row"><span class="rn">B</span><span><b>后端接口工程师 ×1.5</b>：最熟悉公用接口的人，负责语义化改造</span></div>
+            <div class="role-row"><span class="rn">C</span><span><b>投顾业务 Prompt/Skill 产品 ×1.5</b>：把业务经验写成可执行 SOP</span></div>
+            <div class="role-row"><span class="rn">D</span><span><b>交互设计师 ×1</b>：只为"意图 → 卡片"设计，不为页面设计</span></div>
+            <div class="role-row"><span class="rn">E</span><span><b>安全合规专家 ×1</b>：适当性、留痕、话术审查，拥有否决权</span></div>
+            <div class="role-row"><span class="rn">F</span><span><b>PM ×1</b>：管口径与节奏，抵住"顺手加个功能"的诱惑</span></div>
           </div>
-
-          <div class="tier-connector">▲ &nbsp; 按需渐进式上下文裁剪（严禁一股脑堆砌服务消耗算力与变慢） &nbsp; ▼</div>
-
-          <div class="tier-row t-mid">
-            <div>
-              <h4>涨乐 Agent 编排中枢（用户增长与平台运营部新主阵地）</h4>
-              <p>克制裁剪上下文路由 · 深度挖掘契合业务场景 · 保障传统存量业务调用丝滑闭环</p>
-            </div>
-            <span class="tier-owner" style="color:var(--terracotta);border-color:var(--terracotta);">职能转型核心</span>
+          <div class="rhythm">
+            <div class="rh-row"><span>第 1–2 月</span><span>网关骨架 ＋ 持仓/行情两段语义化，跑通第一个意图闭环</span></div>
+            <div class="rh-row"><span>第 3–4 月</span><span>接入交易与原语执行，评测集覆盖前 20 个高频意图</span></div>
+            <div class="rh-row"><span>第 5 月起</span><span>按业务切片扩面，每个切片带独立回滚点与验收口径</span></div>
           </div>
-
-          <div class="tier-connector">▲ &nbsp; 全面复用现有账号鉴权、AI 涨乐与主站柜台、华泰真人投顾体系 &nbsp; ▼</div>
-
-          <div class="tier-row t-bot">
-            <div>
-              <h4>公司公用后端与优质投资产品底座（释放人力聚焦高价值创新）</h4>
-              <p>告别无止境重复画静态页面，将宝贵力量投入生产真正有价值的华泰投资产品与策略</p>
-            </div>
-            <span class="tier-owner" style="color:var(--ink-muted);">满意度与 ROI 双升</span>
-          </div>
+          <div class="exec-note">与现有 App 团队的关系：<strong>同源中台、双端并列</strong>，不吞并、不接管，共用账号、行情与柜台底座。</div>
         </div>
 
-        <!-- Right Team Capabilities -->
-        <div class="roster-col">
-          <div class="roster-item">
-            <div class="rk">SHIFT 01 / CONTEXT PRUNING</div>
-            <h4>克制编排 · 拒绝一股脑堆服务</h4>
-            <p>华泰服务浩如烟海，全塞过去既耗算力、浪费上下文又慢；前端与架构负责按需分层路由，只挂载当下最准的能力。</p>
+        <div class="exec-card">
+          <div class="ec-num">02 / COLLABORATION</div>
+          <h3>和后台、合规、风控的协作机制</h3>
+          <p>真正的难点从来不是模型，而是把一个为页面而生的接口体系，改造成可被 Agent 理解的语义层。</p>
+          <div class="exec-cap">
+            <div class="cap-item"><b>Agent Gateway 抽象层</b>新增一层语义网关，把数十个碎接口收敛为十来个带描述的工具，页面侧零改动。</div>
+            <div class="cap-item"><b>接口语义化改造排期</b>按季度切片：先持仓与行情，再交易与两融，最后长尾业务；每个切片带独立回滚点。</div>
+            <div class="cap-item"><b>留痕与拦截的责任划分</b>网关负责记录全量调用与参数；合规模块负责适当性硬拦截与话术边界；模型层不承担任何合规判断。</div>
+            <div class="cap-item"><b>风控联动</b>异常调用频率、非本人设备、批量询价等信号回流风控，与现有反欺诈规则同池。</div>
+            <div class="cap-item"><b>数据与行情授权</b>Level-2、研报、指数等授权边界在网关层显式声明，避免模型越权取数。</div>
           </div>
+          <div class="exec-note">一句话原则：<strong>能力可被模型调用，判断绝不能交给模型。</strong></div>
+        </div>
 
-          <div class="roster-item">
-            <div class="rk">SHIFT 02 / SCENARIO MINING</div>
-            <h4>场景挖掘 · 替代传统静态页面设计</h4>
-            <p>从“接需求→画页面→拉通前后端发版”转向挖掘高价值业务触点（如向未报名高收益客推实盘赛、真人投顾方向对表）。</p>
+        <div class="exec-card">
+          <div class="ec-num">03 / CAPABILITY BUILD-OUT</div>
+          <h3>四项必须自建的能力</h3>
+          <p>这四样都不性感，但缺任何一项，线上表现都会变成"时好时坏的玄学"。</p>
+          <div class="exec-cap">
+            <div class="cap-item"><b>意图评测集</b>把真实客户说法整理成回归测试集，测"意图 → 工具调用"的准确率，每次改动必跑。</div>
+            <div class="cap-item"><b>上下文预算看板</b>按场景盯 Token 成本与延迟，把每次对话的钱算到场景粒度，而非月度总账。</div>
+            <div class="cap-item"><b>灰度与回滚</b>能力包按客户分桶上线，任何异常可在十分钟内整体摘除，不必等版本发版。</div>
+            <div class="cap-item"><b>留痕审计</b>每一次建议、每一次确认、每一次拒绝都留档，可复盘、可举证、可对外解释。</div>
+            <div class="cap-item"><b>双周复盘机制</b>把线上失败案例回灌进评测集，形成"越用越准"的闭环，而不是越用越多补丁。</div>
           </div>
+          <div class="exec-note">验收口径：<strong>没有评测集的功能不算做完了，只能算演示过了。</strong></div>
+        </div>
+      </div>
 
-          <div class="roster-item" style="border-bottom:none;padding-bottom:0;">
-            <div class="rk">SHIFT 03 / SMOOTH EXECUTION</div>
-            <h4>闭环保障 · 释放精力打磨好产品</h4>
-            <p>确保传统业务经 Agent 调用顺畅完结；把省下的排期与营销资源投向真正有价值的投资产品，提升满意度与资源利用率。</p>
+      <div class="exec-bottom">
+        <div class="kpi-band">
+          <div class="kb-t">
+            <h3>考核口径必须换：App 看停留，Agent 看完成</h3>
+            <span>NEVER MEASURE AN AGENT BY TIME-ON-SCREEN</span>
           </div>
+          <div class="kpi-grid">
+            <div class="kpi-cell"><span class="old">停留时长</span><span class="new">意图完成率 <em>↑</em></span></div>
+            <div class="kpi-cell"><span class="old">DAU / 打开次数</span><span class="new">交易笔数 <em>↑</em></span></div>
+            <div class="kpi-cell"><span class="old">页面 PV</span><span class="new">条件单渗透率 <em>↑</em></span></div>
+            <div class="kpi-cell"><span class="old">活动曝光量</span><span class="new">增值签约率 <em>↑</em></span></div>
+            <div class="kpi-cell"><span class="old">弹窗点击率</span><span class="new">AUM 留存 <em>↑</em></span></div>
+            <div class="kpi-cell"><span class="old">功能覆盖数</span><span class="new">被宿主调用次数 <em>↑</em></span></div>
+          </div>
+        </div>
+        <div class="org-compare">
+          <div class="oc-h">组织形式对比 · 两条路的终局</div>
+          <div class="oc-opt bad"><b>让 App 团队顺手做</b>排期永远排在版本需求之后；产出必然是一个角落里的客服图标，考核沿用页面口径，越做越鸡肋。</div>
+          <div class="oc-opt good"><b>独立特种小队（推荐）</b>独立口径、独立预算、独立灰度权限；<span>对上直接汇报，对下与 App 团队并列协作。</span></div>
         </div>
       </div>
 
       <div class="ed-footer">
-        <div><span class="takeaway-label">ORG VALUE</span><strong>传统业务稳守当下压舱石，Agent 编排解放重复造页面人力——让华泰聚焦生产真正有价值的投资产品。</strong></div>
-        <div class="page-code">10 / 12</div>
+        <div><span class="takeaway-label">EXECUTION RULE</span><strong>考核什么，就会长成什么。拿停留时长考核 Agent，得到的必然是一个更会黏人的 App。</strong></div>
+        <div class="page-code">13 / 14</div>
       </div>
     </section>
 
-    <!-- ==================== SLIDE 11: 3-PHASE MVP ROADMAP & HUMAN ADVISOR SYNERGY ==================== -->
-    <section class="slide" data-title="人机投顾协同与三阶段演进路线">
-      <div class="ed-topbar">
-        <span><span class="sec-tag">SECTION 06</span> &nbsp;/&nbsp; 虚拟随身投顾 × 华泰真人投顾</span>
-        <span>HUMAN-AI SYNERGY &amp; ROADMAP</span>
-      </div>
-
-      <div class="ed-header">
-        <h2 class="ed-title">人机双打：<span class="hl">与华泰真人投顾深度配合</span>，再破圈外部生态</h2>
-        <p class="ed-lead">虚拟随身投顾不是替代真人投顾，而是实时观察真人投顾方向对表持仓、分担震荡期心理按摩，把专家服务半径放大十倍。</p>
-      </div>
-
-      <div class="road-timeline">
-        <!-- Phase 1 (Featured Dark Block) -->
-        <div class="road-col p1">
-          <div class="rc-meta">
-            <span class="rc-tag" style="color:var(--terracotta);">PHASE 01 · 人机协同</span>
-            <span style="color:#9C968D;">0 ~ 3 MONTHS</span>
-          </div>
-          <h3>联动华泰真人投顾</h3>
-          <p class="rc-lead">围绕“三分投、七分顾”，打造虚拟随身投顾与持牌真人投顾的高效配合样板。</p>
-          <ul class="rc-list" style="color:#EAE5DC;">
-            <li><span style="color:var(--terracotta);">—</span><span><strong>观察投顾方向对表：</strong>订阅签约真人投顾最新策略，自动对比客户持仓偏差并拟跟调卡。</span></li>
-            <li><span style="color:var(--terracotta);">—</span><span><strong>急跌秒级心理按摩：</strong>大跌时秒级同步真人投顾定心丸，筛出高危重仓客转接真人 1v1。</span></li>
-            <li><span style="color:var(--terracotta);">—</span><span><strong>新工作流场景打样：</strong>拿《智投实盘赛》验证克制编排与未报名高手千人千面出卡。</span></li>
-          </ul>
-          <div class="rc-kpi">
-            <strong>阶段目标：</strong>单名华泰真人投顾有效服务半径放大 <strong style="color:var(--terracotta);">5~10×</strong>，投顾跟调执行率与续约率跃升。
-          </div>
-        </div>
-
-        <!-- Phase 2 -->
-        <div class="road-col p2">
-          <div class="rc-meta">
-            <span class="rc-tag" style="color:var(--petrol);">PHASE 02 · C 端破圈</span>
-            <span style="color:var(--ink-muted);">3 ~ 9 MONTHS</span>
-          </div>
-          <h3>新潮股民双栖内测</h3>
-          <p class="rc-lead">将 Phase 1 成熟的内核与交互微卡片，通过邀请码机制开放给活跃年轻客群。</p>
-          <ul class="rc-list" style="color:var(--ink-secondary);">
-            <li><span style="color:var(--petrol);">—</span><span><strong style="color:var(--ink);">App 极客模式：</strong>无广告、无冗余菜单的意图驱动第二桌面。</span></li>
-            <li><span style="color:var(--petrol);">—</span><span><strong style="color:var(--ink);">四大王牌场景：</strong>热点闪电拼单、自然语言云盯盘、盘后复盘、异步唤醒。</span></li>
-            <li><span style="color:var(--petrol);">—</span><span><strong style="color:var(--ink);">权益分级增长：</strong>交易/资产达标解锁多路盯盘席位，形成增长飞轮。</span></li>
-          </ul>
-          <div class="rc-kpi" style="color:var(--ink-secondary);">
-            <strong style="color:var(--ink);">阶段目标：</strong>验证内测客群<strong style="color:var(--petrol);">月均交易笔数、条件单渗透率与次月留存</strong>显著跃升。
-          </div>
-        </div>
-
-        <!-- Phase 3 -->
-        <div class="road-col">
-          <div class="rc-meta">
-            <span class="rc-tag" style="color:var(--ink);">PHASE 03 · 生态卡位</span>
-            <span style="color:var(--ink-muted);">9 ~ 18 MONTHS</span>
-          </div>
-          <h3>上架外部 Harness</h3>
-          <p class="rc-lead">携经过实战检验的合规与安全交易底座，抢占下一代操作系统分发红利。</p>
-          <ul class="rc-list" style="color:var(--ink-secondary);">
-            <li><span style="color:var(--ink);">—</span><span><strong style="color:var(--ink);">标准插件发布：</strong>正式上架主流大模型客户端（Claude / DeepSeek 等）市场。</span></li>
-            <li><span style="color:var(--ink);">—</span><span><strong style="color:var(--ink);">手机 OS 挂载：</strong>抢先接入主流手机厂商原生系统级智能体生态。</span></li>
-            <li><span style="color:var(--ink);">—</span><span><strong style="color:var(--ink);">首选通道确立：</strong>成为客户跨平台调用金融服务的默认官方券商 Agent。</span></li>
-          </ul>
-          <div class="rc-kpi" style="color:var(--ink-secondary);">
-            <strong style="color:var(--ink);">终局愿景：</strong>完成从单一 App 渠道向<strong style="color:var(--ink);">全域 Agent 生态分发</strong>的平滑代际跨越。
-          </div>
-        </div>
-      </div>
-
-      <div class="ed-footer">
-        <div><span class="takeaway-label">RISK-ADJUSTED PATH</span><strong>一步拿投顾实效，二步拿 C 端佣金与活跃，三步锁未来五年入口红利——小步快跑，步步有产出。</strong></div>
-        <div class="page-code">11 / 12</div>
-      </div>
-    </section>
 
     <!-- ==================== SLIDE 12: DARK EDITORIAL CLOSING ==================== -->
-    <section class="slide dark" data-title="结语与即刻行动计划">
+    <section class="slide dark" data-title="结语：把概念变成共识，把共识变成排期">
       <div class="ed-topbar">
-        <span><span class="sec-tag">NEXT STEPS</span> &nbsp;/&nbsp; 即刻启动内部创业</span>
-        <span>12 / 12</span>
+        <span><span class="sec-tag">CLOSING</span> &nbsp;/&nbsp; 认知补充篇到此收束</span>
+        <span>COGNITION → CONSENSUS → SHIP</span>
       </div>
 
       <div class="close-layout">
-        <div class="cover-kicker" style="margin-bottom:14px;">THE 3–10 YEAR STRATEGIC HORIZON · 站在变革前夕</div>
+        <div class="cover-kicker" style="margin-bottom:14px;">WHAT THIS BRIEF WAS FOR · 提案的真正用途</div>
         <h2 class="close-statement">
-          未来三到十年最重大的业务变化已在眼前，<br/>
-          <em>早做准备，才不会在变革到来时陷入被动。</em>
+          概念讲清了，共识才成立；<br/>
+          <em>共识成立了，排期才推得动。</em>
         </h2>
         <p class="close-sub">
-          传统 App 仍将继续稳健服务存量客群，但新一代 AI 底座的卡位窗口不会等人。<br/>
-          就从现在开始，双轨稳进、重构服务编排能力，让华泰牢牢掌握下一代财富管理主动权。
+          这份提案不重复"要做什么"，只补齐三样东西：一套全公司通用的词汇表，
+          一份对外部世界的判断，以及一套照着就能开工的组织与考核设计。<br/>
+          剩下的事，交给真刀真枪的试点去验证。
         </p>
 
         <div class="next-grid">
           <div class="next-col">
-            <div class="nw">WEEK 01 · 接口盘点</div>
-            <h4>锁定首批复用接口</h4>
-            <p>盘点公用后端现成的账号登录、客户持仓、实时行情与异步审批查询接口，确认零改造接入路径。</p>
+            <div class="nw">01 / 统一词汇</div>
+            <h4>先让全公司说同一种话</h4>
+            <p>Harness、MCP、B2A、AEO 不再靠个人理解，20 个词条写进同一页——沟通成本是这类项目最大的一笔隐性开销。</p>
           </div>
           <div class="next-col">
-            <div class="nw">WEEK 02–04 · 原型构建</div>
-            <h4>跑通投顾 MVP 闭环</h4>
-            <p>前端自建轻量 Node 语义中间层，联合业务设计交付“持仓异动雷达 ＋ 增值触达卡片”可交互原型。</p>
+            <div class="nw">02 / 外部判断</div>
+            <h4>看清谁在造 OS、谁在抢入口</h4>
+            <p>模型层与宿主层都打不赢，垂直能力包才是我们的战场；跨宿主中立、不做独家绑定，是这份判断的直接推论。</p>
           </div>
           <div class="next-col">
-            <div class="nw">MONTH 02 · 真实试点</div>
-            <h4>10~20 位头部投顾上线</h4>
-            <p>真实嵌入一线展业工作流，采集投顾服务半径与增值线索转化增量数据，撬动二期 C 端放量。</p>
+            <div class="nw">03 / 内部准备</div>
+            <h4>编制、机制、能力、口径四件事</h4>
+            <p>5–8 人轻骑兵独立成建制，Agent Gateway 做厚中台，意图评测集与留痕审计做底座，考核从停留时长换成意图完成率。</p>
           </div>
         </div>
       </div>
 
       <div class="ed-footer" style="border-top-color:rgba(244,241,234,0.16);color:#9C968D;">
         <div><strong style="color:#F4F1EA;">THANK YOU</strong> &nbsp;·&nbsp; 欢迎探讨与指正 &nbsp;·&nbsp; 用户增长与平台运营部</div>
-        <div class="page-code" style="color:#9C968D;">END · 12 / 12</div>
+        <div class="page-code" style="color:#9C968D;">END · 14 / 14</div>
       </div>
     </section>
 
@@ -2601,7 +4218,7 @@
 <!-- Minimalist Presenter HUD -->
 <div id="hud">
   <button id="btn-prev">← 上一页</button>
-  <span id="hud-counter">01 / 12</span>
+  <span id="hud-counter">01 / 14</span>
   <button id="btn-next">下一页 →</button>
   <button id="btn-overview">目录 (O)</button>
   <button id="btn-fs">全屏 (F)</button>
