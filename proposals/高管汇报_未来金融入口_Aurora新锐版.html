@@ -373,9 +373,12 @@ svg.wires { position: absolute; inset: 0; overflow: visible; pointer-events: non
    P06 人机协同
    ===================================================================== */
 /* 标题下小标题：把「分工」从左侧卡片里提出来，成为全页命题的注解 */
-.s6-sub { display: flex; align-items: center; gap: 12px; margin-top: 16px; font-size: 18px; color: var(--fg2); }
-.s6-sub b { font-weight: 600; color: var(--fg); }
-.s6-sub .sb-sep { color: var(--amber); font-family: var(--mono); font-size: 13px; letter-spacing: .12em; padding-right: 4px; border-right: 1px solid rgba(255,181,71,.3); }
+.s6-sub { display: flex; align-items: center; gap: 18px; margin-top: 16px; font-size: 18px; color: var(--fg2); }
+.s6-sub .sb-grp { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.s6-sub .sb-sep { font-weight: 600; }
+.s6-sub .sb-grp.amber .sb-sep { color: var(--amber); }
+.s6-sub .sb-grp.violet .sb-sep { color: #BFAEFF; }
+.s6-sub .sb-div { width: 1px; height: 17px; background: rgba(255,255,255,.16); }
 .s6-sub .sb-dot { color: var(--fg4); }
 .s6-stage { position: relative; margin-top: 20px; height: 672px; }
 .s6-left { position: absolute; left: 0; top: 0; width: 500px; height: 100%; display: flex; flex-direction: column; gap: 12px; }
@@ -828,10 +831,19 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
       <div class="eyebrow fx" data-t="0"><span class="num">06</span><span class="dash"></span><span class="zh">虚拟随身投顾 × 华泰真人投顾（三分投、七分顾）</span></div>
       <h2 class="h h-md" data-t="0.1"><span class="ln"><span>不是替代真人投顾，而是把专家服务半径<span class="g">放大十倍</span>。</span></span></h2>
       <div class="s6-sub fx" data-t="0.35">
-        <span class="sb-sep">真人投顾侧</span>
-        <span><b>定策略方向</b></span><span class="sb-dot">·</span>
-        <span><b>给信任温度</b></span><span class="sb-dot">·</span>
-        <span><b>1v1 攻坚大客</b></span>
+        <span class="sb-grp amber">
+          <span class="sb-sep">真人投顾</span>
+          <span>定策略方向</span><span class="sb-dot">·</span>
+          <span>给信任温度</span><span class="sb-dot">·</span>
+          <span>1v1 攻坚大客</span>
+        </span>
+        <span class="sb-div"></span>
+        <span class="sb-grp violet">
+          <span class="sb-sep">随身 Agent</span>
+          <span>盯投顾观点</span><span class="sb-dot">·</span>
+          <span>对表实盘持仓</span><span class="sb-dot">·</span>
+          <span>秒级触达</span>
+        </span>
       </div>
 
       <div class="s6-stage">
