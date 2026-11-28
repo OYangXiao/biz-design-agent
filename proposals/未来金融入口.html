@@ -1062,18 +1062,7 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
   </div>
 </div>
 
-<div id="hud-tip">单击 / → 下一页　·　右键 / ← 上一页　·　P 暂停　·　R 重播　·　F 全屏</div>
-<div id="hud">
-  <button id="btn-prev" title="上一页 (←)">‹</button>
-  <span id="hud-counter">1 / 10</span>
-  <button id="btn-next" title="下一页 (→ / 单击)">›</button>
-  <span class="sep"></span>
-  <span id="hud-status">—</span>
-  <button id="btn-pause" title="暂停 / 继续 (P)">⏸</button>
-  <button id="btn-replay" title="重播本页动画 (R)">↻</button>
-  <span class="sep"></span>
-  <button id="btn-fs" title="全屏 (F)">⛶</button>
-</div>
+<!-- 控制栏已移除：支持单击/→ 下一页、右键/← 上一页、P 暂停、R 重播、F 全屏 -->
 
 <script>
 (() => {
@@ -1184,11 +1173,11 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
     setAurora(next);
     $('pg-cur').textContent = String(idx + 1).padStart(2, '0');
     $('chapter').textContent = next.dataset.title || '';
-    $('hud-counter').textContent = `${idx + 1} / ${N}`;
+    if ($('hud-counter')) $('hud-counter').textContent = `${idx + 1} / ${N}`;
     Array.from(segs.children).forEach((el, i) => { el.classList.toggle('on', i < idx); el.classList.toggle('cur', i === idx); });
-    $('btn-prev').disabled = idx === 0;
-    $('btn-next').disabled = idx === N - 1;
-    $('btn-pause').disabled = $('btn-replay').disabled = !next._animated;
+    if ($('btn-prev')) $('btn-prev').disabled = idx === 0;
+    if ($('btn-next')) $('btn-next').disabled = idx === N - 1;
+    if ($('btn-pause') && $('btn-replay')) $('btn-pause').disabled = $('btn-replay').disabled = !next._animated;
     updatePause();
   }
 
@@ -1205,7 +1194,7 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
     const s = slides[current];
     hardSet(s, -1); paused = false; startAt = performance.now(); updatePause();
   }
-  function updatePause() { $('btn-pause').textContent = paused ? '▶' : '⏸'; }
+  function updatePause() { if ($('btn-pause')) $('btn-pause').textContent = paused ? '▶' : '⏸'; }
 
   function tick() {
     if (!deterministic) {
@@ -1213,10 +1202,12 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
       const t = curT();
       apply(s, t);
       const st = $('hud-status');
-      if (!s._animated) st.textContent = '静态页';
-      else if (paused) st.textContent = '已暂停';
-      else if (t < s._end) st.textContent = `演绎中 ${Math.min(99, Math.floor((t / s._end) * 100))}%`;
-      else st.textContent = '完整画面 · R 重播';
+      if (st) {
+        if (!s._animated) st.textContent = '静态页';
+        else if (paused) st.textContent = '已暂停';
+        else if (t < s._end) st.textContent = `演绎中 ${Math.min(99, Math.floor((t / s._end) * 100))}%`;
+        else st.textContent = '完整画面 · R 重播';
+      }
     }
     requestAnimationFrame(tick);
   }
@@ -1227,7 +1218,7 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
   window.togglePauseAnim = togglePause;
   window.restartSlideAnim = replay;
 
-  /* ---------- 交互：点击 / 右键 / 键盘 / HUD ---------- */
+  /* ---------- 交互：点击 / 右键 / 键盘 ---------- */
   viewport.addEventListener('click', (e) => {
     if (e.target.closest('button, a, [data-nonav]')) return;
     if (window.getSelection && String(window.getSelection())) return;
@@ -1235,12 +1226,12 @@ body.export-mode #hud, body.export-mode #hud-tip, body.export-mode .spot { displ
   });
   viewport.addEventListener('contextmenu', (e) => { e.preventDefault(); prev(); });
 
-  $('btn-prev').addEventListener('click', prev);
-  $('btn-next').addEventListener('click', next);
-  $('btn-pause').addEventListener('click', togglePause);
-  $('btn-replay').addEventListener('click', replay);
+  if ($('btn-prev')) $('btn-prev').addEventListener('click', prev);
+  if ($('btn-next')) $('btn-next').addEventListener('click', next);
+  if ($('btn-pause')) $('btn-pause').addEventListener('click', togglePause);
+  if ($('btn-replay')) $('btn-replay').addEventListener('click', replay);
   const toggleFs = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
-  $('btn-fs').addEventListener('click', toggleFs);
+  if ($('btn-fs')) $('btn-fs').addEventListener('click', toggleFs);
 
   addEventListener('keydown', (e) => {
     const k = e.key;

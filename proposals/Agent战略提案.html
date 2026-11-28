@@ -4217,15 +4217,6 @@
   </div>
 </div>
 
-<!-- Minimalist Presenter HUD -->
-<div id="hud">
-  <button id="btn-prev">← 上一页</button>
-  <span id="hud-counter">01 / 14</span>
-  <button id="btn-next">下一页 →</button>
-  <button id="btn-overview">目录 (O)</button>
-  <button id="btn-fs">全屏 (F)</button>
-</div>
-
 <!-- Overview Modal -->
 <div id="overview">
   <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -4257,8 +4248,8 @@
   function renderSlide(idx) {
     current = Math.max(0, Math.min(slides.length - 1, idx));
     slides.forEach((s, i) => s.classList.toggle('active', i === current));
-    counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
-    progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
+    if (counter) counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+    if (progressBar) progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
     Array.from(ovGrid.children).forEach((el, i) => el.classList.toggle('current', i === current));
   }
 
@@ -4270,11 +4261,25 @@
     ovGrid.appendChild(item);
   });
 
-  document.getElementById('btn-prev').addEventListener('click', () => renderSlide(current - 1));
-  document.getElementById('btn-next').addEventListener('click', () => renderSlide(current + 1));
-  document.getElementById('btn-overview').addEventListener('click', () => overview.classList.toggle('open'));
+  document.getElementById('viewport').addEventListener('click', (e) => {
+    if (overview.classList.contains('open')) return;
+    if (e.target.closest('button, a')) return;
+    renderSlide(current + 1);
+  });
+  document.getElementById('viewport').addEventListener('contextmenu', (e) => {
+    if (overview.classList.contains('open')) return;
+    e.preventDefault();
+    renderSlide(current - 1);
+  });
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const btnOv = document.getElementById('btn-overview');
+  const btnFs = document.getElementById('btn-fs');
+  if (btnPrev) btnPrev.addEventListener('click', () => renderSlide(current - 1));
+  if (btnNext) btnNext.addEventListener('click', () => renderSlide(current + 1));
+  if (btnOv) btnOv.addEventListener('click', () => overview.classList.toggle('open'));
   document.getElementById('btn-close-ov').addEventListener('click', () => overview.classList.remove('open'));
-  document.getElementById('btn-fs').addEventListener('click', () => {
+  if (btnFs) btnFs.addEventListener('click', () => {
     if (!document.fullscreenElement) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
   });
